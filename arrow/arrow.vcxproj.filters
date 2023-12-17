@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="资源文件\assets">
+      <UniqueIdentifier>{4ba466dc-6314-4ba1-b094-e4ff332dae52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader">
+      <UniqueIdentifier>{0a665431-9e19-4d5a-8542-5c30450af13b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader\box">
+      <UniqueIdentifier>{d7978d50-3199-46ec-9857-16b66a993909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader\default">
+      <UniqueIdentifier>{cfeaf83c-9c36-46e8-8adf-41795353ffd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader\diffuse">
+      <UniqueIdentifier>{ae590ed9-a5da-4340-81ec-18fa0eb82f44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader\normal">
+      <UniqueIdentifier>{f8debf80-a4c2-44de-a4e9-b62f66941476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader\pbr">
+      <UniqueIdentifier>{b161daba-951b-4cd6-93b5-f98353549ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\shader\skybox">
+      <UniqueIdentifier>{7394a13a-bf2a-4872-baa5-19f1180236e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\assets\skybox_zjg">
+      <UniqueIdentifier>{ecc398d8-5fb3-4ced-aa4b-1e4e6530b0fa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resource\assets\skybox_zjg\back.jpg">
+      <Filter>资源文件\assets\skybox_zjg</Filter>
+    </Image>
+    <Image Include="resource\assets\skybox_zjg\bottom.jpg">
+      <Filter>资源文件\assets\skybox_zjg</Filter>
+    </Image>
+    <Image Include="resource\assets\skybox_zjg\front.jpg">
+      <Filter>资源文件\assets\skybox_zjg</Filter>
+    </Image>
+    <Image Include="resource\assets\skybox_zjg\left.jpg">
+      <Filter>资源文件\assets\skybox_zjg</Filter>
+    </Image>
+    <Image Include="resource\assets\skybox_zjg\right.jpg">
+      <Filter>资源文件\assets\skybox_zjg</Filter>
+    </Image>
+    <Image Include="resource\assets\skybox_zjg\top.jpg">
+      <Filter>资源文件\assets\skybox_zjg</Filter>
+    </Image>
+    <Image Include="resource\assets\earth.jpg">
+      <Filter>资源文件\assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resource\shader\box\fs.glsl">
+      <Filter>资源文件\shader\box</Filter>
+    </None>
+    <None Include="resource\shader\box\vs.glsl">
+      <Filter>资源文件\shader\box</Filter>
+    </None>
+    <None Include="resource\shader\default\fs.glsl">
+      <Filter>资源文件\shader\default</Filter>
+    </None>
+    <None Include="resource\shader\default\vs.glsl">
+      <Filter>资源文件\shader\default</Filter>
+    </None>
+    <None Include="resource\shader\diffuse\fs.glsl">
+      <Filter>资源文件\shader\diffuse</Filter>
+    </None>
+    <None Include="resource\shader\diffuse\vs.glsl">
+      <Filter>资源文件\shader\diffuse</Filter>
+    </None>
+    <None Include="resource\shader\skybox\fs.glsl">
+      <Filter>资源文件\shader\skybox</Filter>
+    </None>
+    <None Include="resource\shader\skybox\vs.glsl">
+      <Filter>资源文件\shader\skybox</Filter>
+    </None>
+    <None Include="resource\shader\pbr\fs.glsl">
+      <Filter>资源文件\shader\pbr</Filter>
+    </None>
+    <None Include="resource\shader\pbr\vs.glsl">
+      <Filter>资源文件\shader\pbr</Filter>
+    </None>
+    <None Include="resource\shader\normal\fs.glsl">
+      <Filter>资源文件\shader\normal</Filter>
+    </None>
+    <None Include="resource\shader\normal\gs.glsl">
+      <Filter>资源文件\shader\normal</Filter>
+    </None>
+    <None Include="resource\shader\normal\vs.glsl">
+      <Filter>资源文件\shader\normal</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\glad.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shape.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texturemgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\control.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\box.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\camera.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\light.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\object.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\objLoader.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shape.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\texturemgr.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\defs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\control.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\player.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
