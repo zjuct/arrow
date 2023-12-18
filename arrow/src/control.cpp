@@ -1,4 +1,7 @@
 #include <control.h>
+#include <texturemgr.hpp>
+
+#include <iostream>
 
 static Control* control = Control::getInstance();
 
@@ -49,6 +52,7 @@ void Control::init() {
 	// 初始化视口
 	glViewport(0, 0, control->wwidth, control->wheight);
 
+	player.init("resource/assets/player/player.obj");
 }
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods) {
@@ -114,20 +118,29 @@ void Control::handleKeyInput(int key, int action) {
 	if (action == GLFW_PRESS) {
 		switch (key) {
 		case GLFW_KEY_W:
+			player.setState(Player::PLAYER_RUN);
 			camera.ProcessKeyboard(FORWARD, dt);
 			break;
 		case GLFW_KEY_A:
+			player.setState(Player::PLAYER_RUN);
 			camera.ProcessKeyboard(LEFT, dt);
 			break;
 		case GLFW_KEY_S:
+			player.setState(Player::PLAYER_RUN);
 			camera.ProcessKeyboard(RIGHT, dt);
 			break;
 		case GLFW_KEY_D:
+			player.setState(Player::PLAYER_RUN);
 			camera.ProcessKeyboard(BACKWARD, dt);
 			break;
 		}
 	}
 	else if (action == GLFW_RELEASE) {
+		switch (key) {
+		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
+			player.setState(Player::PLAYER_STILL);
+			break;
+		}
 	}
 }
 

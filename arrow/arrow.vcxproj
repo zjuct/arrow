@@ -46,6 +46,7 @@
     <ClCompile Include="src\control.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\material.cpp" />
     <ClCompile Include="src\objLoader.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\shader.cpp" />

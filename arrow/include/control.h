@@ -11,8 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <camera.hpp>
-
-#include <iostream>
+#include <player.h>
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods);
 void mouseMoveCB(GLFWwindow* window, double xpos, double ypos);
@@ -35,12 +34,10 @@ public:
 	// 相机
 	Camera camera;
 
-// 玩家(跟Player中保持同步)
-	glm::vec3 eyePos = glm::vec3(0.0f, 1.0f, 0.0f);
-	float bodyRadians = 0.0f;
-	float eyeRadians = 0.0f;
+	// 玩家(跟Player中保持同步)
+	Player player;
 
-// 窗口
+	// 窗口
 	GLFWwindow* window = nullptr;
 	float lastX = 0.0f;
 	float lastY = 0.0f;
@@ -58,8 +55,6 @@ private:
 	Control();
 	Control(const Control&) = delete;
 	Control& operator = (const Control&) = delete;
-
-	
 };
 
 #endif
