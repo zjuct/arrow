@@ -2,10 +2,8 @@
 out vec4 FragColor;
 
 struct Material {
-    sampler2D diffuse_map;
+    sampler2D diffuse;
     bool has_diffuse_map;
-
-    vec3 diffuse;
 };
 
 in vec3 FragPos;
@@ -15,5 +13,5 @@ in vec2 TexCoords;
 uniform Material material;
 
 void main() {
-    FragColor = texture(material.diffuse_map, TexCoords);
+    FragColor = texture(material.diffuse, TexCoords);
 }

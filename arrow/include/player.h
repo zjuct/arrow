@@ -35,7 +35,7 @@ private:
 	Object larm, rarm;
 	Object lleg, rleg;
 
-	float omega = 0.5f;		// 角速度
+	float omega = 1.0f;		// 角速度
 	float theta = 0.0f;		// 手臂和腿转动
 };
 

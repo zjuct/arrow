@@ -29,6 +29,7 @@ public:
 	void handleMouseMove(double xposIn, double yposIn);
 	void handleKeyInput(int key, int action);
 	void handleScroll(double xoffset, double yoffset);
+	void pollKeyPress();
 
 
 	// Па»ъ
