@@ -30,4 +30,6 @@ target_link_libraries(arrow
     PUBLIC ${A}
 )
 
+set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
 
