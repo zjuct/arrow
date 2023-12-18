@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 build/
 arrow/arrow.exe
+
+!resource/assets/player2/player.obj
