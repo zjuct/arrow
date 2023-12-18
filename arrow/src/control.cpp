@@ -52,7 +52,11 @@ void Control::init() {
 	// 初始化视口
 	glViewport(0, 0, control->wwidth, control->wheight);
 
-	player.init("resource/assets/player/player.obj");
+	Shader::initShader();
+
+	camera = Camera(glm::vec3(0.465571f, 0.96744f, 2.21652f));
+
+	player.init("resource/assets/player2/player.obj");
 }
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods) {
@@ -114,28 +118,33 @@ void Control::handleMouseMove(double xposIn, double yposIn) {
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-void Control::handleKeyInput(int key, int action) {
-	if (action == GLFW_PRESS) {
-		switch (key) {
-		case GLFW_KEY_W:
-			player.setState(Player::PLAYER_RUN);
-			camera.ProcessKeyboard(FORWARD, dt);
-			break;
-		case GLFW_KEY_A:
-			player.setState(Player::PLAYER_RUN);
-			camera.ProcessKeyboard(LEFT, dt);
-			break;
-		case GLFW_KEY_S:
-			player.setState(Player::PLAYER_RUN);
-			camera.ProcessKeyboard(RIGHT, dt);
-			break;
-		case GLFW_KEY_D:
-			player.setState(Player::PLAYER_RUN);
-			camera.ProcessKeyboard(BACKWARD, dt);
-			break;
-		}
+void Control::pollKeyPress() {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		camera.ProcessKeyboard(FORWARD, dt);
+		player.setState(Player::PLAYER_RUN);
 	}
-	else if (action == GLFW_RELEASE) {
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		camera.ProcessKeyboard(BACKWARD, dt);
+		player.setState(Player::PLAYER_RUN);
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		camera.ProcessKeyboard(LEFT, dt);
+		player.setState(Player::PLAYER_RUN);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		camera.ProcessKeyboard(RIGHT, dt);
+		player.setState(Player::PLAYER_RUN);
+	}
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		camera.ProcessKeyboard(DOWN, dt);
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+		camera.ProcessKeyboard(UP, dt);
+}
+
+void Control::handleKeyInput(int key, int action) {
+	if (action == GLFW_RELEASE) {
 		switch (key) {
 		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
 			player.setState(Player::PLAYER_STILL);
