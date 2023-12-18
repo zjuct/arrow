@@ -61,32 +61,30 @@ public:
     void update(float dt);
     void updateModel();
     void fire(glm::vec3 pos, glm::vec3 dir, float scale, float speed);
-    void stop();
-    void disappear();
+    // void stop();
+    // void disappear();
 
     
 };
 
-static ArrowManager* instance = nullptr;
+
 
 class ArrowManager {
 public:
-    static ArrowManager* getInstance() {
-        if (instance == nullptr) {
-            instance = new ArrowManager();
-        }
-        return instance;
-    }
+    static ArrowManager* getInstance();
 
-    void init();
-    void draw();
-    void update(float dt);
-    void fire(glm::vec3 pos, glm::vec3 dir, float scale, float speed);
-    void stop();
-    void disappear();
+    ArrowManager(){}
+    ~ArrowManager(){}
+
+    void init(const char* objfile);
+    // void draw();
+    // void update(float dt);
+    // void fire(glm::vec3 pos, glm::vec3 dir, float scale, float speed);
+    // void stop();
+    // void disappear();
 
     std::vector<Arrow> arrows;
-}
+};
 
 
 #endif

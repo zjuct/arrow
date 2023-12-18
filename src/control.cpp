@@ -60,7 +60,7 @@ void Control::init() {
 	player.init("resource/assets/player2/player.obj");
 
 	// 箭测试
-	arrow.init("resource/assets/player2/player.obj");
+	arrowMgr.init("resource/assets/player2/player.obj");
 
 }
 

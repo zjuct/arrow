@@ -42,7 +42,7 @@ public:
 	Player player;
 
 	// 箭
-	Arrow arrows;
+	ArrowManager arrowMgr;
 
 
 	// 窗口

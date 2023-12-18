@@ -1,8 +1,9 @@
 #include "arrow.hpp"
 #include "defs.h"
+#include "control.h"
 
-static Control* control = Control::getInstance();
-static ArrowManager* arrowMgr = ArrowManager::getInstance();
+static Control *control = Control::getInstance();
+static ArrowManager *arrowMgr = ArrowManager::getInstance();
 
 void Arrow::init(const char *objfile)
 {
@@ -41,7 +42,6 @@ void Arrow::update(float dt)
         glm::vec3 delta = dir * speed + g * dt * weight / WIND_RESISTANCE;
         pos += delta;
         dir = glm::normalize(delta);
-
     }
 }
 
@@ -58,5 +58,16 @@ void Arrow::updateModel()
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, pos);
     model = glm::scale(model, glm::vec3(scale, scale, scale));
+}
+
+static ArrowManager *instance = nullptr;
+ArrowManager *ArrowManager::getInstance()
+{
+    static ArrowManager instance;
+    return &instance;
+}
+
+void ArrowManager::init(const char *objfile)
+{
     
 }

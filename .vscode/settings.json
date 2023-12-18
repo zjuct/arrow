@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "E:/WorkSpace/arrow",
+    "cmake.sourceDirectory": "D:/dmh/books/cg/arrow",
     "files.associations": {
         "*.asm": "assembly",
         "*.S": "platformio-debug.asm",
