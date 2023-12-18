@@ -30,9 +30,9 @@ void material_t::configShader(Shader* shader) {
         if (tex < 0) {
             std::cerr << "[ERROR] No texture." << std::endl;
         }
-        shader->setInt("material.diffuse", 0);      // °ó¶¨µ½0ºÅÎÆÀíµ¥Ôª
+        shader->setInt("material.diffuse", 0);      // ç»‘å®šåˆ°0å·çº¹ç†å•å…ƒ
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex);      // ½«ÎÆÀíÊý¾Ý°ó¶¨µ½ÎÆÀíµ¥Ôª
+        glBindTexture(GL_TEXTURE_2D, tex);      // å°†çº¹ç†æ•°æ®ç»‘å®šåˆ°çº¹ç†å•å…ƒ
     }
     if (!specular_texname.empty()) {
         int tex = TextureMgr::getInstance()->gettex(specular_texname, TEX_2D);
@@ -50,7 +50,7 @@ void material_t::configShader(Shader* shader) {
         }
         shader->setInt("material.albedo_map", 2);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tex);      // ½«ÎÆÀíÊý¾Ý°ó¶¨µ½ÎÆÀíµ¥Ôª
+        glBindTexture(GL_TEXTURE_2D, tex);      // å°†çº¹ç†æ•°æ®ç»‘å®šåˆ°çº¹ç†å•å…ƒ
     }
     shader->setBool("material.has_diffuse_map", !diffuse_texname.empty());
     shader->setBool("material.has_specular_map", !specular_texname.empty());

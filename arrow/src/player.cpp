@@ -20,7 +20,7 @@ Player::~Player() {
 void Player::init(const char* objfile) {
 	obj = Scene::LoadObj(objfile);
 	std::vector<Mesh>& meshes = obj->getMesh();
-	// .objÖÐ¶¨ÒåµÄË³Ðò±ØÐëÎªbody, head, larm, lleg, rarm, rleg
+	// .objä¸­å®šä¹‰çš„é¡ºåºå¿…é¡»ä¸ºbody, head, larm, lleg, rarm, rleg
 	body = Object(OBJECT_MESH, &meshes[0], player_shader);
 	head = Object(OBJECT_MESH, &meshes[1], player_shader);
 	larm = Object(OBJECT_MESH, &meshes[2], player_shader);
@@ -60,27 +60,27 @@ void Player::update(float dt) {
 }
 
 void Player::updateModel() {
-	// head: ÊÀ½ç×ø±êÆ½ÒÆ * ¾Ö²¿×ø±êÆ½ÒÆ * ÕûÌåÄ£ÐÍ×ª¶¯ * Í·¸©Ñö½Ç×ª¶¯
+	// head: ä¸–ç•Œåæ ‡å¹³ç§» * å±€éƒ¨åæ ‡å¹³ç§» * æ•´ä½“æ¨¡åž‹è½¬åŠ¨ * å¤´ä¿¯ä»°è§’è½¬åŠ¨
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// ¸Ä³ÉheadµÄ¾Ö²¿×ø±ê
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// æ”¹æˆheadçš„å±€éƒ¨åæ ‡
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	//model = glm::rotate(model, control->camera.Pitch, glm::vec3(0.0f, 0.0f, 1.0f));
 	head.setModel(model);
 	head.setModel_noscale(model);
 
-	// body: ÊÀ½ç×ø±êÆ½ÒÆ * ¾Ö²¿×ø±êÆ½ÒÆ * ÕûÌåÄ£ÐÍ×ª¶¯
+	// body: ä¸–ç•Œåæ ‡å¹³ç§» * å±€éƒ¨åæ ‡å¹³ç§» * æ•´ä½“æ¨¡åž‹è½¬åŠ¨
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// ¸Ä³ÉbodyµÄ¾Ö²¿×ø±ê
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// æ”¹æˆbodyçš„å±€éƒ¨åæ ‡
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	body.setModel(model);
 	body.setModel_noscale(model);
 
-	// larm, rarm, lleg, rleg: ÊÀ½ç×ø±êÆ½ÒÆ * ¾Ö²¿×ø±êÆ½ÒÆ * ÕûÌåÄ£ÐÍ×ª¶¯ * ÊÖ±Û/ÍÈ²¿×ª¶¯
+	// larm, rarm, lleg, rleg: ä¸–ç•Œåæ ‡å¹³ç§» * å±€éƒ¨åæ ‡å¹³ç§» * æ•´ä½“æ¨¡åž‹è½¬åŠ¨ * æ‰‹è‡‚/è…¿éƒ¨è½¬åŠ¨
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// ¸Ä³ÉlarmµÄ¾Ö²¿×ø±ê
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// æ”¹æˆlarmçš„å±€éƒ¨åæ ‡
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	larm.setModel(model);
@@ -88,7 +88,7 @@ void Player::updateModel() {
 	
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// ¸Ä³ÉrarmµÄ¾Ö²¿×ø±ê
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// æ”¹æˆrarmçš„å±€éƒ¨åæ ‡
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	rarm.setModel(model);
@@ -96,7 +96,7 @@ void Player::updateModel() {
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// ¸Ä³ÉllegµÄ¾Ö²¿×ø±ê
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// æ”¹æˆllegçš„å±€éƒ¨åæ ‡
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	lleg.setModel(model);
@@ -104,7 +104,7 @@ void Player::updateModel() {
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// ¸Ä³ÉrlegµÄ¾Ö²¿×ø±ê
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// æ”¹æˆrlegçš„å±€éƒ¨åæ ‡
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	rleg.setModel(model);

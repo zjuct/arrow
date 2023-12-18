@@ -2,7 +2,7 @@
 #define _CONTROL_H
 
 /**
-* ´¦ÀíÓÃ»§ÊäÈë£¬¿ØÖÆÏà»úÒÆ¶¯ºÍ³¡¾°¸üĞÂ
+* å¤„ç†ç”¨æˆ·è¾“å…¥ï¼Œæ§åˆ¶ç›¸æœºç§»åŠ¨å’Œåœºæ™¯æ›´æ–°
 */ 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -21,7 +21,7 @@ void fbSizeCB(GLFWwindow* window, int width, int height);
 
 class Control {
 public:
-	// µ¥ÀıÄ£Ê½
+	// å•ä¾‹æ¨¡å¼
 	static Control* getInstance();
 	void init();
 
@@ -32,19 +32,19 @@ public:
 	void pollKeyPress();
 
 
-	// Ïà»ú
+	// ç›¸æœº
 	Camera camera;
 
-	// Íæ¼Ò(¸úPlayerÖĞ±£³ÖÍ¬²½)
+	// ç©å®¶(è·ŸPlayerä¸­ä¿æŒåŒæ­¥)
 	Player player;
 
-	// ´°¿Ú
+	// çª—å£
 	GLFWwindow* window = nullptr;
 	float lastX = 0.0f;
 	float lastY = 0.0f;
 	bool firstMouse = true;
-	double dt = 0.0;		// ¼ä¸ôÊ±¼ä
-	double oldTime = 0.0;	// ÉÏ´Î¸üĞÂÊ±¼ä
+	double dt = 0.0;		// é—´éš”æ—¶é—´
+	double oldTime = 0.0;	// ä¸Šæ¬¡æ›´æ–°æ—¶é—´
 	int wwidth = 800;
 	int wheight = 600;
 

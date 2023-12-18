@@ -28,15 +28,15 @@ public:
 private:
 	void updateModel();
 
-	Scene* obj;			// 用于析构
+	Scene* obj;			// 鐢ㄤ簬鏋愭瀯
 
 	Object head;
 	Object body;
 	Object larm, rarm;
 	Object lleg, rleg;
 
-	float omega = 1.0f;		// 角速度
-	float theta = 0.0f;		// 手臂和腿转动
+	float omega = 1.0f;		// 瑙掗�熷害
+	float theta = 0.0f;		// 鎵嬭噦鍜岃吙杞姩
 };
 
 #endif

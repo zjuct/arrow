@@ -14,7 +14,7 @@ struct material_t {
     float ambient[3];       // Ka
     float diffuse[3];       // Kd
     float specular[3];      // Ks
-    float shininess;        // Ns£¬Ö¸Êý
+    float shininess;        // Nsï¼ŒæŒ‡æ•°
     int illum;              // illum
 
     // index into TextureMgr

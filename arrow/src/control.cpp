@@ -17,13 +17,13 @@ Control::Control() {
 void Control::init() {
 	srand((unsigned)time(NULL));
 
-	// ³õÊ¼»¯glfw£¬Ê¹ÓÃOpenGL 3.3
+	// åˆå§‹åŒ–glfwï¼Œä½¿ç”¨OpenGL 3.3
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// ´´½¨´°¿Ú£¬ÉèÖÃOpenGL context
+	// åˆ›å»ºçª—å£ï¼Œè®¾ç½®OpenGL context
 	window = glfwCreateWindow(wwidth, wheight, "Solar System", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -38,18 +38,18 @@ void Control::init() {
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// ³õÊ¼»¯GLAD
+	// åˆå§‹åŒ–GLAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return;
 	}
 
-	// ÅäÖÃOpenGL
+	// é…ç½®OpenGL
 	glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
 //    glCullFace(GL_BACK);
 
-	// ³õÊ¼»¯ÊÓ¿Ú
+	// åˆå§‹åŒ–è§†å£
 	glViewport(0, 0, control->wwidth, control->wheight);
 
 	Shader::initShader();
