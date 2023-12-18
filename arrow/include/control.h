@@ -13,6 +13,8 @@
 #include <camera.hpp>
 #include <player.h>
 
+#include <ctime>
+
 void mousePressCB(GLFWwindow* window, int button, int action, int mods);
 void mouseMoveCB(GLFWwindow* window, double xpos, double ypos);
 void keyCB(GLFWwindow* window, int key, int scancode, int action, int mods);

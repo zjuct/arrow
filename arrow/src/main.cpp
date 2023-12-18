@@ -5,7 +5,6 @@
 #include "texturemgr.hpp"
 
 #include <iostream>
-#include <ctime>
 
 void printVec3(const glm::vec3 &v)
 {

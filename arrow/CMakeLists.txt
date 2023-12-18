@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(arrow)
 
+# 设置目标为Mingw
+set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
+
 # 设置编译选项
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -29,6 +32,7 @@ message(AUTHOR_WARNING "glfw3 path: ${A}")
 target_link_libraries(arrow 
     PUBLIC ${A}
 )
+
 
 set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
