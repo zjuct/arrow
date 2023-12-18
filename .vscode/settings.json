@@ -3,6 +3,7 @@
     "files.associations": {
         "*.asm": "assembly",
         "*.S": "platformio-debug.asm",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iostream": "cpp"
     }
 }

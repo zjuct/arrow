@@ -62,11 +62,11 @@ int main()
         control->player.update(control->dt);
 
         control->pollKeyPress();
-        std::cout << "pos:";
-        printVec3(control->camera.Position);
+        // std::cout << "pos:";
+        // printVec3(control->camera.Position);
 
-        std::cout << "Front:";
-        printVec3(control->camera.Front);
+        // std::cout << "Front:";
+        // printVec3(control->camera.Front);
     }
 
     glfwTerminate();

@@ -35,6 +35,7 @@ void Control::init() {
 	glfwSetFramebufferSizeCallback(window, fbSizeCB);
 	glfwSetCursorPosCallback(window, mouseMoveCB);
 	glfwSetScrollCallback(window, scrollCB);
+	glfwSetMouseButtonCallback(window, mousePressCB);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -57,6 +58,10 @@ void Control::init() {
 	camera = Camera(glm::vec3(0.465571f, 0.96744f, 2.21652f));
 
 	player.init("resource/assets/player2/player.obj");
+
+	// 箭测试
+	arrow.init("resource/assets/player2/player.obj");
+
 }
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods) {

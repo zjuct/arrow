@@ -12,8 +12,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <camera.hpp>
 #include <player.h>
-
+#include <arrow.hpp>
 #include <ctime>
+#include <vector>
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods);
 void mouseMoveCB(GLFWwindow* window, double xpos, double ypos);
@@ -39,6 +40,10 @@ public:
 
 	// 玩家(跟Player中保持同步)
 	Player player;
+
+	// 箭
+	Arrow arrows;
+
 
 	// 窗口
 	GLFWwindow* window = nullptr;
