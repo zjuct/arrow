@@ -62,6 +62,10 @@ void Control::init() {
 	// 箭测试
 	arrowMgr.init("resource/assets/player2/player.obj");
 
+#ifdef SAT_TEST
+	test.init();
+#endif
+
 }
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods) {
@@ -149,6 +153,11 @@ void Control::pollKeyPress() {
 }
 
 void Control::handleKeyInput(int key, int action) {
+#ifdef SAT_TEST
+	if (action == GLFW_PRESS) {
+		test.updateKeyBoard(key);
+	}
+#endif
 	if (action == GLFW_RELEASE) {
 		switch (key) {
 		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:

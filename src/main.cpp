@@ -52,6 +52,9 @@ int main()
         skybox_obj.draw();
         glDepthMask(GL_TRUE);
         control->player.draw();
+#ifdef SAT_TEST
+        control->test.draw(diffuse_shader);
+#endif
 
         glfwSwapBuffers(control->window);
         glfwPollEvents();
@@ -62,11 +65,6 @@ int main()
         control->player.update(control->dt);
 
         control->pollKeyPress();
-        // std::cout << "pos:";
-        // printVec3(control->camera.Position);
-
-        // std::cout << "Front:";
-        // printVec3(control->camera.Front);
     }
 
     glfwTerminate();

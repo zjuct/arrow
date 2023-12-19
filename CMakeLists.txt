@@ -12,14 +12,18 @@ set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1)
 
 set(CMAKE_BUILD_TYPE "Debug")
 
+# add_compile_options(-DSAT_TEST)
+
 # 设置源文件目录
 aux_source_directory(./src DIR_SRCS)
+aux_source_directory(./test TEST_SRCS)
 # set(DIR_SRCS ./src/main.cpp)
 
 # message(AUTHOR_WARNING "source files: ${DIR_SRCS}")
 
 include_directories(./include)
 include_directories(./3rdparty)
+include_directories(./test)
 # message(AUTHOR_WARNING "include path: ${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 
@@ -27,7 +31,7 @@ include_directories(./3rdparty)
 # message(AUTHOR_WARNING "link path: ${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 # 添加源文件
-add_executable(arrow ${DIR_SRCS})
+add_executable(arrow ${DIR_SRCS} ${TEST_SRCS})
 
 find_library(A glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 # message(AUTHOR_WARNING "glfw3 path: ${A}")

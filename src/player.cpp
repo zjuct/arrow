@@ -45,7 +45,6 @@ void Player::update(float dt) {
 		theta = 0.0f;
 		break;
 	case PLAYER_RUN:
-		std::cout << "update" << std::endl;
 		theta += omega * dt;
 		if (theta > M_PIf / 6.0f) {
 			theta = M_PIf / 6.0f;
