@@ -50,13 +50,13 @@ void Player::processMouseMovement(float xoffset, float yoffset, GLboolean constr
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
-	yaw   -= xoffset;
+	yaw   += xoffset;
 	pitch += yoffset;
 
 	// make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (constrainPitch) {
-			if (pitch > 89.0f)
-					pitch = 89.0f;
+			if (pitch > 30.0f)
+					pitch = 30.0f;
 			if (pitch < -89.0f)
 					pitch = -89.0f;
   }
@@ -111,7 +111,7 @@ void Player::update(float dt) {
 
 void Player::updateModel() {
 	glm::vec3 offset = glm::vec3(0.0f, 0.5f, 0.0f);
-	control->camera.updateCamera(position + offset - front, front + front);
+	control->camera.updateCamera(position + offset - ((1.5f - front.y) * front), front);
 
 	glm::mat4 basemodel(1.0f);
 	basemodel = glm::translate(basemodel, position);
