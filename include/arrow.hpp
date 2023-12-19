@@ -7,32 +7,36 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <vector>
+#include <map>
 
-enum ArrowState {
-    ARROW_HOLD = 0,
+enum ArrowState
+{
+    ARROW_NONE = 0,
+    ARROW_LOADING,
+    ARROW_HOLD,
     ARROW_FLY,
     ARROW_HIT_PLAYER,
     ARROW_HIT_WALL,
     ARROW_ON_FLOOR,
+    ARROW_SPIKE_LIVE,
     ARROW_STOP,
     ARROW_DISAPPEAR,
 };
 
-enum ArrowType {
+enum ArrowType
+{
     ARROW_NORMAL = 0,
     ARROW_LASER,        // 激光
     ARROW_GROUND_SPIKE, // 地刺
 };
 
-class Arrow {
+class Arrow
+{
 
 public:
-    Scene* obj;
-
     Object arrow_normal;
     Object arrow_laser;
     Object arrow_ground_spike;
-
 
     bool isFire = false;
     bool isStop = false;
@@ -40,51 +44,66 @@ public:
     float scale = 1.0f;
     float speed = 1.0f;
     float weight = 1.0f;
+    float loadTime = 10.0f;
 
     float liveTime = 0.0f;
-    
-    float stopTime = 0.0f;
+    // float stopTime = 0.0f;
     float disappearTime = 5.0f;
 
     glm::vec3 pos;
     glm::vec3 dir;
-    
+
     ArrowState state = ARROW_HOLD;
     ArrowType type = ARROW_NORMAL;
 
 public:
-    Arrow(){}
-    ~Arrow(){}
+    Arrow() {}
+    Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike);
+    ~Arrow() {}
 
-    void init(const char* objfile);
+    Arrow(const Arrow &arrow);
+
+    // void init(const char* objfile);
     void draw();
     void update(float dt);
+    void update(glm::vec3 pos, glm::vec3 dir);
     void updateModel();
-    void fire(glm::vec3 pos, glm::vec3 dir, float scale, float speed);
+    void fire(glm::vec3 pos, glm::vec3 dir);
     // void stop();
     // void disappear();
-
-    
 };
 
-
-
-class ArrowManager {
+class ArrowManager
+{
 public:
-    static ArrowManager* getInstance();
+    static ArrowManager *getInstance();
 
-    ArrowManager(){}
-    ~ArrowManager(){}
+    Scene *obj;
 
-    void init(const char* objfile);
-    // void draw();
-    // void update(float dt);
-    // void fire(glm::vec3 pos, glm::vec3 dir, float scale, float speed);
+    Object arrow_normal;
+    Object arrow_laser;
+    Object arrow_ground_spike;
+    int arrowCnt = 0;
+    std::map<int, Arrow> arrows;
+    std::map<int, int> arrowMap;
+    std::map<int, int> arrowSetting;
+    std::map<int, std::vector<int>> arrowHitMap;
+
+
+    ArrowManager() {}
+    ~ArrowManager() {}
+    
+
+    void init(const char *objfile);
+    void draw();
+    void update(float dt);
     // void stop();
     // void disappear();
-
-    std::vector<Arrow> arrows;
+    void bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type = ARROW_NORMAL, float speed = 1.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 10.0f);
+    void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
+    void deleteArrow(int playerId);
+    void fire(int playerId, glm::vec3 pos, glm::vec3 dir);
+    void load(int playerId);
 };
-
 
 #endif

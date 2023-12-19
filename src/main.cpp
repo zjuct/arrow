@@ -54,6 +54,9 @@ int main()
         control->ground.draw();
         control->player.draw();
 
+        control->arrowMgr.update(control->dt);
+        control->arrowMgr.draw();
+
         glfwSwapBuffers(control->window);
         glfwPollEvents();
 

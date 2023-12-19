@@ -63,6 +63,9 @@ void Control::init() {
 
 	// 箭测试
 	arrowMgr.init("resource/assets/player2/player.obj");
+	arrowMgr.bindArrow(1, camera.Position, camera.Front, ARROW_NORMAL, 1.0f, 1.0f, 1.0f, 1.0f);
+
+
 
 }
 
@@ -101,6 +104,7 @@ void Control::handleMousePress(int button, int action) {
 			break;
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button pressed." << std::endl;
+			arrowMgr.fire(1, camera.Position, camera.Front);
 			break;
 		}
 	}
