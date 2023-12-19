@@ -9,7 +9,7 @@
 
 static Control* control = Control::getInstance();
 
-Player::Player() {
+Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f) {
 
 }
 
@@ -18,6 +18,8 @@ Player::~Player() {
 }
 
 void Player::init(const char* objfile) {
+	updatePlayerVectors();
+
 	obj = Scene::LoadObj(objfile);
 	std::vector<Mesh>& meshes = obj->getMesh();
 	// .obj中定义的顺序必须为body, head, larm, lleg, rarm, rleg
@@ -27,6 +29,54 @@ void Player::init(const char* objfile) {
 	lleg = Object(OBJECT_MESH, &meshes[3], player_shader);
 	rarm = Object(OBJECT_MESH, &meshes[4], player_shader);
 	rleg = Object(OBJECT_MESH, &meshes[5], player_shader);
+}
+
+void Player::processKeyboard(Movement direction, float deltaTime) {
+	float velocity = speed * deltaTime;
+	if (direction == FORWARD)
+			position += glm::vec3(front.x, 0.0f, front.z) * velocity;
+	if (direction == BACKWARD)
+			position -= glm::vec3(front.x, 0.0f, front.z) * velocity;
+	if (direction == LEFT)
+			position -= right * velocity;
+	if (direction == RIGHT)
+			position += right * velocity;
+	// if (direction == DOWN)
+	// 		position -= up * velocity;
+	// if (direction == UP)
+	// 		position += up * velocity;
+}
+void Player::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw   -= xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (constrainPitch) {
+			if (pitch > 89.0f)
+					pitch = 89.0f;
+			if (pitch < -89.0f)
+					pitch = -89.0f;
+  }
+
+	updatePlayerVectors();
+}
+
+// 根据 pitch 和 yaw 修改 front right up 等
+void Player::updatePlayerVectors() {
+		// calculate the new Front vector
+		glm::vec3 f;
+
+		// 这里调用的是 cmath 库中的三角函数，输入为弧度制
+		f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+		f.y = glm::sin(glm::radians(pitch));
+		f.z = glm::sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+		this->front = glm::normalize(f);
+		// also re-calculate the Right and Up vector
+		this->right = glm::normalize(glm::cross(front, control->camera.WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+		this->up    = glm::normalize(glm::cross(right, front));
 }
 
 void Player::draw() {
@@ -60,51 +110,47 @@ void Player::update(float dt) {
 }
 
 void Player::updateModel() {
+	glm::vec3 offset = glm::vec3(0.0f, 0.5f, 0.0f);
+	control->camera.updateCamera(position + offset - front, front + front);
+
+	glm::mat4 basemodel(1.0f);
+	basemodel = glm::translate(basemodel, position);
+	// 这里的 rotate 输入为弧度制
+	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+
 	// head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
-	glm::mat4 model(1.0f);
-	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// 改成head的局部坐标
-	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 model = basemodel;
+	//model = glm::rotate(model, , right);
 	//model = glm::rotate(model, control->camera.Pitch, glm::vec3(0.0f, 0.0f, 1.0f));
 	head.setModel(model);
 	head.setModel_noscale(model);
 
 	// body: 世界坐标平移 * 局部坐标平移 * 整体模型转动
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// 改成body的局部坐标
+	model = basemodel;
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	body.setModel(model);
 	body.setModel_noscale(model);
 
 	// larm, rarm, lleg, rleg: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 手臂/腿部转动
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// 改成larm的局部坐标
+	model = basemodel;
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	larm.setModel(model);
 	larm.setModel_noscale(model);
 	
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// 改成rarm的局部坐标
+	model = basemodel;
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	rarm.setModel(model);
 	rarm.setModel_noscale(model);
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// 改成lleg的局部坐标
+	model = basemodel;
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	lleg.setModel(model);
 	rleg.setModel_noscale(model);
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, control->camera.Position - glm::vec3(0.465571f, 0.96744f, 2.21652f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));		// 改成rleg的局部坐标
+	model = basemodel;
 	//model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	rleg.setModel(model);

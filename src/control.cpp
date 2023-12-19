@@ -1,5 +1,6 @@
 #include <control.h>
 #include <texturemgr.hpp>
+#include <camera.hpp>
 
 #include <iostream>
 
@@ -54,8 +55,6 @@ void Control::init() {
 	glViewport(0, 0, control->wwidth, control->wheight);
 
 	Shader::initShader();
-
-	camera = Camera(glm::vec3(0.465571f, 0.96744f, 2.21652f));
 
 	player.init("resource/assets/player2/player.obj");
 
@@ -140,32 +139,39 @@ void Control::handleMouseMove(double xposIn, double yposIn) {
 
 	lastX = xpos;
 	lastY = ypos;
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	// camera.ProcessMouseMovement(xoffset, yoffset);
+	player.processMouseMovement(xoffset, yoffset);
 }
 
 void Control::pollKeyPress() {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		camera.ProcessKeyboard(FORWARD, dt);
+		// camera.ProcessKeyboard(FORWARD, dt);
+		player.processKeyboard(Movement::FORWARD, dt);
 		player.setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		camera.ProcessKeyboard(BACKWARD, dt);
+		// camera.ProcessKeyboard(BACKWARD, dt);
+		player.processKeyboard(Movement::BACKWARD, dt);
 		player.setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		camera.ProcessKeyboard(LEFT, dt);
+		// camera.ProcessKeyboard(LEFT, dt);
+		player.processKeyboard(Movement::LEFT, dt);
 		player.setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		camera.ProcessKeyboard(RIGHT, dt);
+		// camera.ProcessKeyboard(RIGHT, dt);
+		player.processKeyboard(Movement::RIGHT, dt);
 		player.setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-		camera.ProcessKeyboard(DOWN, dt);
+		// camera.ProcessKeyboard(DOWN, dt);
+		player.processKeyboard(Movement::DOWN, dt);
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-		camera.ProcessKeyboard(UP, dt);
+		// camera.ProcessKeyboard(UP, dt);
+		player.processKeyboard(Movement::UP, dt);
 }
 
 void Control::handleKeyInput(int key, int action) {
