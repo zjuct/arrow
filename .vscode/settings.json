@@ -1,8 +1,0 @@
-{
-    "cmake.sourceDirectory": "E:/WorkSpace/arrow",
-    "files.associations": {
-        "*.asm": "assembly",
-        "*.S": "platformio-debug.asm",
-        "vector": "cpp"
-    }
-}
