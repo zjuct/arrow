@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(arrow)
 
 # 设置目标为Mingw
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
 
 # 设置编译选项
