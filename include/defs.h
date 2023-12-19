@@ -8,5 +8,8 @@
 #define M_PI_2		1.57079632679489661923	/* pi/2 */
 #define M_PI_4		0.78539816339744830962	/* pi/4 */
 
+#define FLOOR_Y (0)
+#define WIND_RESISTANCE (0.1f)
+#define GRAVITY (9.8f)
 
 #endif

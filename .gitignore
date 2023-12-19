@@ -368,3 +368,6 @@ build/
 arrow.exe
 
 !resource/*
+
+.vscode/
+
