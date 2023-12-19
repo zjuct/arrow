@@ -207,6 +207,7 @@ void ArrowManager::fire(int playerId, glm::vec3 pos, glm::vec3 dir, float pressT
         return;
     bool t = arrows[arrowMap[playerId]].fire(pos, dir, playerId == PLAYER_ID ? pressTime : 1.0f);
     std::cout << "fire time: " << pressTime << std::endl;
+    std::cout<<"playerId: "<<playerId<<std::endl;
     if (t)
         load(playerId);
 }

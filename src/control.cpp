@@ -122,7 +122,7 @@ void Control::handleMousePress(int button, int action) {
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button released." << std::endl;
 			leftPress = false;
-			arrowMgr->fire(1, players[PLAYER_ID].getPosition(), players[PLAYER_ID].getFront(), leftPressTime);
+			arrowMgr->fire(PLAYER_ID, players[PLAYER_ID].getPosition(), glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()), leftPressTime);
 			break;
 		}
 	}

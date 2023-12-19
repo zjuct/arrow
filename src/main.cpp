@@ -58,7 +58,7 @@ int main()
         for (auto player : control->players)
             player.draw();
 
-        control->arrowMgr->updateArrow(1,control->players[PLAYER_ID].getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()));
+        control->arrowMgr->updateArrow(PLAYER_ID,control->players[PLAYER_ID].getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 
