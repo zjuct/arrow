@@ -28,6 +28,14 @@ public:
 	}
 
 	PlayerState state = PLAYER_STILL;
+
+	glm::vec3 getPosition() {
+		return position;
+	}
+
+	glm::vec3 getFront() {
+		return front;
+	}
 	
 private:
 	void updateModel();
