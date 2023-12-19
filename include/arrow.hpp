@@ -44,9 +44,9 @@ public:
     float scale = 1.0f;
     float speed = 1.0f;
     float weight = 1.0f;
-    float loadTime = 10.0f;
+    float loadTime = 1.0f;
 
-    float liveTime = 0.0f;
+    float liveTime = 1000.0f;
     // float stopTime = 0.0f;
     float disappearTime = 5.0f;
 
@@ -61,14 +61,14 @@ public:
     Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike);
     ~Arrow() {}
 
-    Arrow(const Arrow &arrow);
+    // Arrow(const Arrow &arrow);
 
     // void init(const char* objfile);
     void draw();
     void update(float dt);
     void update(glm::vec3 pos, glm::vec3 dir);
     void updateModel();
-    void fire(glm::vec3 pos, glm::vec3 dir);
+    bool fire(glm::vec3 pos, glm::vec3 dir, float strength = 1.0f);
     // void stop();
     // void disappear();
 };
@@ -99,10 +99,10 @@ public:
     void update(float dt);
     // void stop();
     // void disappear();
-    void bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type = ARROW_NORMAL, float speed = 1.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 10.0f);
+    void bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type = ARROW_NORMAL, float speed = 0.1f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
     void deleteArrow(int playerId);
-    void fire(int playerId, glm::vec3 pos, glm::vec3 dir);
+    void fire(int playerId, glm::vec3 pos, glm::vec3 dir, float strength = 1.0f);
     void load(int playerId);
 };
 

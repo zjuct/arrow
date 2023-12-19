@@ -10,6 +10,6 @@
 
 #define FLOOR_Y (0)
 #define WIND_RESISTANCE (0.1f)
-#define GRAVITY (9.8f)
+#define GRAVITY (0.001f)
 
 #endif

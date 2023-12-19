@@ -54,8 +54,9 @@ int main()
         control->ground.draw();
         control->player.draw();
 
-        control->arrowMgr.update(control->dt);
-        control->arrowMgr.draw();
+        control->arrowMgr->updateArrow(1,control->camera.Position,control->camera.Front);
+        control->arrowMgr->update(control->dt);
+        control->arrowMgr->draw();
 
         glfwSwapBuffers(control->window);
         glfwPollEvents();

@@ -46,7 +46,7 @@ public:
 	Ground ground;
 
 	// 箭
-	ArrowManager arrowMgr;
+	ArrowManager *arrowMgr = ArrowManager::getInstance();
 
 
 	// 窗口
