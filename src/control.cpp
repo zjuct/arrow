@@ -1,7 +1,7 @@
 #include <control.h>
 #include <texturemgr.hpp>
 #include <camera.hpp>
-
+#include <defs.h>
 #include <iostream>
 
 static Control* control = Control::getInstance();
@@ -117,7 +117,7 @@ void Control::handleMousePress(int button, int action) {
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button released." << std::endl;
 			leftPress = false;
-			arrowMgr->fire(1, control->player.getPosition(),control->player.getFront(), leftPressTime);
+			arrowMgr->fire(1, control->player.getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->player.getPosition()), leftPressTime);
 			break;
 		}
 	}
@@ -172,6 +172,11 @@ void Control::pollKeyPress() {
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 		// camera.ProcessKeyboard(UP, dt);
 		player.processKeyboard(Movement::UP, dt);
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		// camera.ProcessKeyboard(UP, dt);
+		player.processKeyboard(Movement::UP, dt);
+		// player.setState(Player::PLAYER_JUMP);
+	}
 }
 
 void Control::handleKeyInput(int key, int action) {
@@ -186,4 +191,9 @@ void Control::handleKeyInput(int key, int action) {
 
 void Control::handleScroll(double xoffset, double yoffset) {
 	camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+glm::vec3 getAim()
+{
+	;
 }

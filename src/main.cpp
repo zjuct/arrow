@@ -3,6 +3,7 @@
 #include "control.h"
 #include "light.hpp"
 #include "texturemgr.hpp"
+#include "defs.h"
 
 #include <iostream>
 
@@ -54,7 +55,7 @@ int main()
         control->ground.draw();
         control->player.draw();
 
-        control->arrowMgr->updateArrow(1,control->player.getPosition(),control->player.getFront());
+        control->arrowMgr->updateArrow(1,control->player.getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->player.getPosition()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 

@@ -110,8 +110,7 @@ void Player::update(float dt) {
 }
 
 void Player::updateModel() {
-	glm::vec3 offset = glm::vec3(0.0f, 0.5f, 0.0f);
-	control->camera.updateCamera(position + offset - ((1.5f - front.y) * front), front);
+	control->camera.updateCamera(position + offset - ((2.5f - front.y) * front), front);
 
 	glm::mat4 basemodel(1.0f);
 	basemodel = glm::translate(basemodel, position);

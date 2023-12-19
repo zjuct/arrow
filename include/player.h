@@ -36,6 +36,7 @@ public:
 	glm::vec3 getFront() {
 		return front;
 	}
+	glm::vec3 offset = glm::vec3(0.0f, 1.0f, 0.0f);
 	
 private:
 	void updateModel();
