@@ -12,7 +12,7 @@
 #define WIND_RESISTANCE (0.1f)
 #define GRAVITY (0.0098f)
 
-#define PLAYER_ID (1)
+#define PLAYER_ID (0)
 #define AIM_DISTANCE (10.0f)
 
 #endif

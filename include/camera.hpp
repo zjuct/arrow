@@ -3,17 +3,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "player.h"
 
 #include <vector>
-
-enum Movement {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT,
-    DOWN,
-    UP,
-};
 
 // Default camera values
 const float YAW         = -90.0f;
@@ -36,6 +28,8 @@ public:
     // camera options
     float Zoom;
 
+    Player* player;
+
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f))
     {
@@ -46,14 +40,29 @@ public:
         updateCameraVectors();
     }
 
+    // Camera(glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), Player* player = nullptr)
+    // {
+    //     WorldUp = up;
+    //     Zoom = ZOOM;
+    //     follow(player);
+    //     updateCamera();
+    // }
+
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
         return glm::lookAt(Position, Position + Front, Up);
     }
 
-    void updateCamera(glm::vec3 position, glm::vec3 front) {
-        this->Position = position;
+    void follow(Player* player) {
+        this->player = player;
+    }
+
+    void updateCamera() {
+        glm::vec3 offset = glm::vec3(0.0f, 0.5f, 0.0f);
+        glm::vec3 position = player->position;
+        glm::vec3 front    = player->front;
+        this->Position = position + offset - ((1.5f - front.y) * front);
         this->Front    = front;
         updateCameraVectors();
     }

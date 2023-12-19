@@ -1,7 +1,8 @@
 #include <control.h>
 #include <texturemgr.hpp>
 #include <camera.hpp>
-#include <defs.h>
+#include "defs.h"
+
 #include <iostream>
 
 static Control* control = Control::getInstance();
@@ -56,15 +57,19 @@ void Control::init() {
 
 	Shader::initShader();
 
-	player.init("resource/assets/player2/player.obj");
+	Player player1;
+	player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+	players.push_back(player1);
+	Player player2;
+	player2.init("resource/assets/player2/player.obj", glm::vec3(0.0f, 0.0f, 0.0f));
+	players.push_back(player2);
+	camera.follow(&players[PLAYER_ID]);
 
 	ground.init("resource/assets/scene/scene.obj");
 
 	// 箭测试
 	arrowMgr->init("resource/assets/player2/player.obj");
 	arrowMgr->bindArrow(1, camera.Position, camera.Front, ARROW_NORMAL);
-
-
 
 }
 
@@ -117,7 +122,7 @@ void Control::handleMousePress(int button, int action) {
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button released." << std::endl;
 			leftPress = false;
-			arrowMgr->fire(1, control->player.getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->player.getPosition()), leftPressTime);
+			arrowMgr->fire(1, players[PLAYER_ID].getPosition(), players[PLAYER_ID].getFront(), leftPressTime);
 			break;
 		}
 	}
@@ -140,7 +145,7 @@ void Control::handleMouseMove(double xposIn, double yposIn) {
 	lastX = xpos;
 	lastY = ypos;
 	// camera.ProcessMouseMovement(xoffset, yoffset);
-	player.processMouseMovement(xoffset, yoffset);
+	players[PLAYER_ID].processMouseMovement(xoffset, yoffset);
 }
 
 void Control::pollKeyPress() {
@@ -148,42 +153,37 @@ void Control::pollKeyPress() {
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(FORWARD, dt);
-		player.processKeyboard(Movement::FORWARD, dt);
-		player.setState(Player::PLAYER_RUN);
+		players[PLAYER_ID].processKeyboard(Movement::FORWARD, dt);
+		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(BACKWARD, dt);
-		player.processKeyboard(Movement::BACKWARD, dt);
-		player.setState(Player::PLAYER_RUN);
+		players[PLAYER_ID].processKeyboard(Movement::BACKWARD, dt);
+		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(LEFT, dt);
-		player.processKeyboard(Movement::LEFT, dt);
-		player.setState(Player::PLAYER_RUN);
+		players[PLAYER_ID].processKeyboard(Movement::LEFT, dt);
+		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(RIGHT, dt);
-		player.processKeyboard(Movement::RIGHT, dt);
-		player.setState(Player::PLAYER_RUN);
+		players[PLAYER_ID].processKeyboard(Movement::RIGHT, dt);
+		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 		// camera.ProcessKeyboard(DOWN, dt);
-		player.processKeyboard(Movement::DOWN, dt);
+		players[PLAYER_ID].processKeyboard(Movement::DOWN, dt);
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 		// camera.ProcessKeyboard(UP, dt);
-		player.processKeyboard(Movement::UP, dt);
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		// camera.ProcessKeyboard(UP, dt);
-		player.processKeyboard(Movement::UP, dt);
-		// player.setState(Player::PLAYER_JUMP);
-	}
+		players[PLAYER_ID].processKeyboard(Movement::UP, dt);
 }
 
 void Control::handleKeyInput(int key, int action) {
 	if (action == GLFW_RELEASE) {
 		switch (key) {
 		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
-			player.setState(Player::PLAYER_STILL);
+			players[PLAYER_ID].setState(Player::PLAYER_STILL);
 			break;
 		}
 	}
@@ -191,9 +191,4 @@ void Control::handleKeyInput(int key, int action) {
 
 void Control::handleScroll(double xoffset, double yoffset) {
 	camera.ProcessMouseScroll(static_cast<float>(yoffset));
-}
-
-glm::vec3 getAim()
-{
-	;
 }

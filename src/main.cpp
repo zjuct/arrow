@@ -30,6 +30,8 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        control->camera.updateCamera();
+        
         // 设置view和projection矩阵
         default_shader->use();
         glm::mat4 projection = glm::perspective(glm::radians(control->camera.Zoom), (float)control->wwidth / (float)control->wheight, 0.1f, 100.0f);
@@ -53,9 +55,10 @@ int main()
         skybox_obj.draw();
         glDepthMask(GL_TRUE);
         control->ground.draw();
-        control->player.draw();
+        for (auto player : control->players)
+            player.draw();
 
-        control->arrowMgr->updateArrow(1,control->player.getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->player.getPosition()));
+        control->arrowMgr->updateArrow(1,control->players[PLAYER_ID].getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 
@@ -65,7 +68,7 @@ int main()
         float currenttime = glfwGetTime();
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
-        control->player.update(control->dt);
+        control->players[PLAYER_ID].update(control->dt);
         if(control->leftPress)
             control->leftPressTime += control->dt;
         else

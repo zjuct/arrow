@@ -41,7 +41,7 @@ public:
 	Camera camera;
 
 	// 玩家(跟Player中保持同步)
-	Player player;
+	std::vector<Player> players;
 
 	// 场景
 	Ground ground;

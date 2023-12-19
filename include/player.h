@@ -3,14 +3,22 @@
 
 #include "objLoader.hpp"
 #include "object.hpp"
-#include "camera.hpp"
+
+enum Movement {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT,
+    DOWN,
+    UP,
+};
 
 class Player {
 public:
 	Player();
 	~Player();
 
-	void init(const char* objfile);
+	void init(const char* objfile, glm::vec3 position);
 
 	void processKeyboard(Movement direction, float deltaTime);
 	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
@@ -36,7 +44,11 @@ public:
 	glm::vec3 getFront() {
 		return front;
 	}
-	glm::vec3 offset = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	glm::vec3 position;
+	glm::vec3 front;
+	glm::vec3 right;
+	glm::vec3 up;
 	
 private:
 	void updateModel();
@@ -49,10 +61,6 @@ private:
 	Object larm, rarm;
 	Object lleg, rleg;
 
-	glm::vec3 position;
-	glm::vec3 front;
-	glm::vec3 right;
-	glm::vec3 up;
 	float yaw;
 	float pitch;
 	float speed;

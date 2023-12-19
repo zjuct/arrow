@@ -17,7 +17,8 @@ Player::~Player() {
 
 }
 
-void Player::init(const char* objfile) {
+void Player::init(const char* objfile, glm::vec3 position) {
+	this->position = position;
 	updatePlayerVectors();
 
 	obj = Scene::LoadObj(objfile);
@@ -110,8 +111,7 @@ void Player::update(float dt) {
 }
 
 void Player::updateModel() {
-	control->camera.updateCamera(position + offset - ((2.5f - front.y) * front), front);
-
+	
 	glm::mat4 basemodel(1.0f);
 	basemodel = glm::translate(basemodel, position);
 	// 这里的 rotate 输入为弧度制
