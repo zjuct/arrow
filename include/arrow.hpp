@@ -50,9 +50,9 @@ public:
     // float stopTime = 0.0f;
     float disappearTime = 5.0f;
 
-    float strengthMax = 2.0f;
+    float strengthMax = 10.0f;
     float strengthMin = 1.0f;
-    float strengthTime = 0.5f;
+    float strengthTime = 5.0f;
     float strength = 1.0f;
 
     glm::vec3 pos;
@@ -104,7 +104,7 @@ public:
     void update(float dt);
     // void stop();
     // void disappear();
-    void bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type = ARROW_NORMAL, float speed = 0.1f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
+    void bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type = ARROW_NORMAL, float speed = 0.02f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
     void deleteArrow(int playerId);
     void fire(int playerId, glm::vec3 pos, glm::vec3 dir, float strength = 1.0f);

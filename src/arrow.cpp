@@ -37,11 +37,14 @@ void Arrow::update(float dt)
 {
     if (state == ARROW_FLY)
     {
-        glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
-        glm::vec3 delta = dir * speed + g * dt * weight / WIND_RESISTANCE;
-        pos += delta;
-        dir = glm::normalize(delta);
-        if(pos.y <= FLOOR_Y - 10.0f)
+        if (type == ARROW_NORMAL)
+        {
+            glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
+            glm::vec3 delta = dir * speed + g * dt * weight / WIND_RESISTANCE;
+            pos += delta;
+            dir = glm::normalize(delta);
+        }
+        if (pos.y <= FLOOR_Y - 10.0f)
         {
             state = ARROW_DISAPPEAR;
         }
@@ -96,6 +99,9 @@ bool Arrow::fire(glm::vec3 pos, glm::vec3 dir, float pressTime)
     this->pos = pos;
     this->dir = dir;
     this->state = ARROW_FLY;
+    pressTime -= 0.1f;
+    if (pressTime < 0.0f)
+        pressTime = 0.0f;
     float strength = strengthMin + (strengthMax - strengthMin) * pressTime / strengthTime;
     if (strength > strengthMax)
         strength = strengthMax;
@@ -158,9 +164,9 @@ void ArrowManager::update(float dt)
     {
         arrow.update(dt);
     }
-    for(auto it = arrows.begin(); it != arrows.end();)
+    for (auto it = arrows.begin(); it != arrows.end();)
     {
-        if(it->second.state == ARROW_DISAPPEAR)
+        if (it->second.state == ARROW_DISAPPEAR)
         {
             it = arrows.erase(it);
         }
@@ -199,9 +205,9 @@ void ArrowManager::fire(int playerId, glm::vec3 pos, glm::vec3 dir, float pressT
 {
     if (arrowMap.find(playerId) == arrowMap.end())
         return;
-    bool t = arrows[arrowMap[playerId]].fire(pos, dir, playerId==PLAYER_ID?pressTime:1.0f);
-    std::cout<<"fire time: "<<pressTime<<std::endl;
-    if(t)
+    bool t = arrows[arrowMap[playerId]].fire(pos, dir, playerId == PLAYER_ID ? pressTime : 1.0f);
+    std::cout << "fire time: " << pressTime << std::endl;
+    if (t)
         load(playerId);
 }
 
