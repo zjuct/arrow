@@ -77,6 +77,7 @@ public:
                 shape->draw(shader);
         }
         for(Object* c: children) {
+            c->updateModel();
             c->draw();
         }
     }

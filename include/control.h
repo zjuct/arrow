@@ -13,6 +13,7 @@
 #include <camera.hpp>
 #include <player.h>
 #include <arrow.hpp>
+#include <ground.hpp>
 #include <ctime>
 #include <vector>
 
@@ -40,6 +41,9 @@ public:
 
 	// 玩家(跟Player中保持同步)
 	Player player;
+
+	// 场景
+	Ground ground;
 
 	// 箭
 	ArrowManager arrowMgr;

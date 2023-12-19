@@ -50,6 +50,7 @@ int main()
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
 
         skybox_obj.draw();
+        control->ground.draw();
         glDepthMask(GL_TRUE);
         control->player.draw();
 

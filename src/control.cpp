@@ -59,6 +59,8 @@ void Control::init() {
 
 	player.init("resource/assets/player2/player.obj");
 
+	ground.init("resource/assets/scene/scene.obj");
+
 	// 箭测试
 	arrowMgr.init("resource/assets/player2/player.obj");
 
