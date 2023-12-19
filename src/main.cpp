@@ -54,7 +54,7 @@ int main()
         control->ground.draw();
         control->player.draw();
 
-        control->arrowMgr->updateArrow(1,control->camera.Position,control->camera.Front);
+        control->arrowMgr->updateArrow(1,control->player.getPosition(),control->player.getFront());
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 

@@ -99,7 +99,7 @@ bool Arrow::fire(glm::vec3 pos, glm::vec3 dir, float pressTime)
     this->pos = pos;
     this->dir = dir;
     this->state = ARROW_FLY;
-    pressTime -= 0.1f;
+    pressTime -= 0.2f;
     if (pressTime < 0.0f)
         pressTime = 0.0f;
     float strength = strengthMin + (strengthMax - strengthMin) * pressTime / strengthTime;
@@ -112,12 +112,12 @@ bool Arrow::fire(glm::vec3 pos, glm::vec3 dir, float pressTime)
 void Arrow::updateModel()
 {
     glm::mat4 model = glm::mat4(1.0f);
-    // model = glm::scale(model, glm::vec3(scale, scale, scale));
-    // 旋转到dir方向
-    // glm::vec3 axis = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), dir);
-    // float angle = glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), dir));
-    // model = glm::rotate(model, angle, axis);
     model = glm::translate(model, pos);
+    //旋转到dir方向
+    glm::vec3 axis = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), dir);
+    float angle = glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), dir));
+    model = glm::rotate(model, angle, axis);
+    model = glm::scale(model, glm::vec3(scale, scale, scale));
     switch (type)
     {
     case ARROW_NORMAL:
