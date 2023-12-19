@@ -16,6 +16,8 @@ void Arrow::draw()
 {
     if (state == ARROW_DISAPPEAR | state == ARROW_NONE)
         return;
+    if(state == ARROW_LOADING)
+        return;
     updateModel();
     // std::cout << "state: " << state << std::endl;
     // std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
@@ -40,7 +42,8 @@ void Arrow::update(float dt)
         if (type == ARROW_NORMAL)
         {
             glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
-            glm::vec3 delta = dir * speed + g * dt * weight / WIND_RESISTANCE;
+            glm::vec3 delta = dir * speed + g * dt * weight;
+            delta = delta * (1-WIND_RESISTANCE);
             pos += delta;
             dir = glm::normalize(delta);
         }
@@ -132,7 +135,6 @@ void Arrow::updateModel()
     }
 }
 
-static ArrowManager *instance = nullptr;
 ArrowManager *ArrowManager::getInstance()
 {
     static ArrowManager instance;

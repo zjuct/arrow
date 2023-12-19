@@ -9,10 +9,12 @@
 #define M_PI_4		0.78539816339744830962	/* pi/4 */
 
 #define FLOOR_Y (0)
-#define WIND_RESISTANCE (0.1f)
-#define GRAVITY (0.0098f)
+#define WIND_RESISTANCE (0.0f)
+#define GRAVITY (0.098f)
 
 #define PLAYER_ID (1)
 #define AIM_DISTANCE (10.0f)
+
+#define MAP_SIZE (10)
 
 #endif

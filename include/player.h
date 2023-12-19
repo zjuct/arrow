@@ -22,7 +22,7 @@ public:
 
 	void processKeyboard(Movement direction, float deltaTime);
 	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-
+	void jump();
 	enum PlayerState {
 		PLAYER_STILL = 0,
 		PLAYER_RUN,
@@ -50,6 +50,7 @@ public:
 	glm::vec3 right;
 	glm::vec3 up;
 	
+
 private:
 	void updateModel();
 	void updatePlayerVectors();
@@ -64,7 +65,13 @@ private:
 	float yaw;
 	float pitch;
 	float speed;
-  float sensitivity;
+  	float sensitivity;
+
+	int jumpTime = 2;
+	bool floating = false;
+	float jumpHeight = 3.0f;
+	float jumpSpeed = 0.0f;
+
 
 	float omega = 1.0f;		// 角速度
 	float theta = 0.0f;		// 手臂和腿转动

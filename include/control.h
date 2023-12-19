@@ -13,6 +13,7 @@
 #include <camera.hpp>
 #include <player.h>
 #include <arrow.hpp>
+#include <candy.hpp>
 #include <ground.hpp>
 #include <ctime>
 #include <vector>
@@ -52,6 +53,9 @@ public:
 
 	// 箭
 	ArrowManager *arrowMgr = ArrowManager::getInstance();
+
+	// 道具
+	CandyManager *candyMgr = CandyManager::getInstance();
 
 
 	// 窗口

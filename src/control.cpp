@@ -67,9 +67,12 @@ void Control::init() {
 
 	ground.init("resource/assets/scene/scene.obj");
 
-	// 箭测试
+	// 箭
 	arrowMgr->init("resource/assets/player2/player.obj");
 	arrowMgr->bindArrow(1, camera.Position, camera.Front, ARROW_NORMAL);
+
+	// 道具
+	candyMgr->init("resource/assets/player2/player.obj");
 
 #ifdef SAT_TEST
 	test.init();
@@ -175,12 +178,13 @@ void Control::pollKeyPress() {
 		players[PLAYER_ID].processKeyboard(Movement::RIGHT, dt);
 		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-		// camera.ProcessKeyboard(DOWN, dt);
-		players[PLAYER_ID].processKeyboard(Movement::DOWN, dt);
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-		// camera.ProcessKeyboard(UP, dt);
-		players[PLAYER_ID].processKeyboard(Movement::UP, dt);
+	// if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	// 	// camera.ProcessKeyboard(DOWN, dt);
+	// 	players[PLAYER_ID].processKeyboard(Movement::DOWN, dt);
+	// if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	// 	// camera.ProcessKeyboard(UP, dt);
+	// 	players[PLAYER_ID].processKeyboard(Movement::UP, dt);
+	// if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 }
 
 void Control::handleKeyInput(int key, int action) {
@@ -195,6 +199,10 @@ void Control::handleKeyInput(int key, int action) {
 			players[PLAYER_ID].setState(Player::PLAYER_STILL);
 			break;
 		}
+	}
+	if (action == GLFW_PRESS) {
+		if(key==GLFW_KEY_SPACE)
+			players[PLAYER_ID].jump();
 	}
 }
 

@@ -61,6 +61,9 @@ int main()
         control->arrowMgr->updateArrow(PLAYER_ID,control->players[PLAYER_ID].getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
+
+        control->candyMgr->update(control->dt);
+        control->candyMgr->draw();
 #ifdef SAT_TEST
         control->test.draw(diffuse_shader);
 #endif
