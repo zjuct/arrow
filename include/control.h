@@ -63,6 +63,9 @@ public:
 
 	bool end = false;
 
+	bool leftPress = false;
+	float leftPressTime = 0.0f;
+
 private:
 	Control();
 	Control(const Control&) = delete;

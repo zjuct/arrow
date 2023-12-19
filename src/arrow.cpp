@@ -89,13 +89,16 @@ void Arrow::update(glm::vec3 pos, glm::vec3 dir)
     }
 }
 
-bool Arrow::fire(glm::vec3 pos, glm::vec3 dir, float strength)
+bool Arrow::fire(glm::vec3 pos, glm::vec3 dir, float pressTime)
 {
     if (state != ARROW_HOLD)
         return false;
     this->pos = pos;
     this->dir = dir;
     this->state = ARROW_FLY;
+    float strength = strengthMin + (strengthMax - strengthMin) * pressTime / strengthTime;
+    if (strength > strengthMax)
+        strength = strengthMax;
     this->speed *= strength;
     return true;
 }
@@ -192,11 +195,12 @@ void ArrowManager::load(int playerId)
     arrows[arrowCnt].state = ARROW_LOADING;
 }
 
-void ArrowManager::fire(int playerId, glm::vec3 pos, glm::vec3 dir, float strength)
+void ArrowManager::fire(int playerId, glm::vec3 pos, glm::vec3 dir, float pressTime)
 {
     if (arrowMap.find(playerId) == arrowMap.end())
         return;
-    bool t = arrows[arrowMap[playerId]].fire(pos, dir, strength);
+    bool t = arrows[arrowMap[playerId]].fire(pos, dir, playerId==PLAYER_ID?pressTime:1.0f);
+    std::cout<<"fire time: "<<pressTime<<std::endl;
     if(t)
         load(playerId);
 }

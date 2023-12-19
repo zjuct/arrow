@@ -12,4 +12,6 @@
 #define WIND_RESISTANCE (0.1f)
 #define GRAVITY (0.001f)
 
+#define PLAYER_ID (1)
+
 #endif

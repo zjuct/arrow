@@ -104,7 +104,21 @@ void Control::handleMousePress(int button, int action) {
 			break;
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button pressed." << std::endl;
-			arrowMgr->fire(1, camera.Position, camera.Front);
+			leftPress = true;
+			break;
+		}
+	}
+	else
+	{
+		switch (button)
+		{
+		case GLFW_MOUSE_BUTTON_RIGHT:
+			std::cerr << "[DEBUG] Right button released." << std::endl;
+			break;
+		case GLFW_MOUSE_BUTTON_LEFT:
+			std::cerr << "[DEBUG] Left button released." << std::endl;
+			leftPress = false;
+			arrowMgr->fire(1, camera.Position, camera.Front, leftPressTime);
 			break;
 		}
 	}

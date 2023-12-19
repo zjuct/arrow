@@ -65,6 +65,10 @@ int main()
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
         control->player.update(control->dt);
+        if(control->leftPress)
+            control->leftPressTime += control->dt;
+        else
+            control->leftPressTime = 0.0f;
 
         control->pollKeyPress();
         // std::cout << "pos:";

@@ -50,6 +50,11 @@ public:
     // float stopTime = 0.0f;
     float disappearTime = 5.0f;
 
+    float strengthMax = 2.0f;
+    float strengthMin = 1.0f;
+    float strengthTime = 0.5f;
+    float strength = 1.0f;
+
     glm::vec3 pos;
     glm::vec3 dir;
 
