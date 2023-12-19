@@ -61,6 +61,9 @@ int main()
         control->arrowMgr->updateArrow(PLAYER_ID,control->players[PLAYER_ID].getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
+#ifdef SAT_TEST
+        control->test.draw(diffuse_shader);
+#endif
 
         glfwSwapBuffers(control->window);
         glfwPollEvents();
@@ -75,11 +78,6 @@ int main()
             control->leftPressTime = 0.0f;
 
         control->pollKeyPress();
-        // std::cout << "pos:";
-        // printVec3(control->camera.Position);
-
-        // std::cout << "Front:";
-        // printVec3(control->camera.Front);
     }
 
     glfwTerminate();

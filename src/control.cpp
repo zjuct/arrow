@@ -71,6 +71,10 @@ void Control::init() {
 	arrowMgr->init("resource/assets/player2/player.obj");
 	arrowMgr->bindArrow(1, camera.Position, camera.Front, ARROW_NORMAL);
 
+#ifdef SAT_TEST
+	test.init();
+#endif
+
 }
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods) {
@@ -180,6 +184,11 @@ void Control::pollKeyPress() {
 }
 
 void Control::handleKeyInput(int key, int action) {
+#ifdef SAT_TEST
+	if (action == GLFW_PRESS) {
+		test.updateKeyBoard(key);
+	}
+#endif
 	if (action == GLFW_RELEASE) {
 		switch (key) {
 		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
