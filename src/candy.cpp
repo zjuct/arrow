@@ -5,12 +5,25 @@
 static Control *control = Control::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
 
+// #include <iostream>
+
+// void printMat4(const glm::mat4& mat) {
+//     for(int i = 0; i < 4; i++) {
+//         for(int j = 0; j < 4; j++) {
+//             std::cout << mat[i][j] << " ";
+//         }
+//         std::cout << std::endl;
+//     }
+//     std::cout << "-------------" << std::endl;
+// }
+
 void Candy::draw()
 {
     if (type == CANDY_NONE)
         return;
     updateModel();
-    candy.draw();
+    // printMat4(candy->getGModelNoscale());
+    candy->draw();
 }
 
 void Candy::updateModel()
@@ -19,7 +32,8 @@ void Candy::updateModel()
     model = glm::translate(model, pos);
     model = glm::rotate(model, rotateDir, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(scale, scale, scale));
-    candy.setModel(model);
+    candy->setModel(model);
+    candy->setModel_noscale(model);
 }
 
 void Candy::update(float dt)
@@ -52,9 +66,12 @@ CandyManager *CandyManager::getInstance()
 void CandyManager::init(const char *objfile)
 {
     obj = Scene::LoadObj(objfile);
-    std::vector<Mesh> &meshes = obj->getMesh();
-    // .obj中定义的顺序必须为arrow_normal, arrow_laser, arrow_ground_spike
-    model = Object(OBJECT_MESH, &meshes[4], player_shader);
+    model = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
+                   nullptr, false);
+    for (auto &mesh : obj->getMesh())
+    {
+        Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &model);
+    }
 }
 
 void CandyManager::draw()
@@ -92,7 +109,7 @@ void CandyManager::update(float dt)
 
 void CandyManager::generateCandy(glm::vec3 pos, CandyType type)
 {
-    candies.push_back(Candy(model, pos, 0.0f, 1.0f, type));
+    candies.push_back(Candy(&model, pos, 0.0f, 1.0f, type));
 }
 
 void CandyManager::generateCandy()

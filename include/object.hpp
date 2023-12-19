@@ -86,6 +86,10 @@ public:
         return gmodel;
     }
 
+    const glm::mat4& getGModelNoscale() {
+        return gmodel_noscale;
+    }
+
     virtual void update(float dt) {}
 
     void updateModel() {

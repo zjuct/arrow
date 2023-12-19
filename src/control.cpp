@@ -68,11 +68,11 @@ void Control::init() {
 	ground.init("resource/assets/scene/scene.obj");
 
 	// 箭
-	arrowMgr->init("resource/assets/player2/player.obj");
+	arrowMgr->init("resource/assets/weapon/knife.obj");
 	arrowMgr->bindArrow(1, camera.Position, camera.Front, ARROW_NORMAL);
 
 	// 道具
-	candyMgr->init("resource/assets/player2/player.obj");
+	candyMgr->init("resource/assets/weapon/knife.obj");
 
 #ifdef SAT_TEST
 	test.init();

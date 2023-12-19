@@ -34,9 +34,9 @@ class Arrow
 {
 
 public:
-    Object arrow_normal;
-    Object arrow_laser;
-    Object arrow_ground_spike;
+    Object* arrow_normal;
+    Object* arrow_laser;
+    Object* arrow_ground_spike;
 
     bool isFire = false;
     bool isStop = false;
@@ -63,7 +63,7 @@ public:
 
 public:
     Arrow() {}
-    Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike);
+    Arrow(Object* arrow_normal, Object* arrow_laser, Object* arrow_ground_spike);
     ~Arrow() {}
 
     // Arrow(const Arrow &arrow);

@@ -5,7 +5,7 @@
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
 
-Arrow::Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike)
+Arrow::Arrow(Object* arrow_normal, Object* arrow_laser, Object* arrow_ground_spike)
 {
     this->arrow_normal = arrow_normal;
     this->arrow_laser = arrow_laser;
@@ -24,13 +24,13 @@ void Arrow::draw()
     switch (type)
     {
     case ARROW_NORMAL:
-        arrow_normal.draw();
+        arrow_normal->draw();
         break;
     case ARROW_LASER:
-        arrow_laser.draw();
+        arrow_laser->draw();
         break;
     case ARROW_GROUND_SPIKE:
-        arrow_ground_spike.draw();
+        arrow_ground_spike->draw();
         break;
     }
 }
@@ -117,20 +117,46 @@ void Arrow::updateModel()
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, pos);
     //旋转到dir方向
-    glm::vec3 axis = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), dir);
-    float angle = glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), dir));
+    glm::vec3 axis;
+    float angle; 
+    axis = glm::cross(glm::vec3(0.0f, 0.0f,1.0f), glm::vec3(dir.x, 0.0f, dir.z));
+    angle = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f,1.0f), glm::normalize(glm::vec3(dir.x, 0.0f, dir.z))));
+    if(axis.y < 0.0f)
+    {
+        angle = -angle;
+    }
+    axis = glm::vec3(0.0f, 1.0f, 0.0f);
+    std::cout<<"angle: "<<angle<<std::endl;
+    std::cout<<"dir: "<<dir.x<<" "<<dir.y<<" "<<dir.z<<std::endl;
     model = glm::rotate(model, angle, axis);
+    axis = glm::vec3(1.0f, 0.0f, 0.0f);
+    angle = glm::acos(dir.y);
+    model = glm::rotate(model, angle, axis);
+    // model = glm::rotate(model, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    switch (type)
+    {
+    case ARROW_NORMAL:
+        arrow_normal->setModel_noscale(model);
+        break;
+    case ARROW_LASER:
+        arrow_laser->setModel_noscale(model);
+        break;
+    case ARROW_GROUND_SPIKE:
+        arrow_ground_spike->setModel_noscale(model);
+        break;
+    }
     model = glm::scale(model, glm::vec3(scale, scale, scale));
     switch (type)
     {
     case ARROW_NORMAL:
-        arrow_normal.setModel(model);
+        arrow_normal->setModel(model);
         break;
     case ARROW_LASER:
-        arrow_laser.setModel(model);
+        arrow_laser->setModel(model);
         break;
     case ARROW_GROUND_SPIKE:
-        arrow_ground_spike.setModel(model);
+        arrow_ground_spike->setModel(model);
         break;
     }
 }
@@ -144,11 +170,25 @@ ArrowManager *ArrowManager::getInstance()
 void ArrowManager::init(const char *objfile)
 {
     obj = Scene::LoadObj(objfile);
-    std::vector<Mesh> &meshes = obj->getMesh();
-    // .obj中定义的顺序必须为arrow_normal, arrow_laser, arrow_ground_spike
-    arrow_normal = Object(OBJECT_MESH, &meshes[4], player_shader);
-    arrow_laser = Object(OBJECT_MESH, &meshes[1], player_shader);
-    arrow_ground_spike = Object(OBJECT_MESH, &meshes[2], player_shader);
+    arrow_normal = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
+                   nullptr, false);
+    for (auto &mesh : obj->getMesh())
+    {
+        Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &arrow_normal);
+    }
+    arrow_laser = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
+                   nullptr, false);
+    for (auto &mesh : obj->getMesh())
+    {
+        Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &arrow_laser);
+    }
+    arrow_ground_spike = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
+                   nullptr, false);
+    for (auto &mesh : obj->getMesh())
+    {
+        Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &arrow_ground_spike);
+    }
+    
 }
 
 void ArrowManager::draw()
@@ -181,7 +221,7 @@ void ArrowManager::update(float dt)
 
 void ArrowManager::bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type, float speed, float scale, float weight, float loadTime)
 {
-    Arrow arrow = Arrow(arrowMgr->arrow_normal, arrowMgr->arrow_laser, arrowMgr->arrow_ground_spike);
+    Arrow arrow = Arrow(&arrowMgr->arrow_normal, &arrowMgr->arrow_laser, &arrowMgr->arrow_ground_spike);
     arrow.type = type;
     arrow.scale = scale;
     arrow.speed = speed;
