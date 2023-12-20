@@ -31,7 +31,7 @@ enum CandyType
 class Candy
 {
 public:
-    Object *candy;
+    Object candy;
     constexpr static float rotateSpeed = 0.5f;
     float liveTime = 10.0f;
     glm::vec3 pos;
@@ -46,7 +46,7 @@ public:
         scale = 1.0f;
         type = CANDY_NONE;
     }
-    Candy(Object *candy, glm::vec3 pos, CandyType type, float rotateDir = 0.0f, float scale = 1.0f)
+    Candy(Object &candy, glm::vec3 pos, CandyType type, float rotateDir = 0.0f, float scale = 1.0f)
     {
         this->candy = candy;
         this->pos = pos;

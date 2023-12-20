@@ -32,6 +32,41 @@ public:
         updateModel();
     }
 
+    Object(const Object& o) {
+        type = o.type;
+        shape = o.shape;
+        shader = o.shader;
+        lmodel = o.lmodel;
+        lmodel_noscale = o.lmodel_noscale;
+        parent = o.parent;
+        show = o.show;
+        for(Object* c : o.children) {
+            addChild(new Object(*c));
+        }
+        updateModel();
+    }
+
+    Object operator = (const Object& o) {
+        type = o.type;
+        shape = o.shape;
+        shader = o.shader;
+        lmodel = o.lmodel;
+        lmodel_noscale = o.lmodel_noscale;
+        parent = o.parent;
+        show = o.show;
+        for(Object* c : o.children) {
+            addChild(new Object(*c));
+        }
+        updateModel();
+        return *this;
+    }
+
+    ~Object() {
+        for(Object* c : children) {
+            delete c;
+        }
+    }
+
     ObjectType getType() {
         return type;
     }

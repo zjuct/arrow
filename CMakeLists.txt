@@ -5,6 +5,8 @@ project(arrow)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
 
+
+
 # 设置编译选项
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,6 +45,8 @@ target_link_libraries(arrow
     PUBLIC ${A}
 )
 
+# 设置编译选项 -Wno-volatile
+target_compile_options(arrow PRIVATE -Wno-volatile)
 
 set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
