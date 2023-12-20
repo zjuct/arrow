@@ -72,7 +72,7 @@ void Control::init() {
 
 	// 箭
 	arrowMgr->init("resource/assets/weapon/knife.obj");
-	arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
+	arrowMgr->bindArrow(PLAYER_ID, ARROW_LASER);
 
 	// 道具
 	candyMgr->init("resource/assets/weapon/knife.obj");

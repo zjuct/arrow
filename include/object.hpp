@@ -34,7 +34,6 @@ public:
     }
 
     Object(const Object& o) {
-        if(this == &o) return;
         type = o.type;
         shape = o.shape;
         shader = o.shader;
@@ -48,7 +47,7 @@ public:
         updateModel();
     }
 
-    Object operator = (const Object& o) {
+    Object& operator= (const Object& o) {
         if(this == &o) return *this;
         type = o.type;
         shape = o.shape;
@@ -57,6 +56,7 @@ public:
         lmodel_noscale = o.lmodel_noscale;
         parent = o.parent;
         show = o.show;
+        children.clear();
         for(Object* c : o.children) {
             addChild(new Object(*c));
         }
@@ -65,8 +65,6 @@ public:
     }
 
     ~Object() {
-        static int cnt = 0;
-        // std::cout<<"Object destructor"<<++cnt<<std::endl;
         for(Object* c : children) {
             delete c;
         }
