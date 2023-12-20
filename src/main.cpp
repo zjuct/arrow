@@ -57,7 +57,7 @@ int main()
         skybox_obj.draw();
         glDepthMask(GL_TRUE);
         control->ground.draw();
-        for (auto player : control->players)
+        for (auto& player : control->players)
             player.draw();
 
         control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));

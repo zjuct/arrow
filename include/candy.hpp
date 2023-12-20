@@ -8,6 +8,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <vector>
 #include <map>
+#include <set>
+#include <list>
 
 enum CandyType
 {
@@ -47,8 +49,8 @@ public:
         type = CANDY_NONE;
     }
     Candy(Object &candy, glm::vec3 pos, CandyType type, float rotateDir = 0.0f, float scale = 1.0f)
+    : candy(candy)
     {
-        this->candy = candy;
         this->pos = pos;
         this->type = type;
         this->rotateDir = 1.0f * (rand() % 360);
@@ -68,7 +70,7 @@ public:
 
     Scene *obj;
     Object model;
-    std::vector<Candy> candies;
+    std::list<Candy> candies;
 
     float generateTime = 1.0f;
 

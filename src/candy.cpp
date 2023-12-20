@@ -91,6 +91,7 @@ void CandyManager::update(float dt)
     {
         if (it->type == CANDY_DISAPPEAR)
         {
+            // std::cout<<"disappear"<<std::endl;
             it = candies.erase(it);
         }
         else
@@ -98,6 +99,7 @@ void CandyManager::update(float dt)
             it++;
         }
     }
+    // std::cout<<"size:"<<candies.size()<<std::endl;
     generateTime -= dt;
     if (generateTime <= 0.0f)
     {
@@ -108,7 +110,7 @@ void CandyManager::update(float dt)
 
 void CandyManager::generateCandy(glm::vec3 pos, CandyType type)
 {
-    candies.push_back(Candy(model, pos, type, 0.0f, 1.0f));
+    candies.emplace_back(model, pos, type, 0.0f, 1.0f);
 }
 
 void CandyManager::generateCandy()
