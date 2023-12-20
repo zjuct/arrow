@@ -20,6 +20,8 @@ Player::~Player()
 
 void Player::init(const char *objfile, glm::vec3 position)
 {
+	static int cnt = 0;
+	id = cnt++;
 	this->position = position;
 	updatePlayerVectors();
 
@@ -127,9 +129,9 @@ void Player::update(float dt)
 		break;
 	}
 	if (fireTime > 0.0f)
-		fireTime -= dt;
-	if (control->leftPress)
-		fireTime -= dt;
+		fireTime -= dt / arrowMgr->getArrow(id).loadTime;
+	else if (control->leftPress && id == PLAYER_ID)
+		fireTime -= dt / arrowMgr->getArrow(id).strengthTime;
 	if (fireTime < -1.0f)
 		fireTime = -1.0f;
 
@@ -197,5 +199,6 @@ void Player::updateModel()
 
 void Player::fire()
 {
-	fireTime = 1.0f;
+	if (arrowMgr->fire(PLAYER_ID))
+		fireTime = 1.0f;
 }

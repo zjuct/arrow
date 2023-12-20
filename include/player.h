@@ -67,6 +67,7 @@ public:
 	glm::vec3 up;
 
 	void fire();
+	// void press();
 	
 
 private:
@@ -95,6 +96,7 @@ private:
 
 	float omega = 1.0f;		// 角速度
 	float theta = 0.0f;		// 手臂和腿转动
+	int id;
 };
 
 #endif
