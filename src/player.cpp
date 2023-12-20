@@ -29,11 +29,11 @@ void Player::init(const char *objfile, glm::vec3 position)
 	std::vector<Mesh> &meshes = obj->getMesh();
 	// .obj中定义的顺序必须为body, head, larm, lleg, rarm, rleg
 	body = Object(OBJECT_MESH, &meshes[0], player_shader);
-	head = Object(OBJECT_MESH, &meshes[1], player_shader);
-	larm = Object(OBJECT_MESH, &meshes[2], player_shader);
-	lleg = Object(OBJECT_MESH, &meshes[3], player_shader);
-	rarm = Object(OBJECT_MESH, &meshes[4], player_shader);
-	rleg = Object(OBJECT_MESH, &meshes[5], player_shader);
+	head = Object(OBJECT_MESH, &meshes[5], player_shader);
+	larm = Object(OBJECT_MESH, &meshes[3], player_shader);
+	lleg = Object(OBJECT_MESH, &meshes[4], player_shader);
+	rarm = Object(OBJECT_MESH, &meshes[1], player_shader);
+	rleg = Object(OBJECT_MESH, &meshes[2], player_shader);
 }
 
 void Player::processKeyboard(Movement direction, float deltaTime)
