@@ -5,7 +5,7 @@
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
 
-Arrow::Arrow(Object* arrow_normal, Object* arrow_laser, Object* arrow_ground_spike)
+Arrow::Arrow(Object *arrow_normal, Object *arrow_laser, Object *arrow_ground_spike)
 {
     this->arrow_normal = arrow_normal;
     this->arrow_laser = arrow_laser;
@@ -16,7 +16,7 @@ void Arrow::draw()
 {
     if (state == ARROW_DISAPPEAR | state == ARROW_NONE)
         return;
-    if(state == ARROW_LOADING)
+    if (state == ARROW_LOADING)
         return;
     updateModel();
     // std::cout << "state: " << state << std::endl;
@@ -42,8 +42,8 @@ void Arrow::update(float dt)
         if (type == ARROW_NORMAL)
         {
             glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
-            glm::vec3 delta = dir * speed + g * dt * weight;
-            delta = delta * (1-WIND_RESISTANCE);
+            glm::vec3 delta = dir * speed + g * dt;
+            delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, dt));
             pos += delta;
             dir = glm::normalize(delta);
         }
@@ -116,12 +116,12 @@ void Arrow::updateModel()
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, pos);
-    //旋转到dir方向
+    // 旋转到dir方向
     glm::vec3 axis;
-    float angle; 
-    axis = glm::cross(glm::vec3(0.0f, 0.0f,1.0f), glm::vec3(dir.x, 0.0f, dir.z));
-    angle = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f,1.0f), glm::normalize(glm::vec3(dir.x, 0.0f, dir.z))));
-    if(axis.y < 0.0f)
+    float angle;
+    axis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(dir.x, 0.0f, dir.z));
+    angle = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(glm::vec3(dir.x, 0.0f, dir.z))));
+    if (axis.y < 0.0f)
     {
         angle = -angle;
     }
@@ -169,24 +169,23 @@ void ArrowManager::init(const char *objfile)
 {
     obj = Scene::LoadObj(objfile);
     arrow_normal = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
-                   nullptr, false);
+                          nullptr, false);
     for (auto &mesh : obj->getMesh())
     {
         Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &arrow_normal);
     }
     arrow_laser = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
-                   nullptr, false);
+                         nullptr, false);
     for (auto &mesh : obj->getMesh())
     {
         Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &arrow_laser);
     }
     arrow_ground_spike = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
-                   nullptr, false);
+                                nullptr, false);
     for (auto &mesh : obj->getMesh())
     {
         Object *node = new Object(OBJECT_MESH, &mesh, player_shader, glm::mat4(1.0f), &arrow_ground_spike);
     }
-    
 }
 
 void ArrowManager::draw()
@@ -247,7 +246,7 @@ void ArrowManager::fire(int playerId, glm::vec3 pos, glm::vec3 dir, float pressT
         return;
     bool t = arrows[arrowMap[playerId]].fire(pos, dir, playerId == PLAYER_ID ? pressTime : 1.0f);
     std::cout << "fire time: " << pressTime << std::endl;
-    std::cout<<"playerId: "<<playerId<<std::endl;
+    std::cout << "playerId: " << playerId << std::endl;
     if (t)
         load(playerId);
 }
