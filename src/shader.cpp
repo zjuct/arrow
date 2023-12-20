@@ -6,6 +6,7 @@ Shader* pbr_shader = nullptr;
 Shader* skybox_shader = nullptr;
 Shader* player_shader = nullptr;
 Shader* segment_shader = nullptr;
+Shader* flat_shader = nullptr;
 
 void Shader::initShader() {
     default_shader = new Shader("resource/shader/default/vs.glsl", "resource/shader/default/fs.glsl");
@@ -13,6 +14,7 @@ void Shader::initShader() {
     pbr_shader = new Shader("resource/shader/pbr/vs.glsl", "resource/shader/pbr/fs.glsl");
     skybox_shader = new Shader("resource/shader/skybox/vs.glsl", "resource/shader/skybox/fs.glsl");
     segment_shader = new Shader("resource/shader/segment/vs.glsl", "resource/shader/segment/fs.glsl");
+    flat_shader = new Shader("resource/shader/flat/vs.glsl", "resource/shader/flat/fs.glsl");
 
     player_shader = default_shader;
 }

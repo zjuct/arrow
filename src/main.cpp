@@ -59,6 +59,9 @@ int main()
         control->ground.draw();
         for (auto player : control->players)
             player.draw();
+        glDisable(GL_DEPTH_TEST);
+        control->ui.draw();
+        glEnable(GL_DEPTH_TEST);
 
         control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
         control->arrowMgr->update(control->dt);

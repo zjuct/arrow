@@ -16,6 +16,8 @@
 #include <candy.hpp>
 #include <ground.hpp>
 #include <light.hpp>
+#include <defs.h>
+#include <ui.hpp>
 #include <ctime>
 #include <vector>
 
@@ -42,6 +44,8 @@ public:
 	void pollKeyPress();
 	glm::vec3 getAim();
 
+	// UI 界面
+	UI ui;
 
 	// 相机
 	Camera camera;
@@ -71,8 +75,8 @@ public:
 	bool firstMouse = true;
 	double dt = 0.0;		// 间隔时间
 	double oldTime = 0.0;	// 上次更新时间
-	int wwidth = 800;
-	int wheight = 600;
+	int wwidth = WWIDTH;
+	int wheight = WHEIGHT;
 
 	int fps = 0;
 

@@ -57,6 +57,9 @@ void Control::init() {
 
 	Shader::initShader();
 
+	// 初始化用户界面
+	ui.init();
+
 	Player player1;
 	player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
 	players.push_back(player1);
