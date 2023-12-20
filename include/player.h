@@ -65,6 +65,9 @@ public:
 	glm::vec3 front;
 	glm::vec3 right;
 	glm::vec3 up;
+
+	void fire();
+	// void press();
 	
 
 private:
@@ -87,12 +90,13 @@ private:
 	bool floating = false;
 	float jumpHeight = 3.0f;
 	float jumpSpeed = 0.0f;
-
+	float fireTime = 0.0f;
 
 	float lastyaw;
 
 	float omega = 1.0f;		// 角速度
 	float theta = 0.0f;		// 手臂和腿转动
+	int id;
 };
 
 #endif

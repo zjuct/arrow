@@ -7,9 +7,10 @@
 
 #include <iostream>
 
-static Control* control = Control::getInstance();
+static Control *control = Control::getInstance();
+static ArrowManager *arrowMgr = ArrowManager::getInstance();
 
-Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f) 
+Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
 {
 }
 
@@ -19,6 +20,8 @@ Player::~Player()
 
 void Player::init(const char *objfile, glm::vec3 position)
 {
+	static int cnt = 0;
+	id = cnt++;
 	this->position = position;
 	updatePlayerVectors();
 
@@ -125,6 +128,12 @@ void Player::update(float dt)
 		}
 		break;
 	}
+	if (fireTime > 0.0f)
+		fireTime -= dt / arrowMgr->getArrow(id).loadTime;
+	else if (control->leftPress && id == PLAYER_ID)
+		fireTime -= dt / arrowMgr->getArrow(id).strengthTime;
+	if (fireTime < -1.0f)
+		fireTime = -1.0f;
 
 	jumpSpeed -= GRAVITY * dt * 100.0f;
 	position.y += jumpSpeed * dt;
@@ -142,9 +151,9 @@ void Player::updateModel()
 
 	glm::mat4 basemodel(1.0f);
 	basemodel = glm::translate(basemodel, position);
-	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
 	// 这里的 rotate 输入为弧度制
-	// if (state == PLAYER_RUN) 
+	// if (state == PLAYER_RUN)
 	// 	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
 	// else
 	// 	basemodel = glm::rotate(basemodel, (float)glm::radians(lastyaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -171,7 +180,7 @@ void Player::updateModel()
 
 	model = basemodel;
 	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	// model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, -fireTime, glm::vec3(1.0f, 0.0f, 0.0f));
 	rarm.setModel(model);
 	rarm.setModel_noscale(model);
 
@@ -186,4 +195,10 @@ void Player::updateModel()
 	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	rleg.setModel(model);
 	rleg.setModel_noscale(model);
+}
+
+void Player::fire()
+{
+	if (arrowMgr->fire(PLAYER_ID))
+		fireTime = 1.0f;
 }

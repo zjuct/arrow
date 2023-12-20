@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "player.h"
+#include "defs.h"
 
 #include <vector>
 
@@ -59,10 +60,11 @@ public:
     }
 
     void updateCamera() {
-        glm::vec3 offset = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 offset = CAMERA_TO_PLAYER_OFFSET;
         glm::vec3 position = player->position;
         glm::vec3 front    = player->front;
-        this->Position = position + offset - ((2.5f - front.y) * front);
+        glm::vec3 right    = player->right;
+        this->Position = position + offset - ((2.5f - front.y) * front) + (0.3f * right);
         this->Front    = front;
         updateCameraVectors();
     }

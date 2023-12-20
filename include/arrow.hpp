@@ -45,6 +45,7 @@ public:
     float speed = 1.0f;
     float weight = 1.0f;
     float loadTime = 0.1f;
+    float pressTime = 0.0f;
 
     float liveTime = 1000.0f;
     // float stopTime = 0.0f;
@@ -52,7 +53,7 @@ public:
 
     float strengthMax = 3.0f;
     float strengthMin = 1.0f;
-    float strengthTime = 3.0f;
+    float strengthTime = 2.0f;
     float strength = 1.0f;
 
     glm::vec3 pos;
@@ -73,7 +74,7 @@ public:
     void update(float dt);
     void update(glm::vec3 pos, glm::vec3 dir);
     void updateModel();
-    bool fire(glm::vec3 pos, glm::vec3 dir, float strength = 1.0f);
+    bool fire();
     // void stop();
     // void disappear();
 };
@@ -105,8 +106,12 @@ public:
     void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 0.2f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
     void deleteArrow(int playerId);
-    void fire(int playerId, glm::vec3 pos, glm::vec3 dir, float pressTime = 1.0f);
+    bool fire(int playerId);
     void load(int playerId);
+    Arrow &getArrow(int playerId)
+    {
+        return arrows[arrowMap[playerId]];
+    }
 };
 
 #endif
