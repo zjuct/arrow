@@ -182,6 +182,43 @@ public:
         updateModel();
     }
 
+    Obb* getObb() {
+        return obb;
+    }
+
+    std::vector<Object*>& getChildren() {
+        return children;
+    }
+
+    bool intersactWith(const Object &other) const 
+    {
+        if(obb)
+        {
+            if(other.obb)
+            {
+                return obb->intersactWith(*(other.obb));
+            }
+            else
+            {
+                for(Object* c : other.children)
+                {
+                    if(intersactWith(*c))
+                        return true;
+                }
+                return false;
+            }
+        }
+        else
+        {
+            for(Object* c : children)
+            {
+                if(c->intersactWith(other))
+                    return true;
+            }
+            return false;
+        }
+    }
+
 protected:
     ObjectType type;
     Shape* shape;

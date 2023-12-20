@@ -13,9 +13,9 @@
 
 #define INF 1e6f
 
-glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices);
-void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors);
-void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2);
+glm::mat3 CovMatrix(const std::vector<glm::vec3> &vertices);
+void JacobiSolver(glm::mat3 matrix, glm::vec3 &eValues, glm::mat3 &eVectors);
+void SchmidtOrthogonalization(glm::vec3 &v0, glm::vec3 &v1, glm::vec3 &v2);
 
 // obbgen使用样例
 //    Scene* scene = Scene::LoadObj("resource/assets/scene2/scene.obj");
@@ -36,21 +36,27 @@ void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2);
 //        obbs.emplace_back(obb);
 //    }
 
-struct foo {
-    foo(): x(0.0f), y(0.0f), z(0.0f) {}
-    foo(const foo& other): x(other.x), y(other.y), z(other.z) {}
-    foo(const glm::vec3& vec) {
+struct foo
+{
+    foo() : x(0.0f), y(0.0f), z(0.0f) {}
+    foo(const foo &other) : x(other.x), y(other.y), z(other.z) {}
+    foo(const glm::vec3 &vec)
+    {
         x = vec.x;
         y = vec.y;
         z = vec.z;
     }
     float x, y, z;
-    bool operator==(const foo& other) const {
+    bool operator==(const foo &other) const
+    {
         return x == other.x && y == other.y && z == other.z;
     }
-    bool operator<(const foo& other) const {
-        if(x == other.x) {
-            if(y == other.y) {
+    bool operator<(const foo &other) const
+    {
+        if (x == other.x)
+        {
+            if (y == other.y)
+            {
                 return z < other.z;
             }
             return y < other.y;
@@ -59,20 +65,23 @@ struct foo {
     }
 };
 
-Obb* Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
+Obb *Obb::obbgen(const std::vector<glm::vec3> &vertices, bool ground_parallel)
+{
     // 对顶点去重
     // 由于glm::vec3没有定义<，因此先转成foo
     std::vector<foo> vec;
-    for(int i = 0; i < vertices.size(); i++) {
+    for (int i = 0; i < vertices.size(); i++)
+    {
         vec.emplace_back(vertices[i]);
     }
     std::sort(vec.begin(), vec.end());
     vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
     std::vector<glm::vec3> vertices_unique;
-    for(auto& f : vec) {
+    for (auto &f : vec)
+    {
         vertices_unique.emplace_back(f.x, f.y, f.z);
     }
-    
+
     glm::mat3 covMat = CovMatrix(vertices_unique);
 
     glm::vec3 eValues;
@@ -80,25 +89,28 @@ Obb* Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
     // OBB的三条轴为eVectors
     JacobiSolver(covMat, eValues, eVectors);
 
-    for(int i = 0; i < 3; i++) {
-        if(eValues[i] == 0 || i == 2) {
+    for (int i = 0; i < 3; i++)
+    {
+        if (eValues[i] == 0 || i == 2)
+        {
             SchmidtOrthogonalization(eVectors[(i + 1) % 3], eVectors[(i + 2) % 3], eVectors[i]);
             break;
         }
     }
 
-    if(ground_parallel) {
+    if (ground_parallel)
+    {
         // 将第二个基变为(0, 1, 0)，强制OBB与地面平行
         eVectors[1] = glm::vec3(0.0f, 1.0f, 0.0f);
         eVectors[2] = glm::normalize(glm::cross(eVectors[0], eVectors[1]));
         eVectors[0] = glm::normalize(glm::cross(eVectors[1], eVectors[2]));
     }
-    
 
     glm::vec3 minExtents(INF, INF, INF);
     glm::vec3 maxExtents(-INF, -INF, -INF);
 
-    for(const glm::vec3& v : vertices_unique) {
+    for (const glm::vec3 &v : vertices_unique)
+    {
         minExtents[0] = std::min(minExtents[0], glm::dot(v, eVectors[0]));
         minExtents[1] = std::min(minExtents[1], glm::dot(v, eVectors[1]));
         minExtents[2] = std::min(minExtents[2], glm::dot(v, eVectors[2]));
@@ -116,17 +128,19 @@ Obb* Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
     return new Obb(center, halfExtent, glm::transpose(eVectors));
 }
 
-Obb::Obb(const glm::vec3& center, const glm::vec3& extends, const glm::mat3& rotate)
-    : center(center), extends(extends), rotate(rotate) {
-    
+Obb::Obb(const glm::vec3 &center, const glm::vec3 &extends, const glm::mat3 &rotate)
+    : center(center), extends(extends), rotate(rotate)
+{
 }
 
-void Obb::init() {
+void Obb::init()
+{
     generate();
     bind();
 }
 
-void Obb::draw(Shader* shader) {
+void Obb::draw(Shader *shader)
+{
 #if OBB_SHOW
     shader->use();
     glm::mat4 model(1.0f);
@@ -143,7 +157,12 @@ void Obb::draw(Shader* shader) {
 #endif
 }
 
-void Obb::drawLine(Shader* shader) {
+void Obb::drawLine(Shader *shader)
+{
+    if (drawFlag-- <= 0)
+    {
+        return;
+    }
 #if OBB_SHOW
     shader->use();
     glm::mat4 model(1.0f);
@@ -159,47 +178,58 @@ void Obb::drawLine(Shader* shader) {
 #endif
 }
 
+bool Obb::intersactWith(Obb &other)
+{
 
-bool Obb::intersactWith(const Obb& other) {
-    glm::vec3 v = other.center - this->center;
+    glm::vec3 translateMat = object->getGModelNoscale() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 otherTranslateMat = other.object->getGModelNoscale() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    glm::vec3 v = other.center + otherTranslateMat - this->center - translateMat;
+
+    glm::mat3 rotateMat = this->object->getGModelNoscale();
+    glm::mat3 otherRotateMat = other.object->getGModelNoscale();
 
     // A旋转后的轴
-    glm::vec3 VAx = this->rotate * glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 VAy = this->rotate * glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 VAz = this->rotate * glm::vec3(0.0f, 0.0f, 1.0f);
+    glm::vec3 VAx = rotateMat * this->rotate * glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 VAy = rotateMat * this->rotate * glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 VAz = rotateMat * this->rotate * glm::vec3(0.0f, 0.0f, 1.0f);
 
-    std::vector<glm::vec3> VA = { VAx, VAy, VAz };
+    std::vector<glm::vec3> VA = {VAx, VAy, VAz};
 
     // B旋转后的轴
-    glm::vec3 VBx = other.rotate * glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 VBy = other.rotate * glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 VBz = other.rotate * glm::vec3(0.0f, 0.0f, 1.0f);
+    glm::vec3 VBx = otherRotateMat * other.rotate * glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 VBy = otherRotateMat * other.rotate * glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 VBz = otherRotateMat * other.rotate * glm::vec3(0.0f, 0.0f, 1.0f);
 
-    std::vector<glm::vec3> VB = { VBx, VBy, VBz };
+    std::vector<glm::vec3> VB = {VBx, VBy, VBz};
 
     glm::vec3 T(glm::dot(v, VAx), glm::dot(v, VAy), glm::dot(v, VAz));
 
     glm::vec3 R[3], FR[3];
     float ra, rb, t;
-    
-    for(int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
             R[i][j] = glm::dot(VA[i], VB[j]);
             FR[i][j] = 1e-6f + abs(R[i][j]);
         }
     }
 
     // split axis与A的轴平行
-    for(int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         ra = this->extends[i];
         rb = other.extends[0] * FR[i][0] + other.extends[1] * FR[i][1] + other.extends[2] * FR[i][2];
         t = abs(T[i]);
-        if(t > ra + rb)
+        if (t > ra + rb)
             return false;
     }
 
     // split axis与B的轴平行
-    for(int j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++)
+    {
         ra = this->extends[0] * FR[0][j] + this->extends[1] * FR[1][j] + this->extends[2] * FR[2][j];
         rb = other.extends[j];
         t = abs(T[0] * R[0][j] + T[1] * R[1][j] + T[2] * R[2][j]);
@@ -270,61 +300,104 @@ bool Obb::intersactWith(const Obb& other) {
     if (t > ra + rb)
         return false;
 
+    other.drawFlag = 100;
+    this->drawFlag = 100;
     return true;
 }
 
-void Obb::generate() {
-    for(int i = -1; i <= 1; i += 2) {
-        for(int j = -1; j <= 1; j += 2) {
-            for(int k = -1; k <= 1; k += 2) {
+void Obb::generate()
+{
+    for (int i = -1; i <= 1; i += 2)
+    {
+        for (int j = -1; j <= 1; j += 2)
+        {
+            for (int k = -1; k <= 1; k += 2)
+            {
                 vertices.push_back(glm::vec3(i, j, k));
             }
         }
     }
 
-    indices = std::vector<unsigned> ({
-        0, 3, 1,
-        0, 2, 3,
-        1, 5, 4,
-        1, 4, 0,
-        1, 7, 5,
-        1, 3, 7,
-        3, 2, 6,
-        7, 3, 6,
-        5, 7, 4,
-        4, 7, 6,
-        2, 0, 6,
-        0, 4, 6,
+    indices = std::vector<unsigned>({
+        0,
+        3,
+        1,
+        0,
+        2,
+        3,
+        1,
+        5,
+        4,
+        1,
+        4,
+        0,
+        1,
+        7,
+        5,
+        1,
+        3,
+        7,
+        3,
+        2,
+        6,
+        7,
+        3,
+        6,
+        5,
+        7,
+        4,
+        4,
+        7,
+        6,
+        2,
+        0,
+        6,
+        0,
+        4,
+        6,
     });
 
-    line_indices = std::vector<unsigned> ({
-        0, 2,
-        0, 1,
-        1, 3,
-        2, 3,
-        0, 4,
-        2, 6,
-        3, 7,
-        1, 5,
-        4, 5,
-        5, 7,
-        6, 7,
-        4, 6,
+    line_indices = std::vector<unsigned>({
+        0,
+        2,
+        0,
+        1,
+        1,
+        3,
+        2,
+        3,
+        0,
+        4,
+        2,
+        6,
+        3,
+        7,
+        1,
+        5,
+        4,
+        5,
+        5,
+        7,
+        6,
+        7,
+        4,
+        6,
     });
 }
 
-void Obb::bind() {
+void Obb::bind()
+{
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     glGenVertexArrays(1, &VAO);
-    
+
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
@@ -334,14 +407,14 @@ void Obb::bind() {
     // line
     glGenBuffers(1, &EBOline);
     glGenVertexArrays(1, &VAOline);
-    
+
     glBindVertexArray(VAOline);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOline);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * line_indices.size(), line_indices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
@@ -350,31 +423,37 @@ void Obb::bind() {
 }
 
 // 计算协方差矩阵
-glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices) {
-//    for(int i = 0; i < vertices.size(); i++) {
-//        for(int j = 0; j < 3; j++) {
-//            std::cout << vertices[i][j] << " ";
-//        }
-//        std::cout << std::endl;
-//    }
+glm::mat3 CovMatrix(const std::vector<glm::vec3> &vertices)
+{
+    //    for(int i = 0; i < vertices.size(); i++) {
+    //        for(int j = 0; j < 3; j++) {
+    //            std::cout << vertices[i][j] << " ";
+    //        }
+    //        std::cout << std::endl;
+    //    }
     glm::mat3 cov(0.0f);
     std::vector<glm::vec3> vcopy(vertices);
 
     // compute average x, y, z
     glm::vec3 avg(0.0);
-    for(int i = 0; i < vcopy.size(); i++) {
+    for (int i = 0; i < vcopy.size(); i++)
+    {
         avg += vcopy[i];
     }
     avg /= (float)vcopy.size();
 
-    for(int i = 0; i < vcopy.size(); i++) {
+    for (int i = 0; i < vcopy.size(); i++)
+    {
         vcopy[i] -= avg;
     }
 
     // compute cov
-    for(int row = 0; row < 3; row++) {
-        for(int col = 0; col < 3; col++) {
-            for(int i = 0; i < vcopy.size(); i++) {
+    for (int row = 0; row < 3; row++)
+    {
+        for (int col = 0; col < 3; col++)
+        {
+            for (int i = 0; i < vcopy.size(); i++)
+            {
                 cov[row][col] += vcopy[i][row] * vcopy[i][col];
             }
         }
@@ -385,32 +464,32 @@ glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices) {
 }
 
 // 求解特征向量
-void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors)
+void JacobiSolver(glm::mat3 matrix, glm::vec3 &eValues, glm::mat3 &eVectors)
 {
-//    for(int i = 0; i < 3; i++) {
-//        for(int j = 0; j < 3; j++) {
-//            std::cout << matrix[i][j] << " ";
-//        }
-//        std::cout << std::endl;
-//    }
+    //    for(int i = 0; i < 3; i++) {
+    //        for(int j = 0; j < 3; j++) {
+    //            std::cout << matrix[i][j] << " ";
+    //        }
+    //        std::cout << std::endl;
+    //    }
     const float eps1 = 0.000001f;
     const float eps2 = 0.000001f;
     const float eps3 = 0.000001f;
     const float INV_SQRT_TWO = 0.707106781f;
 
     float p, q, spq;
-    float cosa, sina;					// holds cos(alpha) and sin(alpha)
-    float temp;							// used for temporary storage
-    float s1 = 0.0f;					// sums of squares of diagonal
-    float s2;							// elements
+    float cosa, sina; // holds cos(alpha) and sin(alpha)
+    float temp;       // used for temporary storage
+    float s1 = 0.0f;  // sums of squares of diagonal
+    float s2;         // elements
 
-    bool flag = true;					// determines whether to iterate again.
-    int iteration = 0;					// iteration counter
+    bool flag = true;  // determines whether to iterate again.
+    int iteration = 0; // iteration counter
 
-    glm::vec3 mik;						// used for temporary storage of m[i][k]
+    glm::vec3 mik; // used for temporary storage of m[i][k]
 
-    glm::mat3 t = glm::mat3(1.0f);	// stores the product of the rotation matrices.
-                                        // Its columns ultimately hold the eigenvectors
+    glm::mat3 t = glm::mat3(1.0f); // stores the product of the rotation matrices.
+                                   // Its columns ultimately hold the eigenvectors
 
     do
     {
@@ -516,7 +595,8 @@ void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors)
 }
 
 // 施密特正交化
-void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2) {
+void SchmidtOrthogonalization(glm::vec3 &v0, glm::vec3 &v1, glm::vec3 &v2)
+{
     v0 = glm::normalize(v0);
     v1 -= glm::dot(v0, v1) * v0;
     v1 = glm::normalize(v1);

@@ -10,6 +10,10 @@ class Ground {
 
   void init(const char* objectfile);
   void draw();
+  Object& getModel()
+  {
+    return model;
+  }
 
   private:
   Scene *obj;

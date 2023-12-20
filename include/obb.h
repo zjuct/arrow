@@ -62,12 +62,14 @@ public:
 
     Object* object;     // OBB所属的object
 
-    bool intersactWith(const Obb& other);
+    bool intersactWith(Obb& other);
 
     void draw(Shader* shader);
     void drawLine(Shader* shader);
 
     material_t material;
+
+    int drawFlag = 0;
 
 private:
     void generate();

@@ -62,6 +62,8 @@ public:
     ArrowState state = ARROW_HOLD;
     ArrowType type = ARROW_NORMAL;
 
+    int attackerId = -1;
+
 public:
     Arrow() {}
     Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike);

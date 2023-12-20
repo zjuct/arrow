@@ -37,6 +37,18 @@ void Arrow::draw()
 
 void Arrow::update(float dt)
 {
+    Object &arrow = [&]() -> Object & {
+        switch (type)
+        {
+        case ARROW_NORMAL:
+            return arrow_normal;
+        case ARROW_LASER:
+            return arrow_laser;
+        case ARROW_GROUND_SPIKE:
+            return arrow_ground_spike;
+        }
+        return arrow_normal;
+    }();
     if (state == ARROW_FLY)
     {
         if (type == ARROW_NORMAL)
@@ -58,6 +70,10 @@ void Arrow::update(float dt)
         if (pos.y <= FLOOR_Y - 0.1f)
         {
             state = ARROW_ON_FLOOR;
+        }
+        if(arrow.intersactWith(control->ground.getModel()))
+        {
+            state = ARROW_HIT_WALL;
         }
     }
     if (state == ARROW_LOADING)
@@ -242,6 +258,7 @@ void ArrowManager::bindArrow(int playerId, ArrowType type, float speed, float sc
     arrow.weight = weight;
     arrow.loadTime = loadTime;
     arrow.state = ARROW_NONE;
+    arrow.attackerId = playerId;
     arrows[++arrowCnt] = arrow;
     if(arrowSetting.count(playerId))
         arrows.erase(arrowSetting[playerId]);
