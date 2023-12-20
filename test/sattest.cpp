@@ -39,7 +39,7 @@ void SatTest::draw(Shader* shader) {
 }
 
 void SatTest::checkCollision() {
-    if(box1.intersactWith(box2)) {
+    if(box1.intersectWith(box2)) {
         box1.material.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
         box2.material.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
     } else {

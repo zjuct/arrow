@@ -178,7 +178,7 @@ void Obb::drawLine(Shader *shader)
 #endif
 }
 
-bool Obb::intersactWith(Obb &other)
+bool Obb::intersectWith(Obb &other)
 {
 
     glm::vec3 translateMat = object->getGModelNoscale() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

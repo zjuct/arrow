@@ -190,19 +190,19 @@ public:
         return children;
     }
 
-    bool intersactWith(const Object &other) const 
+    bool intersectWith(const Object &other) const 
     {
         if(obb)
         {
             if(other.obb)
             {
-                return obb->intersactWith(*(other.obb));
+                return obb->intersectWith(*(other.obb));
             }
             else
             {
                 for(Object* c : other.children)
                 {
-                    if(intersactWith(*c))
+                    if(intersectWith(*c))
                         return true;
                 }
                 return false;
@@ -212,7 +212,7 @@ public:
         {
             for(Object* c : children)
             {
-                if(c->intersactWith(other))
+                if(c->intersectWith(other))
                     return true;
             }
             return false;

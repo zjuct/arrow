@@ -71,7 +71,7 @@ void Arrow::update(float dt)
         {
             state = ARROW_ON_FLOOR;
         }
-        if(arrow.intersactWith(control->ground.getModel()))
+        if(arrow.intersectWith(control->ground.getModel()))
         {
             state = ARROW_HIT_WALL;
         }

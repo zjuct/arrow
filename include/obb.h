@@ -62,7 +62,7 @@ public:
 
     Object* object;     // OBB所属的object
 
-    bool intersactWith(Obb& other);
+    bool intersectWith(Obb& other);
 
     void draw(Shader* shader);
     void drawLine(Shader* shader);
