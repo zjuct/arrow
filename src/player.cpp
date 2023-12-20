@@ -37,9 +37,9 @@ void Player::processKeyboard(Movement direction, float deltaTime)
 {
 	float velocity = speed * deltaTime;
 	if (direction == FORWARD)
-		position += glm::vec3(front.x, 0.0f, front.z) * velocity;
+		position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
 	if (direction == BACKWARD)
-		position -= glm::vec3(front.x, 0.0f, front.z) * velocity;
+		position -= glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
 	if (direction == LEFT)
 		position -= right * velocity;
 	if (direction == RIGHT)
@@ -142,11 +142,12 @@ void Player::updateModel()
 
 	glm::mat4 basemodel(1.0f);
 	basemodel = glm::translate(basemodel, position);
+	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
 	// 这里的 rotate 输入为弧度制
-	if (state == PLAYER_RUN) 
-		basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
-	else
-		basemodel = glm::rotate(basemodel, (float)glm::radians(lastyaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+	// if (state == PLAYER_RUN) 
+	// 	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+	// else
+	// 	basemodel = glm::rotate(basemodel, (float)glm::radians(lastyaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
 
 	// head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
 	glm::mat4 model = basemodel;
