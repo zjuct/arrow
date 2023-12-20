@@ -43,7 +43,7 @@ private:
 
 class PointLight: public Light {
 public:
-    PointLight(glm::vec3 pos = glm::vec3(0.0f, 50.0f, 0.0f), float c = 1.0f, float l = 0.0014f, float q = 0.000007f, 
+    PointLight(glm::vec3 pos = glm::vec3(0.0f, 100.0f, 0.0f), float c = 1.0f, float l = 0.0014f, float q = 0.000007f, 
         glm::vec3 a = glm::vec3(0.5f), glm::vec3 d = glm::vec3(0.5f), glm::vec3 s = glm::vec3(0.5f), Shader* shader = nullptr, bool hasBox = false)
         : position(pos), constant(c), linear(l), quadratic(q), ambient(a), diffuse(d), specular(s), shader(shader) {
         if(hasBox) {

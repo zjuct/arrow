@@ -64,7 +64,8 @@ void main() {
     }
 
     FragColor = vec4(result, 1.0);
-//    FragColor = texture(material.diffuse, TexCoords);
+    //FragColor = vec4(pointLight.enable ? 1.0f : 0.0f, 0.0f, 0.0f, 1.0f);
+    //FragColor = texture(material.diffuse, TexCoords);
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
@@ -73,12 +74,14 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
     // 镜面光着色
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 5.0);
     // 合并结果
     vec3 ambient  = light.ambient * (material.has_diffuse_map ? texture(material.diffuse, TexCoords).rgb : material.Ka);
     vec3 diffuse  = light.diffuse * diff * (material.has_diffuse_map ? texture(material.diffuse, TexCoords).rgb : material.Kd);
     vec3 specular = light.specular * spec * (material.has_specular_map ? texture(material.specular, TexCoords).rgb : material.Ks);
     return (ambient + diffuse + specular);
+    //return light.specular;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
