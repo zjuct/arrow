@@ -5,7 +5,7 @@
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
 
-Arrow::Arrow(Object *arrow_normal, Object *arrow_laser, Object *arrow_ground_spike)
+Arrow::Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike)
 {
     this->arrow_normal = arrow_normal;
     this->arrow_laser = arrow_laser;
@@ -24,13 +24,13 @@ void Arrow::draw()
     switch (type)
     {
     case ARROW_NORMAL:
-        arrow_normal->draw();
+        arrow_normal.draw();
         break;
     case ARROW_LASER:
-        arrow_laser->draw();
+        arrow_laser.draw();
         break;
     case ARROW_GROUND_SPIKE:
-        arrow_ground_spike->draw();
+        arrow_ground_spike.draw();
         break;
     }
 }
@@ -144,26 +144,26 @@ void Arrow::updateModel()
     switch (type)
     {
     case ARROW_NORMAL:
-        arrow_normal->setModel_noscale(model);
+        arrow_normal.setModel_noscale(model);
         break;
     case ARROW_LASER:
-        arrow_laser->setModel_noscale(model);
+        arrow_laser.setModel_noscale(model);
         break;
     case ARROW_GROUND_SPIKE:
-        arrow_ground_spike->setModel_noscale(model);
+        arrow_ground_spike.setModel_noscale(model);
         break;
     }
     model = glm::scale(model, glm::vec3(scale, scale, scale));
     switch (type)
     {
     case ARROW_NORMAL:
-        arrow_normal->setModel(model);
+        arrow_normal.setModel(model);
         break;
     case ARROW_LASER:
-        arrow_laser->setModel(model);
+        arrow_laser.setModel(model);
         break;
     case ARROW_GROUND_SPIKE:
-        arrow_ground_spike->setModel(model);
+        arrow_ground_spike.setModel(model);
         break;
     }
 }
@@ -227,7 +227,7 @@ void ArrowManager::update(float dt)
 
 void ArrowManager::bindArrow(int playerId, ArrowType type, float speed, float scale, float weight, float loadTime)
 {
-    Arrow arrow = Arrow(&arrowMgr->arrow_normal, &arrowMgr->arrow_laser, &arrowMgr->arrow_ground_spike);
+    Arrow arrow = Arrow(arrowMgr->arrow_normal, arrowMgr->arrow_laser, arrowMgr->arrow_ground_spike);
     arrow.type = type;
     arrow.scale = scale;
     arrow.speed = speed;

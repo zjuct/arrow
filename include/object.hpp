@@ -7,6 +7,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <vector>
 #include <material.h>
+#include <iostream>
 
 enum ObjectType {
     OBJECT_NONE = 0,
@@ -30,6 +31,45 @@ public:
         if(parent)
             parent->addChild(this);
         updateModel();
+    }
+
+    Object(const Object& o) {
+        if(this == &o) return;
+        type = o.type;
+        shape = o.shape;
+        shader = o.shader;
+        lmodel = o.lmodel;
+        lmodel_noscale = o.lmodel_noscale;
+        parent = o.parent;
+        show = o.show;
+        for(Object* c : o.children) {
+            addChild(new Object(*c));
+        }
+        updateModel();
+    }
+
+    Object operator = (const Object& o) {
+        if(this == &o) return *this;
+        type = o.type;
+        shape = o.shape;
+        shader = o.shader;
+        lmodel = o.lmodel;
+        lmodel_noscale = o.lmodel_noscale;
+        parent = o.parent;
+        show = o.show;
+        for(Object* c : o.children) {
+            addChild(new Object(*c));
+        }
+        updateModel();
+        return *this;
+    }
+
+    ~Object() {
+        static int cnt = 0;
+        // std::cout<<"Object destructor"<<++cnt<<std::endl;
+        for(Object* c : children) {
+            delete c;
+        }
     }
 
     ObjectType getType() {

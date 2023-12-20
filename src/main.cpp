@@ -57,7 +57,7 @@ int main()
         skybox_obj.draw();
         glDepthMask(GL_TRUE);
         control->ground.draw();
-        for (auto player : control->players)
+        for (auto& player : control->players)
             player.draw();
         glDisable(GL_DEPTH_TEST);
         control->ui.draw();
