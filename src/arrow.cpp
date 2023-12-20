@@ -126,8 +126,6 @@ void Arrow::updateModel()
         angle = -angle;
     }
     axis = glm::vec3(0.0f, 1.0f, 0.0f);
-    std::cout<<"angle: "<<angle<<std::endl;
-    std::cout<<"dir: "<<dir.x<<" "<<dir.y<<" "<<dir.z<<std::endl;
     model = glm::rotate(model, angle, axis);
     axis = glm::vec3(1.0f, 0.0f, 0.0f);
     angle = glm::acos(dir.y);

@@ -46,13 +46,13 @@ public:
         scale = 1.0f;
         type = CANDY_NONE;
     }
-    Candy(Object *candy, glm::vec3 pos, float rotateDir, float scale, CandyType type)
+    Candy(Object *candy, glm::vec3 pos, CandyType type , float rotateDir =0.0f, float scale=1.0f)
     {
         this->candy = candy;
         this->pos = pos;
-        this->rotateDir = rotateDir;
-        this->scale = scale;
         this->type = type;
+        this->rotateDir = 1.0f * (rand() % 360);
+        this->scale = scale;
     }
 
     void draw();
