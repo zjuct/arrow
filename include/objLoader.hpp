@@ -41,6 +41,10 @@ public:
     void setScene(Scene* scene) {
         this->scene = scene;
     }
+
+    const std::vector<index_t>& getIndex() {
+        return indices;
+    }
 private:
     void setupMesh();
 
