@@ -120,6 +120,7 @@ void Control::handleMousePress(int button, int action) {
 			break;
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button pressed." << std::endl;
+			ui.aim.setState(AimState::AIM_FIRE);
 			leftPress = true;
 			break;
 		}
@@ -136,6 +137,7 @@ void Control::handleMousePress(int button, int action) {
 			leftPress = false;
 			// arrowMgr->fire(PLAYER_ID);
 			players[PLAYER_ID].fire();
+			ui.aim.setState(AimState::AIM_STILL);
 			break;
 		}
 	}
