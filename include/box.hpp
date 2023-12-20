@@ -8,6 +8,8 @@
 #include <vector>
 #include "shape.hpp"
 
+#include <obb.h>
+
 // 不含normal, texcoords的纯色Box
 // 如果需要带normal, texcoords的box，用.obj
 class Box: public Shape {
@@ -30,6 +32,11 @@ public:
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+
+    Obb* getObb() {
+        return nullptr;
+    }
+
 
 private:
     void generate() {

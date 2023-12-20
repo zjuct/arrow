@@ -13,6 +13,8 @@ Shape并不包含层次结构，层次结构定义在Object中
 #include <shader.h>
 #include <glm/glm.hpp>
 
+#include <obb.h>
+
 #include <vector>
 
 struct vertex_t {
@@ -27,6 +29,7 @@ struct vertex_t {
 class Shape {
 public:
     virtual void draw(Shader* shader) = 0;
+    virtual Obb* getObb() = 0;
 };
 
 extern void calcVNormal(std::vector<vertex_t>& v, const std::vector<unsigned int>& indices);

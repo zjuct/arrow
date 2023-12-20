@@ -9,6 +9,8 @@
 #include <material.h>
 #include <iostream>
 
+#include <obb.h>
+
 enum ObjectType {
     OBJECT_NONE = 0,
     OBJECT_MESH,
@@ -26,11 +28,19 @@ enum ObjectType {
 class Object {
 public:
     Object(ObjectType _type, Shape* _shape, Shader* _shader, glm::mat4 _model = glm::mat4(1.0f), Object* _parent = nullptr, bool _show = true)
-        : type(_type), shape(_shape), shader(_shader), lmodel(_model), parent(_parent), show(_show) {
+        : type(_type), shape(_shape), shader(_shader), lmodel(_model), parent(_parent), show(_show), obb(nullptr) {
         lmodel_noscale = lmodel;
         if(parent)
             parent->addChild(this);
         updateModel();
+
+        if(shape) {
+            obb = shape->getObb();
+            if(obb) {
+                obb->init();
+                obb->object = this;
+            }
+        }
     }
 
     Object(const Object& o) {
@@ -41,6 +51,12 @@ public:
         lmodel_noscale = o.lmodel_noscale;
         parent = o.parent;
         show = o.show;
+        if(o.obb) {
+            obb = new Obb(*(o.obb));
+            obb->object = this;
+        } else {
+            obb = nullptr;
+        }
         for(Object* c : o.children) {
             addChild(new Object(*c));
         }
@@ -56,6 +72,12 @@ public:
         lmodel_noscale = o.lmodel_noscale;
         parent = o.parent;
         show = o.show;
+        if(o.obb) {
+            obb = new Obb(*(o.obb));
+            obb->object = this;
+        } else {
+            obb = nullptr;
+        }
         children.clear();
         for(Object* c : o.children) {
             addChild(new Object(*c));
@@ -65,6 +87,8 @@ public:
     }
 
     ~Object() {
+      if(obb)
+            delete obb;
         for(Object* c : children) {
             delete c;
         }
@@ -111,6 +135,9 @@ public:
             shader->setmat4fv("model", GL_FALSE, glm::value_ptr(gmodel));
             material.configShader(shader);
 //            shader->setvec3fv("color", glm::value_ptr(color));
+            if(obb) {
+                obb->drawLine(segment_shader);
+            }
             if(shape)
                 shape->draw(shader);
         }
@@ -151,7 +178,7 @@ public:
 
     Object()
         : type(OBJECT_NONE), shape(nullptr), lmodel_noscale(glm::mat4(1.0f)),
-        lmodel(glm::mat4(1.0f)), parent(nullptr), shader(nullptr) {
+        lmodel(glm::mat4(1.0f)), parent(nullptr), shader(nullptr), obb(nullptr) {
         updateModel();
     }
 
@@ -169,6 +196,8 @@ protected:
     Shader* shader;
     glm::vec3 color;        // used for single color Object
     bool show;
+
+    Obb* obb;
 
 public:
     material_t material;

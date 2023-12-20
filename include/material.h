@@ -7,6 +7,8 @@
 
 struct material_t {
     material_t();
+    material_t(const material_t& other);
+    material_t& operator=(const material_t& other);
     void configShader(Shader* shader);
 
     std::string name;

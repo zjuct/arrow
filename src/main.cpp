@@ -48,6 +48,10 @@ int main()
         diffuse_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
         diffuse_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
 
+        segment_shader->use();
+        segment_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        segment_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+
         glDepthMask(GL_FALSE);
         skybox_shader->use();
         view = glm::mat4(glm::mat3(view));

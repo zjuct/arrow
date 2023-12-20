@@ -340,9 +340,11 @@ bool loadmtl(const std::string& file, const std::string& basedir, std::vector<ma
 }
 
 Scene* Scene::LoadObj(std::string file) {
-    attrib_t attrib;
-    std::vector<Mesh> meshes;
-    std::vector<material_t> materials;
+    Scene* s = new Scene();
+
+    attrib_t& attrib = s->attrib;
+    std::vector<Mesh>& meshes = s->meshes;
+    std::vector<material_t>& materials = s->materials;
 
     std::ifstream ifs(file);
     if(!ifs) {
@@ -546,7 +548,7 @@ Scene* Scene::LoadObj(std::string file) {
     if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib)) {
         std::cerr << "[ERROR] " << file << ":" << lineno << " Failed to commit mesh" << std::endl;
     }
-    Scene* s = new Scene(attrib, meshes, materials);
+//    Scene* s = new Scene(attrib, meshes, materials);
     for(int i = 0; i < s->meshes.size(); i++) {
         s->meshes[i].setScene(s);
     }
@@ -626,4 +628,24 @@ void Mesh::draw(Shader* shader) {
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, indices.size());
     glBindVertexArray(0);
+}
+
+Obb* Mesh::getObb() {
+    std::vector<glm::vec3> vertices;
+//    std::cout << attrib->vertices.size() << std::endl;
+    for(index_t idx : indices) {
+        int vidx = idx.vid;
+//        std::cout << vidx << std::endl;
+        float x = attrib->vertices[(vidx - 1) * 3];
+        float y = attrib->vertices[(vidx - 1) * 3 + 1];
+        float z = attrib->vertices[(vidx - 1) * 3 + 2];
+        vertices.push_back(glm::vec3(x, y, z));
+    }
+
+//    for(int i = 0; i < vertices.size(); i++) {
+//        for(int j = 0; j < 3; j++)
+//            std::cout << vertices[i][j] << " ";
+//        std::cout << std::endl;
+//    }
+    return Obb::obbgen(vertices);
 }

@@ -20,4 +20,6 @@
 
 #define MAP_SIZE (10)
 
+#define OBB_SHOW 1          // OBB是否显示
+
 #endif

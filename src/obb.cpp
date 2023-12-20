@@ -1,9 +1,13 @@
 #include <obb.h>
+#include <object.hpp>
+#include <defs.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
+#include <set>
+#include <algorithm>
 
 #include <iostream>
 
@@ -12,7 +16,6 @@
 glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices);
 void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors);
 void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2);
-
 
 // obbgen使用样例
 //    Scene* scene = Scene::LoadObj("resource/assets/scene2/scene.obj");
@@ -33,8 +36,44 @@ void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2);
 //        obbs.emplace_back(obb);
 //    }
 
-Obb Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
-    glm::mat3 covMat = CovMatrix(vertices);
+struct foo {
+    foo(): x(0.0f), y(0.0f), z(0.0f) {}
+    foo(const foo& other): x(other.x), y(other.y), z(other.z) {}
+    foo(const glm::vec3& vec) {
+        x = vec.x;
+        y = vec.y;
+        z = vec.z;
+    }
+    float x, y, z;
+    bool operator==(const foo& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    }
+    bool operator<(const foo& other) const {
+        if(x == other.x) {
+            if(y == other.y) {
+                return z < other.z;
+            }
+            return y < other.y;
+        }
+        return x < other.x;
+    }
+};
+
+Obb* Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
+    // 对顶点去重
+    // 由于glm::vec3没有定义<，因此先转成foo
+    std::vector<foo> vec;
+    for(int i = 0; i < vertices.size(); i++) {
+        vec.emplace_back(vertices[i]);
+    }
+    std::sort(vec.begin(), vec.end());
+    vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
+    std::vector<glm::vec3> vertices_unique;
+    for(auto& f : vec) {
+        vertices_unique.emplace_back(f.x, f.y, f.z);
+    }
+    
+    glm::mat3 covMat = CovMatrix(vertices_unique);
 
     glm::vec3 eValues;
     glm::mat3 eVectors;
@@ -59,7 +98,7 @@ Obb Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
     glm::vec3 minExtents(INF, INF, INF);
     glm::vec3 maxExtents(-INF, -INF, -INF);
 
-    for(const glm::vec3& v : vertices) {
+    for(const glm::vec3& v : vertices_unique) {
         minExtents[0] = std::min(minExtents[0], glm::dot(v, eVectors[0]));
         minExtents[1] = std::min(minExtents[1], glm::dot(v, eVectors[1]));
         minExtents[2] = std::min(minExtents[2], glm::dot(v, eVectors[2]));
@@ -74,7 +113,7 @@ Obb Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
     // Obb的中心位置: 在eVectors基下坐标为offset, 再乘以过渡矩阵
     glm::vec3 center = offset.x * eVectors[0] + offset.y * eVectors[1] + offset.z * eVectors[2];
 
-    return Obb(center, halfExtent, glm::transpose(eVectors));
+    return new Obb(center, halfExtent, glm::transpose(eVectors));
 }
 
 Obb::Obb(const glm::vec3& center, const glm::vec3& extends, const glm::mat3& rotate)
@@ -88,30 +127,36 @@ void Obb::init() {
 }
 
 void Obb::draw(Shader* shader) {
+#if OBB_SHOW
     shader->use();
     glm::mat4 model(1.0f);
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
+    model = object->getGModel() * model;
     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
 
     material.configShader(shader);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+#endif
 }
 
 void Obb::drawLine(Shader* shader) {
+#if OBB_SHOW
     shader->use();
     glm::mat4 model(1.0f);
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
+    model = object->getGModel() * model;
     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(VAOline);
     glDrawElements(GL_LINES, line_indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+#endif
 }
 
 
@@ -306,6 +351,12 @@ void Obb::bind() {
 
 // 计算协方差矩阵
 glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices) {
+//    for(int i = 0; i < vertices.size(); i++) {
+//        for(int j = 0; j < 3; j++) {
+//            std::cout << vertices[i][j] << " ";
+//        }
+//        std::cout << std::endl;
+//    }
     glm::mat3 cov(0.0f);
     std::vector<glm::vec3> vcopy(vertices);
 
@@ -336,6 +387,12 @@ glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices) {
 // 求解特征向量
 void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors)
 {
+//    for(int i = 0; i < 3; i++) {
+//        for(int j = 0; j < 3; j++) {
+//            std::cout << matrix[i][j] << " ";
+//        }
+//        std::cout << std::endl;
+//    }
     const float eps1 = 0.000001f;
     const float eps2 = 0.000001f;
     const float eps3 = 0.000001f;

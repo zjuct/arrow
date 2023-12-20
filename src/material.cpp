@@ -21,6 +21,57 @@ material_t::material_t() {
     albedo_texname = "";
     metallic = 0.0f;
     roughness = 0.0f;
+
+    skybox_texname = "";
+}
+
+material_t::material_t(const material_t& other) {
+    name = other.name;
+    for(int i = 0; i < 3; i++) {
+        ambient[i] = other.ambient[i]; 
+        diffuse[i] = other.diffuse[i];
+        specular[i] = other.specular[i];
+    }
+    shininess = other.shininess;
+    illum = other.illum;
+
+    ambient_texname = other.ambient_texname;
+    diffuse_texname = other.diffuse_texname;
+    specular_texname = other.specular_texname;
+    bump_texname = other.bump_texname;
+
+    albedo = other.albedo;
+    albedo_texname = other.albedo_texname;
+    metallic = other.metallic;
+    roughness = other.roughness;
+
+    skybox_texname = other.skybox_texname;
+}
+
+material_t& material_t::operator=(const material_t& other) {
+    if(this == &other) 
+        return *this;
+    name = other.name;
+    for(int i = 0; i < 3; i++) {
+        ambient[i] = other.ambient[i]; 
+        diffuse[i] = other.diffuse[i];
+        specular[i] = other.specular[i];
+    }
+    shininess = other.shininess;
+    illum = other.illum;
+
+    ambient_texname = other.ambient_texname;
+    diffuse_texname = other.diffuse_texname;
+    specular_texname = other.specular_texname;
+    bump_texname = other.bump_texname;
+
+    albedo = other.albedo;
+    albedo_texname = other.albedo_texname;
+    metallic = other.metallic;
+    roughness = other.roughness;
+
+    skybox_texname = other.skybox_texname;
+    return *this;
 }
 
 void material_t::configShader(Shader* shader) {

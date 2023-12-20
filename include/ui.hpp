@@ -65,11 +65,11 @@ class Aim {
       circle.push_back(y);
       circle.push_back(z);
     }
-    for (int i = 0; i < circle.size(); i += 3) {
-      for (int j = 0; j < 3; ++j)
-       std::cout << circle[i+j] << " ";
-      std::cout << std::endl;
-    }
+//    for (int i = 0; i < circle.size(); i += 3) {
+//      for (int j = 0; j < 3; ++j)
+//       std::cout << circle[i+j] << " ";
+//      std::cout << std::endl;
+//    }
   }
 
   unsigned int VAO, VBO;
