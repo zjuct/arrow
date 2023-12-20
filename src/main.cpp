@@ -64,6 +64,7 @@ int main()
         glEnable(GL_DEPTH_TEST);
 
         control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
+        control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 
@@ -80,6 +81,7 @@ int main()
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
         control->players[PLAYER_ID].update(control->dt);
+        control->players[ANOTHER_PLAYER_ID].update(control->dt);
         if (control->leftPress)
             control->leftPressTime += control->dt;
         else

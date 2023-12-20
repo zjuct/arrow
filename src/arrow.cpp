@@ -235,6 +235,8 @@ void ArrowManager::bindArrow(int playerId, ArrowType type, float speed, float sc
     arrow.loadTime = loadTime;
     arrow.state = ARROW_NONE;
     arrows[++arrowCnt] = arrow;
+    if(arrowSetting.count(playerId))
+        arrows.erase(arrowSetting[playerId]);
     arrowSetting[playerId] = arrowCnt;
     load(playerId);
 }

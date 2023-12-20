@@ -19,6 +19,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 # 设置源文件目录
 aux_source_directory(./src DIR_SRCS)
 aux_source_directory(./test TEST_SRCS)
+aux_source_directory(./server SERVER_SRCS)
 
 list(TRANSFORM DIR_SRCS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/" OUTPUT_VARIABLE DIR_SRCS)
 # set(DIR_SRCS ./src/main.cpp)
@@ -53,4 +54,7 @@ set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_
 
 add_subdirectory(tools)
 
+add_executable(server ${SERVER_SRCS})
+
+set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 

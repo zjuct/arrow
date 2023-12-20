@@ -65,6 +65,8 @@ public:
 	glm::vec3 front;
 	glm::vec3 right;
 	glm::vec3 up;
+
+	void fire();
 	
 
 private:
@@ -87,7 +89,7 @@ private:
 	bool floating = false;
 	float jumpHeight = 3.0f;
 	float jumpSpeed = 0.0f;
-
+	float fireTime = 0.0f;
 
 	float lastyaw;
 
