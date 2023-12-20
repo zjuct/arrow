@@ -13,7 +13,7 @@
 #define GRAVITY (0.098f)
 
 #define PLAYER_ID (1)
-#define AIM_DISTANCE (10.0f)
+#define AIM_DISTANCE (20.0f)
 
 #define MAP_SIZE (10)
 

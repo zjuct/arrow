@@ -69,7 +69,7 @@ void Control::init() {
 
 	// 箭
 	arrowMgr->init("resource/assets/weapon/knife.obj");
-	arrowMgr->bindArrow(1, camera.Position, camera.Front, ARROW_NORMAL);
+	arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
 
 	// 道具
 	candyMgr->init("resource/assets/weapon/knife.obj");
@@ -129,7 +129,7 @@ void Control::handleMousePress(int button, int action) {
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button released." << std::endl;
 			leftPress = false;
-			arrowMgr->fire(PLAYER_ID, players[PLAYER_ID].getPosition(), glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()), leftPressTime);
+			arrowMgr->fire(PLAYER_ID, players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getWeaponPos()), leftPressTime);
 			break;
 		}
 	}

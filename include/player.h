@@ -45,6 +45,18 @@ public:
 		return front;
 	}
 
+	glm::vec3 getRight() {
+		return right;
+	}
+
+	glm::vec3 getUp() {
+		return up;
+	}
+
+	glm::vec3 getWeaponPos() {
+		return position + up * 0.25f + right * 0.3f;
+	}
+
 	void setLastYaw() {
 		lastyaw = yaw;
 	}

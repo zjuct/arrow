@@ -47,9 +47,17 @@ void Arrow::update(float dt)
             pos += delta;
             dir = glm::normalize(delta);
         }
-        if (pos.y <= FLOOR_Y - 10.0f)
+        else if (type == ARROW_LASER)
         {
-            state = ARROW_DISAPPEAR;
+            glm::vec3 g = glm::vec3(0.0f, 0.0f, 0.0f);
+            glm::vec3 delta = dir * speed + g * dt;
+            // delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, dt));
+            pos += delta;
+            dir = glm::normalize(delta);
+        }
+        if (pos.y <= FLOOR_Y - 0.1f)
+        {
+            state = ARROW_ON_FLOOR;
         }
     }
     if (state == ARROW_LOADING)
@@ -108,7 +116,8 @@ bool Arrow::fire(glm::vec3 pos, glm::vec3 dir, float pressTime)
     float strength = strengthMin + (strengthMax - strengthMin) * pressTime / strengthTime;
     if (strength > strengthMax)
         strength = strengthMax;
-    this->speed *= strength;
+    if (type == ARROW_NORMAL)
+        this->speed *= strength;
     return true;
 }
 
@@ -216,7 +225,7 @@ void ArrowManager::update(float dt)
     }
 }
 
-void ArrowManager::bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowType type, float speed, float scale, float weight, float loadTime)
+void ArrowManager::bindArrow(int playerId, ArrowType type, float speed, float scale, float weight, float loadTime)
 {
     Arrow arrow = Arrow(&arrowMgr->arrow_normal, &arrowMgr->arrow_laser, &arrowMgr->arrow_ground_spike);
     arrow.type = type;
@@ -225,7 +234,6 @@ void ArrowManager::bindArrow(int playerId, glm::vec3 pos, glm::vec3 dir, ArrowTy
     arrow.weight = weight;
     arrow.loadTime = loadTime;
     arrow.state = ARROW_NONE;
-    arrow.update(pos, dir);
     arrows[++arrowCnt] = arrow;
     arrowSetting[playerId] = arrowCnt;
     load(playerId);

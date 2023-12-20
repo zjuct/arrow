@@ -31,7 +31,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         control->camera.updateCamera();
-        
+
         // 设置view和projection矩阵
         default_shader->use();
         glm::mat4 projection = glm::perspective(glm::radians(control->camera.Zoom), (float)control->wwidth / (float)control->wheight, 0.1f, 100.0f);
@@ -39,10 +39,10 @@ int main()
         glm::mat4 view = control->camera.GetViewMatrix();
         default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
         default_shader->setvec3fv("viewPos", glm::value_ptr(control->camera.Position));
-        //default_shader->setBool("dirLight.enable", true);
-        //default_shader->setBool("pointLight.enable", true);
+        // default_shader->setBool("dirLight.enable", true);
+        // default_shader->setBool("pointLight.enable", true);
         control->dirLight.configShader(default_shader);
-        //control->pointLight.configShader(default_shader);
+        // control->pointLight.configShader(default_shader);
 
         diffuse_shader->use();
         diffuse_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
@@ -60,7 +60,7 @@ int main()
         for (auto player : control->players)
             player.draw();
 
-        control->arrowMgr->updateArrow(PLAYER_ID,control->players[PLAYER_ID].getPosition(),glm::normalize(control->camera.Position+control->camera.Front*AIM_DISTANCE- control->players[PLAYER_ID].getPosition()));
+        control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 
@@ -77,7 +77,7 @@ int main()
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
         control->players[PLAYER_ID].update(control->dt);
-        if(control->leftPress)
+        if (control->leftPress)
             control->leftPressTime += control->dt;
         else
             control->leftPressTime = 0.0f;

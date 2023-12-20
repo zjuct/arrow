@@ -171,7 +171,7 @@ void Player::updateModel()
 
 	model = basemodel;
 	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
+	// model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	rarm.setModel(model);
 	rarm.setModel_noscale(model);
 
