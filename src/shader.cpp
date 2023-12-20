@@ -12,7 +12,7 @@ void Shader::initShader() {
     pbr_shader = new Shader("resource/shader/pbr/vs.glsl", "resource/shader/pbr/fs.glsl");
     skybox_shader = new Shader("resource/shader/skybox/vs.glsl", "resource/shader/skybox/fs.glsl");
 
-    player_shader = diffuse_shader;
+    player_shader = default_shader;
 }
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {

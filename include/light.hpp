@@ -18,7 +18,7 @@ public:
 
 class DirLight: public Light {
 public:
-    DirLight(glm::vec3 dir, glm::vec3 a, glm::vec3 d, glm::vec3 s)
+    DirLight(glm::vec3 dir = glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3 a = glm::vec3(0.5), glm::vec3 d = glm::vec3(0.5), glm::vec3 s = glm::vec3(0.5))
         : direction(dir), ambient(a), diffuse(d), specular(s) {
 
     }
@@ -43,7 +43,8 @@ private:
 
 class PointLight: public Light {
 public:
-    PointLight(glm::vec3 pos, float c, float l, float q, glm::vec3 a, glm::vec3 d, glm::vec3 s, Shader* shader = nullptr, bool hasBox = true)
+    PointLight(glm::vec3 pos = glm::vec3(0.0f, 50.0f, 0.0f), float c = 1.0f, float l = 0.0014f, float q = 0.000007f, 
+        glm::vec3 a = glm::vec3(0.5f), glm::vec3 d = glm::vec3(0.5f), glm::vec3 s = glm::vec3(0.5f), Shader* shader = nullptr, bool hasBox = false)
         : position(pos), constant(c), linear(l), quadratic(q), ambient(a), diffuse(d), specular(s), shader(shader) {
         if(hasBox) {
             setupBox();

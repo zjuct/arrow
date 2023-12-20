@@ -7,9 +7,9 @@
 
 #include <iostream>
 
-static Control *control = Control::getInstance();
+static Control* control = Control::getInstance();
 
-Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f)
+Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f) 
 {
 }
 
@@ -143,7 +143,10 @@ void Player::updateModel()
 	glm::mat4 basemodel(1.0f);
 	basemodel = glm::translate(basemodel, position);
 	// 这里的 rotate 输入为弧度制
-	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
+	if (state == PLAYER_RUN) 
+		basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+	else
+		basemodel = glm::rotate(basemodel, (float)glm::radians(lastyaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
 
 	// head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
 	glm::mat4 model = basemodel;

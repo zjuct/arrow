@@ -15,6 +15,7 @@
 #include <arrow.hpp>
 #include <candy.hpp>
 #include <ground.hpp>
+#include <light.hpp>
 #include <ctime>
 #include <vector>
 
@@ -57,6 +58,11 @@ public:
 	// 道具
 	CandyManager *candyMgr = CandyManager::getInstance();
 
+	// 平行光源
+	DirLight dirLight;
+
+	// 点光源
+	PointLight pointLight;
 
 	// 窗口
 	GLFWwindow* window = nullptr;

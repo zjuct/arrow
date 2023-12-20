@@ -197,6 +197,7 @@ void Control::handleKeyInput(int key, int action) {
 		switch (key) {
 		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
 			players[PLAYER_ID].setState(Player::PLAYER_STILL);
+			players[PLAYER_ID].setLastYaw();
 			break;
 		}
 	}

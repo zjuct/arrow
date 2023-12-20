@@ -41,6 +41,8 @@ int main()
         default_shader->setvec3fv("viewPos", glm::value_ptr(control->camera.Position));
         default_shader->setBool("dirLight.enable", false);
         default_shader->setBool("pointLight.enable", false);
+        control->dirLight.configShader(default_shader);
+        control->pointLight.configShader(default_shader);
 
         diffuse_shader->use();
         diffuse_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));

@@ -45,6 +45,10 @@ public:
 		return front;
 	}
 
+	void setLastYaw() {
+		lastyaw = yaw;
+	}
+
 	glm::vec3 position;
 	glm::vec3 front;
 	glm::vec3 right;
@@ -72,6 +76,8 @@ private:
 	float jumpHeight = 3.0f;
 	float jumpSpeed = 0.0f;
 
+
+	float lastyaw;
 
 	float omega = 1.0f;		// 角速度
 	float theta = 0.0f;		// 手臂和腿转动
