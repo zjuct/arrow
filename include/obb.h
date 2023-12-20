@@ -9,6 +9,13 @@
 
 class Object;
 
+enum intersectType {
+    INTERSECT_NONE = 0,
+    INTERSECT_SOMETHING,
+    INTERSECT_ON,
+    INTERSECT_UNDER,
+};
+
 class Obb {
 public:
     static Obb* obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel = true);
@@ -62,7 +69,7 @@ public:
 
     Object* object;     // OBB所属的object
 
-    bool intersectWith(Obb& other);
+    int intersectWith(Obb& other);
 
     void draw(Shader* shader);
     void drawLine(Shader* shader);

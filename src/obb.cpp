@@ -178,7 +178,13 @@ void Obb::drawLine(Shader *shader)
 #endif
 }
 
-bool Obb::intersectWith(Obb &other)
+/*
+    0: 不相交
+    1: 相交
+    2: on
+    3: under
+*/
+int Obb::intersectWith(Obb &other)
 {
 
     glm::vec3 translateMat = object->getGModelNoscale() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -302,7 +308,24 @@ bool Obb::intersectWith(Obb &other)
 
     other.drawFlag = 100;
     this->drawFlag = 100;
-    return true;
+    // return true;
+
+    // std::cout<<"extend: "<<this->extends.x<<" "<<this->extends.y<<" "<<this->extends.z<<std::endl;
+    // std::cout<<"center: "<<this->center.x<<" "<<this->center.y<<" "<<this->center.z<<std::endl;
+    // std::cout<<"other extend: "<<other.extends.x<<" "<<other.extends.y<<" "<<other.extends.z<<std::endl;
+    // std::cout<<"other center: "<<other.center.x<<" "<<other.center.y<<" "<<other.center.z<<std::endl;
+
+    // std::cout<<"intersect"<<std::endl;
+
+    if(this->center.y - this->extends.y > other.center.y + other.extends.y) {
+        return INTERSECT_ON;
+    }
+    if(this->center.y + this->extends.y < other.center.y - other.extends.y) {
+        return INTERSECT_UNDER;
+    }
+
+    return INTERSECT_SOMETHING;
+
 }
 
 void Obb::generate()

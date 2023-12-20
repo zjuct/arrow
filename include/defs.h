@@ -13,7 +13,7 @@
 
 #define FLOOR_Y (0)
 #define WIND_RESISTANCE (0.1f)
-#define GRAVITY (0.098f)
+#define GRAVITY (9.8f)
 
 #define PLAYER_ID (1)
 #define ANOTHER_PLAYER_ID (0)

@@ -37,7 +37,8 @@ void Arrow::draw()
 
 void Arrow::update(float dt)
 {
-    Object &arrow = [&]() -> Object & {
+    Object &arrow = [&]() -> Object &
+    {
         switch (type)
         {
         case ARROW_NORMAL:
@@ -51,29 +52,69 @@ void Arrow::update(float dt)
     }();
     if (state == ARROW_FLY)
     {
+        std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+        if (pos.y <= FLOOR_Y - 100.f)
+        {
+            state = ARROW_ON_FLOOR;
+        }
+        int checkTime = 3;
+        float l = 0.0f, r = dt;
+        // std::cout << "check" << std::endl;
+        for (; checkTime--;)
+        {
+            float mid = (l + r) / 2.0f;
+            // std::cout << "l: " << l << " r: " << r << " mid: " << mid << std::endl;
+            glm::vec3 pos_pre = pos;
+            glm::vec3 dir_pre = dir;
+            if (type == ARROW_NORMAL)
+            {
+                glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
+                glm::vec3 delta = dir * speed * mid + g * mid * mid / 2.0f;
+                delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, mid));
+                pos += delta;
+                dir = glm::normalize(delta);
+            }
+            else if (type == ARROW_LASER)
+            {
+                glm::vec3 g = glm::vec3(0.0f, 0.0f, 0.0f);
+                glm::vec3 delta = dir * speed * mid + g * mid * mid / 2.0f;
+                // delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, mid));
+                pos += delta;
+                dir = glm::normalize(delta);
+            }
+            updateModel();
+            if (arrow.intersectWith(control->ground.getModel()))
+            {
+                r = mid;
+            }
+            else
+            {
+                l = mid;
+            }
+            pos = pos_pre;
+            dir = dir_pre;
+        }
         if (type == ARROW_NORMAL)
         {
             glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
-            glm::vec3 delta = dir * speed + g * dt;
-            delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, dt));
+            glm::vec3 delta = dir * speed * r + g * r * r / 2.0f;
+            delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, r));
             pos += delta;
             dir = glm::normalize(delta);
         }
         else if (type == ARROW_LASER)
         {
             glm::vec3 g = glm::vec3(0.0f, 0.0f, 0.0f);
-            glm::vec3 delta = dir * speed + g * dt;
-            // delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, dt));
+            glm::vec3 delta = dir * speed * r + g * r * r / 2.0f;
+            // delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, r));
             pos += delta;
             dir = glm::normalize(delta);
         }
-        if (pos.y <= FLOOR_Y - 0.1f)
-        {
-            state = ARROW_ON_FLOOR;
-        }
-        if(arrow.intersectWith(control->ground.getModel()))
+        updateModel();
+        if (arrow.intersectWith(control->ground.getModel()))
         {
             state = ARROW_HIT_WALL;
+            std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
         }
     }
     if (state == ARROW_LOADING)
@@ -132,6 +173,7 @@ bool Arrow::fire()
         strength = strengthMax;
     if (type == ARROW_NORMAL)
         this->speed *= strength;
+    std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
     return true;
 }
 
@@ -237,13 +279,13 @@ void ArrowManager::update(float dt)
             it++;
         }
     }
-    if(control->leftPress)
+    if (control->leftPress)
     {
         Arrow &arrow = arrows[arrowMap[PLAYER_ID]];
-        if(arrow.state == ARROW_HOLD)
+        if (arrow.state == ARROW_HOLD)
         {
             arrow.pressTime += dt;
-            if(arrow.pressTime > arrow.strengthTime)
+            if (arrow.pressTime > arrow.strengthTime)
                 arrow.pressTime = arrow.strengthTime;
         }
     }
@@ -260,7 +302,7 @@ void ArrowManager::bindArrow(int playerId, ArrowType type, float speed, float sc
     arrow.state = ARROW_NONE;
     arrow.attackerId = playerId;
     arrows[++arrowCnt] = arrow;
-    if(arrowSetting.count(playerId))
+    if (arrowSetting.count(playerId))
         arrows.erase(arrowSetting[playerId]);
     arrowSetting[playerId] = arrowCnt;
     load(playerId);

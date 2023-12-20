@@ -11,6 +11,7 @@ enum Movement {
     RIGHT,
     DOWN,
     UP,
+	STILL,
 };
 
 class Player {
@@ -20,7 +21,7 @@ public:
 
 	void init(const char* objfile, glm::vec3 position);
 
-	void processKeyboard(Movement direction, float deltaTime);
+	void processKeyboard(Movement direction);
 	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 	void jump();
 	enum PlayerState {
@@ -97,6 +98,8 @@ private:
 	float omega = 1.0f;		// 角速度
 	float theta = 0.0f;		// 手臂和腿转动
 	int id;
+
+	glm::vec3 moveDir;
 };
 
 #endif

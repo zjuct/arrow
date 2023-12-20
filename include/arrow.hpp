@@ -105,7 +105,7 @@ public:
     void update(float dt);
     // void stop();
     // void disappear();
-    void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 0.2f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
+    void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 15.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
     void deleteArrow(int playerId);
     bool fire(int playerId);

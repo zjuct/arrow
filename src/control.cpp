@@ -168,42 +168,42 @@ void Control::pollKeyPress() {
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(FORWARD, dt);
-		players[PLAYER_ID].processKeyboard(Movement::FORWARD, dt);
+		players[PLAYER_ID].processKeyboard(Movement::FORWARD);
 		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(BACKWARD, dt);
-		players[PLAYER_ID].processKeyboard(Movement::BACKWARD, dt);
+		players[PLAYER_ID].processKeyboard(Movement::BACKWARD);
 		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(LEFT, dt);
-		players[PLAYER_ID].processKeyboard(Movement::LEFT, dt);
+		players[PLAYER_ID].processKeyboard(Movement::LEFT);
 		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		// camera.ProcessKeyboard(RIGHT, dt);
-		players[PLAYER_ID].processKeyboard(Movement::RIGHT, dt);
+		players[PLAYER_ID].processKeyboard(Movement::RIGHT);
 		players[PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::FORWARD, dt);
+		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::FORWARD);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::BACKWARD, dt);
+		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::BACKWARD);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::LEFT, dt);
+		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::LEFT);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::RIGHT, dt);
+		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::RIGHT);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	// if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
@@ -226,6 +226,7 @@ void Control::handleKeyInput(int key, int action) {
 		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
 			players[PLAYER_ID].setState(Player::PLAYER_STILL);
 			players[PLAYER_ID].setLastYaw();
+			players[PLAYER_ID].processKeyboard(Movement::STILL);
 			break;
 		case GLFW_KEY_UP: case GLFW_KEY_DOWN: case GLFW_KEY_LEFT: case GLFW_KEY_RIGHT:
 			players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_STILL);

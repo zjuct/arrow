@@ -36,19 +36,25 @@ void Player::init(const char *objfile, glm::vec3 position)
 	rleg = Object(OBJECT_MESH, &meshes[2], player_shader);
 }
 
-void Player::processKeyboard(Movement direction, float deltaTime)
+void Player::processKeyboard(Movement direction)
 {
-	float velocity = speed * deltaTime;
+	// float velocity = speed * deltaTime;
 	if (direction == FORWARD)
-		position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+		// position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+		moveDir = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
 	if (direction == BACKWARD)
-		position -= glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+		// position -= glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+		moveDir = -glm::normalize(glm::vec3(front.x, 0.0f, front.z));
 	if (direction == LEFT)
-		position -= right * velocity;
+		// position -= right * velocity;
+		moveDir = -right;
 	if (direction == RIGHT)
-		position += right * velocity;
+		// position += right * velocity;
+		moveDir = right;
 	// if (direction == DOWN)
 	// 		position -= up * velocity;
+	if (direction == STILL)
+		moveDir = glm::vec3(0.0f);
 }
 void Player::jump()
 {
@@ -135,8 +141,9 @@ void Player::update(float dt)
 	if (fireTime < -1.0f)
 		fireTime = -1.0f;
 
-	jumpSpeed -= GRAVITY * dt * 100.0f;
+	jumpSpeed -= GRAVITY * dt;
 	position.y += jumpSpeed * dt;
+	position += moveDir * speed * dt;
 	// std::cout<<"jumpSpeed: "<<jumpSpeed<<std::endl;
 	if (position.y <= FLOOR_Y)
 	{
@@ -144,6 +151,12 @@ void Player::update(float dt)
 		position.y = FLOOR_Y;
 		jumpTime = 2;
 	}
+	// if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
+	// {
+	// 	jumpSpeed = 0.0f;
+	// 	position.y = FLOOR_Y;
+	// 	jumpTime = 2;
+	// }
 }
 
 void Player::updateModel()
