@@ -35,5 +35,6 @@ extern Shader* diffuse_shader;
 extern Shader* pbr_shader;
 extern Shader* skybox_shader;
 extern Shader* player_shader;
+extern Shader* segment_shader;
 
 #endif

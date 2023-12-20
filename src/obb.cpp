@@ -5,6 +5,78 @@
 
 #include <vector>
 
+#include <iostream>
+
+#define INF 1e6f
+
+glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices);
+void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors);
+void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2);
+
+
+// obbgen使用样例
+//    Scene* scene = Scene::LoadObj("resource/assets/scene2/scene.obj");
+//    std::vector<Mesh>& meshes = scene->getMesh();
+//    std::vector<Obb> obbs;
+//    for(int i = 0; i < meshes.size(); i++) {
+//        std::vector<glm::vec3> vertices;
+//        for(int j = 0; j < meshes[i].getIndex().size(); j++) {
+//            index_t idx = meshes[i].getIndex()[j];
+//            float x = scene->getAttrib().vertices[(idx.vid - 1) * 3];
+//            float y = scene->getAttrib().vertices[(idx.vid - 1) * 3 + 1];
+//            float z = scene->getAttrib().vertices[(idx.vid - 1) * 3 + 2];
+//            vertices.push_back(glm::vec3(x, y, z));
+//        }
+//        Obb obb = Obb::obbgen(vertices);
+//        obb.init();
+//        obb.material.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
+//        obbs.emplace_back(obb);
+//    }
+
+Obb Obb::obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel) {
+    glm::mat3 covMat = CovMatrix(vertices);
+
+    glm::vec3 eValues;
+    glm::mat3 eVectors;
+    // OBB的三条轴为eVectors
+    JacobiSolver(covMat, eValues, eVectors);
+
+    for(int i = 0; i < 3; i++) {
+        if(eValues[i] == 0 || i == 2) {
+            SchmidtOrthogonalization(eVectors[(i + 1) % 3], eVectors[(i + 2) % 3], eVectors[i]);
+            break;
+        }
+    }
+
+    if(ground_parallel) {
+        // 将第二个基变为(0, 1, 0)，强制OBB与地面平行
+        eVectors[1] = glm::vec3(0.0f, 1.0f, 0.0f);
+        eVectors[2] = glm::normalize(glm::cross(eVectors[0], eVectors[1]));
+        eVectors[0] = glm::normalize(glm::cross(eVectors[1], eVectors[2]));
+    }
+    
+
+    glm::vec3 minExtents(INF, INF, INF);
+    glm::vec3 maxExtents(-INF, -INF, -INF);
+
+    for(const glm::vec3& v : vertices) {
+        minExtents[0] = std::min(minExtents[0], glm::dot(v, eVectors[0]));
+        minExtents[1] = std::min(minExtents[1], glm::dot(v, eVectors[1]));
+        minExtents[2] = std::min(minExtents[2], glm::dot(v, eVectors[2]));
+
+        maxExtents[0] = std::max(maxExtents[0], glm::dot(v, eVectors[0]));
+        maxExtents[1] = std::max(maxExtents[1], glm::dot(v, eVectors[1]));
+        maxExtents[2] = std::max(maxExtents[2], glm::dot(v, eVectors[2]));
+    }
+
+    glm::vec3 halfExtent = (maxExtents - minExtents) / 2.0f;
+    glm::vec3 offset = halfExtent + minExtents;
+    // Obb的中心位置: 在eVectors基下坐标为offset, 再乘以过渡矩阵
+    glm::vec3 center = offset.x * eVectors[0] + offset.y * eVectors[1] + offset.z * eVectors[2];
+
+    return Obb(center, halfExtent, glm::transpose(eVectors));
+}
+
 Obb::Obb(const glm::vec3& center, const glm::vec3& extends, const glm::mat3& rotate)
     : center(center), extends(extends), rotate(rotate) {
     
@@ -28,6 +100,20 @@ void Obb::draw(Shader* shader) {
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
+void Obb::drawLine(Shader* shader) {
+    shader->use();
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, center);
+    model = model * glm::mat4(rotate);
+    model = glm::scale(model, extends);
+    shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
+
+    glBindVertexArray(VAOline);
+    glDrawElements(GL_LINES, line_indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 
 bool Obb::intersactWith(const Obb& other) {
     glm::vec3 v = other.center - this->center;
@@ -165,6 +251,21 @@ void Obb::generate() {
         2, 0, 6,
         0, 4, 6,
     });
+
+    line_indices = std::vector<unsigned> ({
+        0, 2,
+        0, 1,
+        1, 3,
+        2, 3,
+        0, 4,
+        2, 6,
+        3, 7,
+        1, 5,
+        4, 5,
+        5, 7,
+        6, 7,
+        4, 6,
+    });
 }
 
 void Obb::bind() {
@@ -184,4 +285,183 @@ void Obb::bind() {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // line
+    glGenBuffers(1, &EBOline);
+    glGenVertexArrays(1, &VAOline);
+    
+    glBindVertexArray(VAOline);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOline);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * line_indices.size(), line_indices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+// 计算协方差矩阵
+glm::mat3 CovMatrix(const std::vector<glm::vec3>& vertices) {
+    glm::mat3 cov(0.0f);
+    std::vector<glm::vec3> vcopy(vertices);
+
+    // compute average x, y, z
+    glm::vec3 avg(0.0);
+    for(int i = 0; i < vcopy.size(); i++) {
+        avg += vcopy[i];
+    }
+    avg /= (float)vcopy.size();
+
+    for(int i = 0; i < vcopy.size(); i++) {
+        vcopy[i] -= avg;
+    }
+
+    // compute cov
+    for(int row = 0; row < 3; row++) {
+        for(int col = 0; col < 3; col++) {
+            for(int i = 0; i < vcopy.size(); i++) {
+                cov[row][col] += vcopy[i][row] * vcopy[i][col];
+            }
+        }
+    }
+    cov /= (float)vcopy.size();
+
+    return cov;
+}
+
+// 求解特征向量
+void JacobiSolver(glm::mat3 matrix, glm::vec3& eValues, glm::mat3& eVectors)
+{
+    const float eps1 = 0.000001f;
+    const float eps2 = 0.000001f;
+    const float eps3 = 0.000001f;
+    const float INV_SQRT_TWO = 0.707106781f;
+
+    float p, q, spq;
+    float cosa, sina;					// holds cos(alpha) and sin(alpha)
+    float temp;							// used for temporary storage
+    float s1 = 0.0f;					// sums of squares of diagonal
+    float s2;							// elements
+
+    bool flag = true;					// determines whether to iterate again.
+    int iteration = 0;					// iteration counter
+
+    glm::vec3 mik;						// used for temporary storage of m[i][k]
+
+    glm::mat3 t = glm::mat3(1.0f);	// stores the product of the rotation matrices.
+                                        // Its columns ultimately hold the eigenvectors
+
+    do
+    {
+        iteration++;
+
+        for (int i = 0; i < 2; ++i)
+        {
+            for (int j = i + 1; j < 3; ++j)
+            {
+                if ((fabs(matrix[j][i]) < eps1))
+                {
+                    matrix[j][i] = 0.0f;
+                }
+                else
+                {
+                    q = fabs(matrix[i][i] - matrix[j][j]);
+
+                    if (q > eps2)
+                    {
+                        p = 2.0f * matrix[j][i] * q / (matrix[i][i] - matrix[j][j]);
+                        spq = sqrt(p * p + q * q);
+                        cosa = sqrt((1.0f + q / spq) / 2.0f);
+                        sina = p / (2.0f * cosa * spq);
+                    }
+                    else
+                    {
+                        sina = cosa = INV_SQRT_TWO;
+                    }
+
+                    for (int k = 0; k < 3; ++k)
+                    {
+                        temp = t[k][i];
+                        t[k][i] = temp * cosa + t[k][j] * sina;
+                        t[k][j] = temp * sina - t[k][j] * cosa;
+                    }
+
+                    for (int k = i; k < 3; ++k)
+                    {
+                        if (k > j)
+                        {
+                            temp = matrix[k][i];
+                            matrix[k][i] = cosa * temp + sina * matrix[k][j];
+                            matrix[k][j] = sina * temp - cosa * matrix[k][j];
+                        }
+                        else
+                        {
+                            mik[k] = matrix[k][i];
+                            matrix[k][i] = cosa * mik[k] + sina * matrix[j][k];
+
+                            if (k == j)
+                            {
+                                matrix[k][j] = sina * mik[k] - cosa * matrix[k][j];
+                            }
+                        }
+                    }
+
+                    mik[j] = sina * mik[i] - cosa * mik[j];
+
+                    for (int k = 0; k <= j; ++k)
+                    {
+                        if (k <= i)
+                        {
+                            temp = matrix[i][k];
+                            matrix[i][k] = cosa * temp + sina * matrix[j][k];
+                            matrix[j][k] = sina * temp - cosa * matrix[j][k];
+                        }
+                        else
+                        {
+                            matrix[j][k] = sina * mik[k] - cosa * matrix[j][k];
+                        }
+                    }
+                }
+            }
+        }
+
+        s2 = 0.0f;
+
+        for (int i = 0; i < 3; ++i)
+        {
+            eValues[i] = matrix[i][i];
+            s2 += eValues[i] * eValues[i];
+        }
+
+        if (fabs(s2) < static_cast<float>(1.e-5) || fabs(1 - s1 / s2) < eps3)
+        {
+            flag = false;
+        }
+        else
+        {
+            s1 = s2;
+        }
+    } while (flag);
+
+    eVectors[0] = t[0];
+    eVectors[1] = t[1];
+    eVectors[2] = t[2];
+
+    // preserve righthanded-ness:
+    if (glm::dot(glm::cross(eVectors[0], eVectors[1]), eVectors[2]) < 0.0f)
+    {
+        eVectors[2] = -eVectors[2];
+    }
+}
+
+// 施密特正交化
+void SchmidtOrthogonalization(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2) {
+    v0 = glm::normalize(v0);
+    v1 -= glm::dot(v0, v1) * v0;
+    v1 = glm::normalize(v1);
+    v2 = glm::cross(v0, v1);
 }

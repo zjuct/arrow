@@ -5,12 +5,14 @@ Shader* diffuse_shader = nullptr;
 Shader* pbr_shader = nullptr;
 Shader* skybox_shader = nullptr;
 Shader* player_shader = nullptr;
+Shader* segment_shader = nullptr;
 
 void Shader::initShader() {
     default_shader = new Shader("resource/shader/default/vs.glsl", "resource/shader/default/fs.glsl");
     diffuse_shader = new Shader("resource/shader/diffuse/vs.glsl", "resource/shader/diffuse/fs.glsl");
     pbr_shader = new Shader("resource/shader/pbr/vs.glsl", "resource/shader/pbr/fs.glsl");
     skybox_shader = new Shader("resource/shader/skybox/vs.glsl", "resource/shader/skybox/fs.glsl");
+    segment_shader = new Shader("resource/shader/segment/vs.glsl", "resource/shader/segment/fs.glsl");
 
     player_shader = default_shader;
 }
