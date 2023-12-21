@@ -72,6 +72,9 @@ public:
 	
 
 private:
+	bool upBlocked();
+	bool downBlocked();
+	bool aroundBlocked();
 	void updateModel();
 	void updatePlayerVectors();
 

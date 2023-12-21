@@ -102,7 +102,13 @@ void Player::updatePlayerVectors()
 }
 
 void Player::draw()
-{
+{	
+	head.getObb()->drawFlag = true;
+	body.getObb()->drawFlag = true;
+	larm.getObb()->drawFlag = true;
+	lleg.getObb()->drawFlag = true;
+	rarm.getObb()->drawFlag = true;
+	rleg.getObb()->drawFlag = true;
 	updateModel();
 	head.draw();
 	body.draw();
@@ -112,6 +118,38 @@ void Player::draw()
 	rleg.draw();
 }
 
+bool Player::upBlocked()
+{
+	for (auto obj : control->ground.getModel().getChildren()) {
+		if (body.getObb()->intersectWith(*(obj->getObb())) == 3) {
+			// obj->getObb()->drawFlag = true;
+			return true;
+		}
+	}
+	return false;
+}
+bool Player::downBlocked()
+{
+	for (auto obj : control->ground.getModel().getChildren()) {
+		if (body.getObb()->intersectWith(*(obj->getObb())) == 2) {
+			std::cout << body.getObb()->intersectWith(*(obj->getObb())) << std::endl;
+			std::cout << "down blocked." << std::endl;
+			obj->getObb()->drawFlag = true;
+			return true;
+		}
+	}
+	return false;
+}
+bool Player::aroundBlocked()
+{
+	for (auto obj : control->ground.getModel().getChildren()) {
+		if (body.getObb()->intersectWith(*(obj->getObb())) == 1) {
+			// obj->getObb()->drawFlag = true;
+			return true;
+		}
+	}
+	return false;
+}
 void Player::update(float dt)
 {
 	switch (this->state)
@@ -142,8 +180,26 @@ void Player::update(float dt)
 		fireTime = -1.0f;
 
 	jumpSpeed -= GRAVITY * dt;
+	// if (jumpSpeed < 0)
+	// {
+	// 	jumpSpeed = (downBlocked()) ? 0 : jumpSpeed;
+	// }
+	// if (jumpSpeed > 0)
+	// {
+	// 	jumpSpeed = (upBlocked()) ? -jumpSpeed : jumpSpeed;
+	// }
 	position.y += jumpSpeed * dt;
-	position += moveDir * speed * dt;
+
+	if (aroundBlocked()) {		// 如果在位置更新前，就已经碰撞，需要允许人物能走出来
+		position += moveDir * speed * dt;
+	} else {									// 否则，更新位置，如果发生碰撞则撤销
+		position += moveDir * speed * dt;
+		updateModel();
+		if (aroundBlocked()) {
+			position -= moveDir * speed * dt;
+		}
+	}
+	
 	// std::cout<<"jumpSpeed: "<<jumpSpeed<<std::endl;
 	if (position.y <= FLOOR_Y)
 	{
@@ -201,7 +257,7 @@ void Player::updateModel()
 	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	lleg.setModel(model);
-	rleg.setModel_noscale(model);
+	lleg.setModel_noscale(model);
 
 	model = basemodel;
 	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
