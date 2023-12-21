@@ -118,7 +118,8 @@ void Arrow::update(float dt)
             dir = glm::normalize(velocity);
         }
         updateModel();
-        if (arrow.intersectWith(control->ground.getModel()))
+        const Object *interObj = arrow.intersectWith(control->ground.getModel());
+        if (interObj)
         {
             if (!isReflect)
             {
@@ -128,7 +129,7 @@ void Arrow::update(float dt)
             else
             {
                 Ray ray = Ray(pos - dir * 0.1f, dir);
-                IntersectPoint intersectPoint = ray.intersectWith(control->ground.getModel());
+                IntersectPoint intersectPoint = ray.intersectWith(*interObj);
                 if (intersectPoint.inter)
                 {
                     // pos = intersectPoint.p;
