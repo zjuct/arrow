@@ -1,7 +1,7 @@
 #ifndef _DEF_H
 #define _DEF_H
 
-#define EPS (1e-3)
+#define EPS 0.1f
 
 #define M_PIf		3.14159265358979323846f	/* pi */
 #define M_PI_2f	1.57079632679489661923f	/* pi/2 */
@@ -14,7 +14,7 @@
 #define WHEIGHT 600
 
 #define FLOOR_Y (0)
-#define WIND_RESISTANCE (0.0f)
+#define WIND_RESISTANCE (0.1f)
 #define GRAVITY (9.8f)
 
 #define PLAYER_ID (1)

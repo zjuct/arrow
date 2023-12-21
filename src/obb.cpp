@@ -317,10 +317,12 @@ int Obb::intersectWith(Obb &other)
 
     // std::cout<<"intersect"<<std::endl;
 
-    if(this->center.y - this->extends.y > other.center.y + other.extends.y) {
+    // std::cout << "this->center.y - this->extends.y" << this->center.y - this->extends.y << "other.center.y + other.extends.y" << other.center.y + other.extends.y - EPS << std::endl;
+    // std::cout << "this->center.y + this->extends.y" << this->center.y + this->extends.y << "other.center.y - other.extends.y" << other.center.y - other.extends.y << std::endl << std::endl;
+    if((this->center.y + translateMat.y - this->extends.y) > (other.center.y + otherTranslateMat.y + other.extends.y) - EPS) {
         return INTERSECT_ON;
     }
-    if(this->center.y + this->extends.y < other.center.y - other.extends.y) {
+    if((this->center.y + translateMat.y + this->extends.y) < (other.center.y + otherTranslateMat.y - other.extends.y) + EPS) {
         return INTERSECT_UNDER;
     }
 

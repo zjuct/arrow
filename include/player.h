@@ -66,12 +66,16 @@ public:
 	glm::vec3 front;
 	glm::vec3 right;
 	glm::vec3 up;
+	bool poschanged;
 
 	void fire();
 	// void press();
 	
 
 private:
+
+	bool checkBlocked(enum intersectType type);
+	bool navigate(float speedfactor, float anglefactor, float dt);
 	void updateModel();
 	void updatePlayerVectors();
 
@@ -85,7 +89,7 @@ private:
 	float yaw;
 	float pitch;
 	float speed;
-  	float sensitivity;
+  float sensitivity;
 
 	int jumpTime = 2;
 	bool floating = false;
