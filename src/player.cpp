@@ -41,24 +41,44 @@ void Player::init(const char *objfile, glm::vec3 position)
 void Player::processKeyboard()
 {
     // float velocity = speed * deltaTime;
-    inputDir = glm::vec3(0.0f);
-    if (control->frontPress)
-        inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-    if (control->backPress)
-        inputDir -= glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-    if (control->leftPress)
-        inputDir -= right;
-    if (control->rightPress)
-        inputDir += right;
-    if (id != PLAYER_ID)
-        inputDir = glm::vec3(0.0f);
-    if (inputDir != glm::vec3(0.0f))
+    if (id == PLAYER_ID)
     {
-        this->state = PLAYER_RUN;
-        inputDir = glm::normalize(inputDir);
+        inputDir = glm::vec3(0.0f);
+        if (control->frontPress)
+            inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+        if (control->backPress)
+            inputDir -= glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+        if (control->leftPress)
+            inputDir -= right;
+        if (control->rightPress)
+            inputDir += right;
+        if (inputDir != glm::vec3(0.0f))
+        {
+            this->state = PLAYER_RUN;
+            inputDir = glm::normalize(inputDir);
+        }
+        else
+            this->state = PLAYER_STILL;
     }
-    else
-        this->state = PLAYER_STILL;
+    else if (id == ANOTHER_PLAYER_ID)
+    {
+        inputDir = glm::vec3(0.0f);
+        if (control->another_frontPress)
+            inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+        if (control->another_backPress)
+            inputDir -= glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+        if (control->another_leftPress)
+            inputDir -= right;
+        if (control->another_rightPress)
+            inputDir += right;
+        if (inputDir != glm::vec3(0.0f))
+        {
+            this->state = PLAYER_RUN;
+            inputDir = glm::normalize(inputDir);
+        }
+        else
+            this->state = PLAYER_STILL;
+    }
 }
 void Player::jump()
 {

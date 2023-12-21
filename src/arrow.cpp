@@ -59,7 +59,7 @@ void Arrow::update(float dt)
         {
             state = ARROW_ON_FLOOR;
         }
-        
+
         int checkTime = CHECK_TIME;
         float l = 0.0f, r = dt;
         // std::cout << "check" << std::endl;
@@ -143,7 +143,7 @@ void Arrow::update(float dt)
             if (!isReflect)
             {
                 state = ARROW_HIT_WALL;
-//                std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+                //                std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
             }
             else
             {
@@ -152,14 +152,14 @@ void Arrow::update(float dt)
                 if (intersectPoint.inter)
                 {
                     // pos = intersectPoint.p;
-//                    std::cout << "n: " << intersectPoint.n.x << " " << intersectPoint.n.y << " " << intersectPoint.n.z << std::endl;
-//                    std::cout << "pos_reflect: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+                    //                    std::cout << "n: " << intersectPoint.n.x << " " << intersectPoint.n.y << " " << intersectPoint.n.z << std::endl;
+                    //                    std::cout << "pos_reflect: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
                     float speed = glm::length(velocity);
-//                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
-//                    std::cout << "speed: " << speed << std::endl;
+                    //                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+                    //                    std::cout << "speed: " << speed << std::endl;
                     dir = glm::normalize(glm::reflect(dir, intersectPoint.n));
                     velocity = dir * speed;
-//                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+                    //                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
                 }
             }
         }
@@ -167,6 +167,16 @@ void Arrow::update(float dt)
         {
             update(dt - r);
             dt = r;
+        }
+        for (auto &player : control->players)
+        {
+            if (player.id == attackerId)
+                continue;
+            if (arrow.intersectWith(player.getBody()) || arrow.intersectWith(player.getHead()))
+            {
+                state = ARROW_HIT_PLAYER;
+                hitPlayerId = player.id;
+            }
         }
     }
     if (state == ARROW_LOADING)
@@ -177,7 +187,7 @@ void Arrow::update(float dt)
             state = ARROW_HOLD;
         }
     }
-    if (state == ARROW_HIT_WALL | state == ARROW_HIT_PLAYER | state == ARROW_ON_FLOOR)
+    if (state == ARROW_HIT_WALL | state == ARROW_ON_PLAYER | state == ARROW_ON_FLOOR)
     {
         disappearTime -= dt;
         if (disappearTime <= 0.0f)
@@ -205,10 +215,11 @@ void Arrow::update(float dt)
 
 void Arrow::update(glm::vec3 pos, glm::vec3 dir)
 {
-    if (state == ARROW_HOLD | state == ARROW_HIT_PLAYER | state == ARROW_LOADING)
+    if (state == ARROW_HOLD | state == ARROW_ON_PLAYER | state == ARROW_LOADING)
     {
         this->pos = pos;
         this->dir = dir;
+        updateModel();
     }
 }
 
@@ -323,8 +334,32 @@ void ArrowManager::update(float dt)
     }
     for (auto it = arrows.begin(); it != arrows.end();)
     {
+        if (it->second.state == ARROW_HIT_PLAYER)
+        {
+            it->second.state = ARROW_ON_PLAYER;
+            glm::vec3 hitPos = it->second.pos;
+            glm::vec3 hitDir = it->second.dir;
+            glm::vec3 posOffset = hitPos - control->players[it->second.hitPlayerId].position;
+            glm::vec3 dirOffset = hitDir - control->players[it->second.hitPlayerId].right;
+            arrowHit[it->second.hitPlayerId].push_back({it->second.id, {posOffset, dirOffset}});
+            std::cout << "id: " << it->second.id << std::endl;
+            std::cout << "hitPlayerId: " << it->second.hitPlayerId << std::endl;
+            std::cout << "posOffset: " << posOffset.x << " " << posOffset.y << " " << posOffset.z << std::endl;
+            std::cout << "dirOffset: " << dirOffset.x << " " << dirOffset.y << " " << dirOffset.z << std::endl;
+        }
         if (it->second.state == ARROW_DISAPPEAR)
         {
+            if (it->second.hitPlayerId != -1)
+            {
+                for (auto &arrow : arrowHit[it->second.hitPlayerId])
+                {
+                    if (arrow.first == it->second.id)
+                    {
+                        arrowHit[it->second.hitPlayerId].erase(arrowHit[it->second.hitPlayerId].begin() + (&arrow - &arrowHit[it->second.hitPlayerId][0]));
+                        break;
+                    }
+                }
+            }
             it = arrows.erase(it);
         }
         else
@@ -354,7 +389,8 @@ void ArrowManager::bindArrow(int playerId, ArrowType type, float speed, float sc
     arrow.loadTime = loadTime;
     arrow.state = ARROW_NONE;
     arrow.attackerId = playerId;
-    arrows[++arrowCnt] = arrow;
+    arrow.id = ++arrowCnt;
+    arrows[arrowCnt] = arrow;
     if (arrowSetting.count(playerId))
         arrows.erase(arrowSetting[playerId]);
     arrowSetting[playerId] = arrowCnt;
@@ -368,6 +404,7 @@ void ArrowManager::load(int playerId)
     if (arrowMap.count(playerId))
         arrows.erase(arrowMap[playerId]);
     arrows[++arrowCnt] = arrows[arrowSetting[playerId]];
+    arrows[arrowCnt].id = arrowCnt;
     arrowMap[playerId] = arrowCnt;
     arrows[arrowCnt].state = ARROW_LOADING;
 }
@@ -390,9 +427,17 @@ bool ArrowManager::fire(int playerId)
 
 void ArrowManager::updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir)
 {
-    if (arrowMap.find(playerId) == arrowMap.end())
-        return;
-    arrows[arrowMap[playerId]].update(pos, dir);
+    if (arrowMap.count(playerId))
+        arrows[arrowMap[playerId]].update(pos, dir);
+    if (arrowHit.count(playerId))
+    {
+        glm::vec3 playerPos = control->players[playerId].position;
+        glm::vec3 playerDir = control->players[playerId].right;
+        for (auto &[arrowId, offset] : arrowHit[playerId])
+        {
+            arrows[arrowId].update(playerPos + offset.first, playerDir + offset.second);
+        }
+    }
 }
 
 void ArrowManager::deleteArrow(int playerId)

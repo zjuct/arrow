@@ -65,7 +65,7 @@ int main()
             player.draw();
 
         control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
-        // control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
+        control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
         control->arrowMgr->update(control->dt);
         control->arrowMgr->draw();
 
@@ -95,7 +95,7 @@ int main()
 
         control->pollKeyPress();
 
-        std::cout << "fps: " << 1.0f / control->dt << std::endl;
+        // std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
 
     glfwTerminate();

@@ -75,7 +75,7 @@ public:
     Object model;
     std::list<Candy> candies;
 
-    float generateTime = 0.5f;
+    float generateTime = 10.5f;
 
     void update(float dt);
     void init(const char *objfile);

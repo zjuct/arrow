@@ -88,6 +88,10 @@ public:
 	bool backPress = false;
 	bool leftPress = false;
 	bool rightPress = false;
+	bool another_frontPress = false;
+	bool another_backPress = false;
+	bool another_leftPress = false;
+	bool another_rightPress = false;
 
 #ifdef SAT_TEST
 	SatTest test;

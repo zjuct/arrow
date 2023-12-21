@@ -1,13 +1,13 @@
 #ifndef _ARROW_H
 #define _ARROW_H
 
-#include "objLoader.hpp"
-#include "object.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include <vector>
+#include "objLoader.hpp"
+#include "object.hpp"
 #include <map>
+#include <vector>
 
 enum ArrowState
 {
@@ -17,6 +17,7 @@ enum ArrowState
     ARROW_FLY,
     ARROW_HIT_PLAYER,
     ARROW_HIT_WALL,
+    ARROW_ON_PLAYER,
     ARROW_ON_FLOOR,
     ARROW_SPIKE_LIVE,
     ARROW_STOP,
@@ -64,6 +65,8 @@ public:
     ArrowType type = ARROW_NORMAL;
 
     int attackerId = -1;
+    int id;
+    int hitPlayerId = -1;
 
 public:
     Arrow() {}
@@ -96,7 +99,7 @@ public:
     std::map<int, Arrow> arrows;
     std::map<int, int> arrowMap;
     std::map<int, int> arrowSetting;
-    std::map<int, std::vector<int>> arrowHitMap;
+    std::map<int, std::vector<std::pair<int, std::pair<glm::vec3, glm::vec3>>>> arrowHit;
 
     ArrowManager() {}
     ~ArrowManager() {}
@@ -106,18 +109,16 @@ public:
     void update(float dt);
     // void stop();
     // void disappear();
-    void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 15.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 1.0f);
+    void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 15.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 0.1f);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
     void deleteArrow(int playerId);
     bool fire(int playerId);
     void load(int playerId);
-    
+
     Arrow &getArrowSetting(int playerId)
     {
         return arrows[arrowSetting[playerId]];
     }
-
-    
 };
 
 #endif

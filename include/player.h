@@ -90,6 +90,7 @@ public:
 		return head;
 	}
 	void getCandy(CandyType type);
+    int id;
 
 private:
     bool checkBlocked(enum intersectType type);
@@ -120,7 +121,6 @@ private:
 
     float omega = 1.0f; // 角速度
     float theta = 0.0f; // 手臂和腿转动
-    int id;
 
     glm::vec3 moveDir;
     glm::vec3 inputDir;
