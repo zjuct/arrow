@@ -1,6 +1,6 @@
 #include "candy.hpp"
-#include "defs.h"
 #include "control.h"
+#include "defs.h"
 
 static Control *control = Control::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
@@ -41,7 +41,12 @@ void Candy::update(float dt)
     if (type == CANDY_NONE | type == CANDY_DISAPPEAR)
         return;
     liveTime -= dt;
-    if (liveTime <= 0.0f)
+    if (liveTime <= 0.0f && type != CANDY_DISAPPEARING)
+    {
+        type = CANDY_DISAPPEARING;
+        liveTime = -0.3f;
+    }
+    if (liveTime <= -1.0f)
     {
         type = CANDY_DISAPPEAR;
     }
@@ -49,6 +54,10 @@ void Candy::update(float dt)
     if (rotateDir > 360.0f)
         rotateDir -= 360.0f;
     scale = 1.0f + sin(liveTime) * 0.2f;
+    if (type == CANDY_DISAPPEARING)
+    {
+        scale = 1.0f / (-liveTime + 0.7f);
+    }
 }
 
 void Candy::hit()
@@ -122,4 +131,20 @@ void CandyManager::generateCandy()
     glm::vec3 pos = glm::vec3(x, y, z);
     CandyType type = (CandyType)(rand() % CANDY_TYPE_NUM);
     generateCandy(pos, type);
+}
+
+void CandyManager::eat(Player &player)
+{
+    for (auto it = candies.begin(); it != candies.end(); it++)
+    {
+        if (glm::length(it->pos - player.position) < 1.0f && it->type < CANDY_DISAPPEARING)
+        {
+            if (it->candy.intersectWith(player.getBody()) || it->candy.intersectWith(player.getHead()))
+            {
+                it->liveTime = 0.0f;
+                player.getCandy(it->type);
+                it->type = CANDY_DISAPPEARING;
+            }
+        }
+    }
 }

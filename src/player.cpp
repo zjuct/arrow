@@ -10,6 +10,7 @@
 
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
+static CandyManager *candyMgr = CandyManager::getInstance();
 
 Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
 {
@@ -170,6 +171,7 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
 void Player::update(float dt)
 {
 	processKeyboard();
+    candyMgr->eat(*this);
     switch (this->state)
     {
     case PLAYER_STILL:
@@ -200,7 +202,7 @@ void Player::update(float dt)
     if (checkBlocked(INTERSECT_ON))
     {
         jumpSpeed = (jumpSpeed > 0) ? jumpSpeed : 0;
-        jumpTime = (jumpSpeed > 0) ? jumpTime : 2;
+        jumpTime = (jumpSpeed > 0) ? jumpTime : maxJumpTime;
     }
     else
     {
@@ -229,7 +231,7 @@ void Player::update(float dt)
     {
         jumpSpeed = 0.0f;
         position.y = FLOOR_Y;
-        jumpTime = 2;
+        jumpTime = maxJumpTime;
     }
     // if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
     // {
@@ -294,4 +296,91 @@ void Player::fire()
 {
     if (arrowMgr->fire(PLAYER_ID))
         fireTime = 1.0f;
+}
+
+// enum CandyType
+// {
+//     CANDY_NONE = -1,
+//     CANDY_SPEED_UP,
+//     CANDY_JUMP_HEIGHT_UP,
+//     CANDY_JUMP_TIME_UP,
+//     CANDY_ARROW_SPEED_UP,
+//     CANDY_ARROW_LOAD_TIME_DOWN,
+//     CANDY_ARROW_STRENGTH_TIME_DOWN,
+//     CANDY_ARROW_SCALE_UP,
+//     CANDY_ARROW_FIRE,
+//     CANDY_ARROW_LIVE_TIME_UP,
+//     CANDY_ARROW_REFLECT,
+//     CANDY_ARROW_LASER,
+//     CANDY_ARROW_GROUND_SPIKE,
+//     CANDY_TYPE_NUM,
+//     CANDY_DISAPPEARING,
+//     CANDY_DISAPPEAR,
+// };
+
+void Player::getCandy(CandyType type)
+{
+    switch (type)
+    {
+    case CANDY_SPEED_UP:
+        speed *= 1.2f;
+        std::cout<<"speed up, now speed: "<<speed<<std::endl;
+        break;
+    case CANDY_JUMP_HEIGHT_UP:
+        jumpHeight *= 1.2f;
+        std::cout<<"jump height up, now jump height: "<<jumpHeight<<std::endl;
+        break;
+    case CANDY_JUMP_TIME_UP:
+        jumpTime += 1;
+        maxJumpTime += 1;
+        std::cout<<"jump time up, now jump time: "<<maxJumpTime<<std::endl;
+        break;
+    case CANDY_ARROW_SPEED_UP:
+        arrowMgr->getArrowSetting(id).speed *= 1.2f;
+        arrowMgr->load(id);
+        std::cout<<"arrow speed up, now arrow speed: "<<arrowMgr->getArrowSetting(id).speed<<std::endl;
+        break;
+    case CANDY_ARROW_LOAD_TIME_DOWN:
+        arrowMgr->getArrowSetting(id).loadTime *= 0.8f;
+        arrowMgr->load(id);
+        std::cout<<"arrow load time down, now arrow load time: "<<arrowMgr->getArrowSetting(id).loadTime<<std::endl;
+        break;
+    case CANDY_ARROW_STRENGTH_TIME_DOWN:  
+        arrowMgr->getArrowSetting(id).strengthTime *= 0.8f;
+        arrowMgr->load(id);
+        std::cout<<"arrow strength time down, now arrow strength time: "<<arrowMgr->getArrowSetting(id).strengthTime<<std::endl;
+        break;
+    case CANDY_ARROW_SCALE_UP:
+        arrowMgr->getArrowSetting(id).scale *= 1.2f;
+        arrowMgr->load(id);
+        std::cout<<"arrow scale up, now arrow scale: "<<arrowMgr->getArrowSetting(id).scale<<std::endl;
+        break;
+    case CANDY_ARROW_FIRE:
+        arrowMgr->getArrowSetting(id).isFire = true;
+        arrowMgr->load(id);
+        std::cout<<"arrow fire"<<std::endl;
+        break;
+    case CANDY_ARROW_LIVE_TIME_UP:
+        if(arrowMgr->getArrowSetting(id).type != ARROW_GROUND_SPIKE)
+            break;
+        arrowMgr->getArrowSetting(id).liveTime *= 1.2f;
+        arrowMgr->load(id);
+        std::cout<<"arrow live time up, now arrow live time: "<<arrowMgr->getArrowSetting(id).liveTime<<std::endl;
+        break;
+    case CANDY_ARROW_REFLECT:
+        arrowMgr->getArrowSetting(id).isReflect = true;
+        arrowMgr->load(id);
+        std::cout<<"arrow reflect"<<std::endl;
+        break;
+    case CANDY_ARROW_LASER:
+        arrowMgr->getArrowSetting(id).type = ARROW_LASER;
+        arrowMgr->load(id);
+        std::cout<<"arrow laser"<<std::endl;
+        break;
+    case CANDY_ARROW_GROUND_SPIKE:
+        std::cout<<"arrow ground spike, not implemented"<<std::endl;
+        break;
+    default:
+        break;
+    }
 }

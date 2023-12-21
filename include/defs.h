@@ -13,7 +13,7 @@
 #define WWIDTH  800
 #define WHEIGHT 600
 
-#define FLOOR_Y (0)
+#define FLOOR_Y (-100.0f)
 #define WIND_RESISTANCE (0.1f)
 #define GRAVITY (9.8f)
 

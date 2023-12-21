@@ -27,6 +27,7 @@ enum CandyType
     CANDY_ARROW_LASER,
     CANDY_ARROW_GROUND_SPIKE,
     CANDY_TYPE_NUM,
+    CANDY_DISAPPEARING,
     CANDY_DISAPPEAR,
 };
 
@@ -35,7 +36,7 @@ class Candy
 public:
     Object candy;
     constexpr static float rotateSpeed = 0.5f;
-    float liveTime = 10.0f;
+    float liveTime = 100.0f;
     glm::vec3 pos;
     float rotateDir;
     float scale = 1.0f;
@@ -63,6 +64,8 @@ public:
     void hit();
 };
 
+class Player;
+
 class CandyManager
 {
 public:
@@ -72,13 +75,15 @@ public:
     Object model;
     std::list<Candy> candies;
 
-    float generateTime = 1.0f;
+    float generateTime = 0.5f;
 
     void update(float dt);
     void init(const char *objfile);
     void draw();
     void generateCandy(glm::vec3 pos, CandyType type);
     void generateCandy();
+
+    void eat(Player &player);
 };
 
 #endif

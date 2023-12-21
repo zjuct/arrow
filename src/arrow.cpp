@@ -55,10 +55,11 @@ void Arrow::update(float dt)
     {
         std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
         std::cout << "liveTime: " << liveTime << std::endl;
-        if (pos.y <= FLOOR_Y - 100.f)
+        if (pos.y <= FLOOR_Y)
         {
             state = ARROW_ON_FLOOR;
         }
+        
         int checkTime = CHECK_TIME;
         float l = 0.0f, r = dt;
         // std::cout << "check" << std::endl;
@@ -85,9 +86,26 @@ void Arrow::update(float dt)
                 dir = glm::normalize(delta);
             }
             updateModel();
-            if (arrow.intersectWith(control->ground.getModel()))
+            const Object *interObj = arrow.intersectWith(control->ground.getModel());
+            if (interObj)
             {
-                r = mid;
+                if (isReflect)
+                {
+                    Ray ray = Ray(pos - dir * 0.1f, dir);
+                    IntersectPoint intersectPoint = ray.intersectWith(*interObj);
+                    if (intersectPoint.inter)
+                    {
+                        r = mid;
+                    }
+                    else
+                    {
+                        l = mid;
+                    }
+                }
+                else
+                {
+                    r = mid;
+                }
             }
             else
             {
