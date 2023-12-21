@@ -21,7 +21,7 @@ public:
 
 	void init(const char* objfile, glm::vec3 position);
 
-	void processKeyboard(Movement direction);
+	void processKeyboard();
 	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 	void jump();
 	enum PlayerState {
@@ -104,6 +104,10 @@ private:
 	int id;
 
 	glm::vec3 moveDir;
+	glm::vec3 inputDir;
+
+	float frontSpeed = 0.0f;
+	float rightSpeed = 0.0f;
 };
 
 #endif

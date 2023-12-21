@@ -123,7 +123,7 @@ void Control::handleMousePress(int button, int action) {
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button pressed." << std::endl;
 			ui.aim.setState(AimState::AIM_FIRE);
-			leftPress = true;
+			leftMousePress = true;
 			break;
 		}
 	}
@@ -136,7 +136,7 @@ void Control::handleMousePress(int button, int action) {
 			break;
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button released." << std::endl;
-			leftPress = false;
+			leftMousePress = false;
 			// arrowMgr->fire(PLAYER_ID);
 			players[PLAYER_ID].fire();
 			ui.aim.setState(AimState::AIM_STILL);
@@ -168,44 +168,44 @@ void Control::handleMouseMove(double xposIn, double yposIn) {
 void Control::pollKeyPress() {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		// camera.ProcessKeyboard(FORWARD, dt);
-		players[PLAYER_ID].processKeyboard(Movement::FORWARD);
-		players[PLAYER_ID].setState(Player::PLAYER_RUN);
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		// camera.ProcessKeyboard(BACKWARD, dt);
-		players[PLAYER_ID].processKeyboard(Movement::BACKWARD);
-		players[PLAYER_ID].setState(Player::PLAYER_RUN);
-	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		// camera.ProcessKeyboard(LEFT, dt);
-		players[PLAYER_ID].processKeyboard(Movement::LEFT);
-		players[PLAYER_ID].setState(Player::PLAYER_RUN);
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		// camera.ProcessKeyboard(RIGHT, dt);
-		players[PLAYER_ID].processKeyboard(Movement::RIGHT);
-		players[PLAYER_ID].setState(Player::PLAYER_RUN);
-	}
+	// if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+	// 	// camera.ProcessKeyboard(FORWARD, dt);
+	// 	players[PLAYER_ID].processKeyboard(Movement::FORWARD);
+	// 	players[PLAYER_ID].setState(Player::PLAYER_RUN);
+	// }
+	// if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+	// 	// camera.ProcessKeyboard(BACKWARD, dt);
+	// 	players[PLAYER_ID].processKeyboard(Movement::BACKWARD);
+	// 	players[PLAYER_ID].setState(Player::PLAYER_RUN);
+	// }
+	// if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+	// 	// camera.ProcessKeyboard(LEFT, dt);
+	// 	players[PLAYER_ID].processKeyboard(Movement::LEFT);
+	// 	players[PLAYER_ID].setState(Player::PLAYER_RUN);
+	// }
+	// if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+	// 	// camera.ProcessKeyboard(RIGHT, dt);
+	// 	players[PLAYER_ID].processKeyboard(Movement::RIGHT);
+	// 	players[PLAYER_ID].setState(Player::PLAYER_RUN);
+	// }
 	if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::FORWARD);
+		// players[ANOTHER_PLAYER_ID].processKeyboard(Movement::FORWARD);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::BACKWARD);
+		// players[ANOTHER_PLAYER_ID].processKeyboard(Movement::BACKWARD);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::LEFT);
+		// players[ANOTHER_PLAYER_ID].processKeyboard(Movement::LEFT);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
-		players[ANOTHER_PLAYER_ID].processKeyboard(Movement::RIGHT);
+		// players[ANOTHER_PLAYER_ID].processKeyboard(Movement::RIGHT);
 		players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_RUN);
 	}
 	// if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
@@ -225,20 +225,53 @@ void Control::handleKeyInput(int key, int action) {
 #endif
 	if (action == GLFW_RELEASE) {
 		switch (key) {
-		case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
-			players[PLAYER_ID].setState(Player::PLAYER_STILL);
-			players[PLAYER_ID].setLastYaw();
-			players[PLAYER_ID].processKeyboard(Movement::STILL);
-			break;
+		// case GLFW_KEY_W: case GLFW_KEY_A: case GLFW_KEY_S: case GLFW_KEY_D:
+		// 	players[PLAYER_ID].setState(Player::PLAYER_STILL);
+		// 	players[PLAYER_ID].setLastYaw();
+		// 	players[PLAYER_ID].processKeyboard(Movement::STILL);
+		// 	break;
 		case GLFW_KEY_UP: case GLFW_KEY_DOWN: case GLFW_KEY_LEFT: case GLFW_KEY_RIGHT:
 			players[ANOTHER_PLAYER_ID].setState(Player::PLAYER_STILL);
 			players[ANOTHER_PLAYER_ID].setLastYaw();
 			break;
 		}
+		if(key==GLFW_KEY_W)
+		{
+			frontPress = false;
+		}
+		if(key==GLFW_KEY_S)
+		{
+			backPress = false;
+		}
+		if(key==GLFW_KEY_A)
+		{
+			leftPress = false;
+		}
+		if(key==GLFW_KEY_D)
+		{
+			rightPress = false;
+		}
 	}
 	if (action == GLFW_PRESS) {
 		if(key==GLFW_KEY_SPACE)
 			players[PLAYER_ID].jump();
+		if(key==GLFW_KEY_W)
+		{
+			frontPress = true;
+		}
+		if(key==GLFW_KEY_S)
+		{
+			backPress = true;
+		}
+		if(key==GLFW_KEY_A)
+		{
+			leftPress = true;
+		}
+		if(key==GLFW_KEY_D)
+		{
+			rightPress = true;
+		}
+
 	}
 }
 

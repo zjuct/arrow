@@ -1,6 +1,6 @@
 #include "arrow.hpp"
-#include "defs.h"
 #include "control.h"
+#include "defs.h"
 #include <ray.h>
 
 static Control *control = Control::getInstance();
@@ -53,7 +53,8 @@ void Arrow::update(float dt)
     }();
     if (state == ARROW_FLY)
     {
-        // std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+        std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+        std::cout << "liveTime: " << liveTime << std::endl;
         if (pos.y <= FLOOR_Y - 100.f)
         {
             state = ARROW_ON_FLOOR;
@@ -144,9 +145,11 @@ void Arrow::update(float dt)
                 }
             }
         }
-        dt -= r;
-        if (dt > EPS)
-            update(dt);
+        if (dt - r > EPS)
+        {
+            update(dt - r);
+            dt = r;
+        }
     }
     if (state == ARROW_LOADING)
     {
