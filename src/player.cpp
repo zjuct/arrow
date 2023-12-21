@@ -50,6 +50,8 @@ void Player::processKeyboard()
         inputDir -= right;
     if (control->rightPress)
         inputDir += right;
+    if (id != PLAYER_ID)
+        inputDir = glm::vec3(0.0f);
     if (inputDir != glm::vec3(0.0f))
     {
         this->state = PLAYER_RUN;
@@ -60,12 +62,12 @@ void Player::processKeyboard()
 }
 void Player::jump()
 {
-//	std::cout << "jump" << std::endl;
-	if (jumpTime <= 0)
-		return;
-	--jumpTime;
-	jumpSpeed = 1.0f * jumpHeight;
-//	std::cout << "time: " << jumpTime << std::endl;
+    //	std::cout << "jump" << std::endl;
+    if (jumpTime <= 0)
+        return;
+    --jumpTime;
+    jumpSpeed = 1.0f * jumpHeight;
+    //	std::cout << "time: " << jumpTime << std::endl;
 }
 void Player::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
 {
@@ -120,17 +122,20 @@ void Player::draw()
     rleg.draw();
 }
 
-bool Player::checkBlocked(enum intersectType type) {
-	for (auto obj : control->ground.getModel().getChildren()) {
-		if (body.getObb()->intersectWith(*(obj->getObb())) == type ||
-				rleg.getObb()->intersectWith(*(obj->getObb())) == type ||
-				lleg.getObb()->intersectWith(*(obj->getObb())) == type)    // 小人踢墙，镜头抖动
-		//if (body.getObb()->intersectWith(*(obj->getObb())) == type)
-		{		
-				if (type == INTERSECT_UNDER) obj->getObb()->drawFlag = 100;
-				return true;
-		}
-	}
+bool Player::checkBlocked(enum intersectType type)
+{
+    for (auto obj : control->ground.getModel().getChildren())
+    {
+        if (body.getObb()->intersectWith(*(obj->getObb())) == type ||
+            rleg.getObb()->intersectWith(*(obj->getObb())) == type ||
+            lleg.getObb()->intersectWith(*(obj->getObb())) == type) // 小人踢墙，镜头抖动
+        // if (body.getObb()->intersectWith(*(obj->getObb())) == type)
+        {
+            if (type == INTERSECT_UNDER)
+                obj->getObb()->drawFlag = 100;
+            return true;
+        }
+    }
     return false;
 }
 bool Player::navigate(float speedfactor, float anglefactor, float dt)
@@ -170,7 +175,7 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
 }
 void Player::update(float dt)
 {
-	processKeyboard();
+    processKeyboard();
     candyMgr->eat(*this);
     switch (this->state)
     {
@@ -324,61 +329,61 @@ void Player::getCandy(CandyType type)
     {
     case CANDY_SPEED_UP:
         speed *= 1.2f;
-        std::cout<<"speed up, now speed: "<<speed<<std::endl;
+        std::cout << "speed up, now speed: " << speed << std::endl;
         break;
     case CANDY_JUMP_HEIGHT_UP:
         jumpHeight *= 1.2f;
-        std::cout<<"jump height up, now jump height: "<<jumpHeight<<std::endl;
+        std::cout << "jump height up, now jump height: " << jumpHeight << std::endl;
         break;
     case CANDY_JUMP_TIME_UP:
         jumpTime += 1;
         maxJumpTime += 1;
-        std::cout<<"jump time up, now jump time: "<<maxJumpTime<<std::endl;
+        std::cout << "jump time up, now jump time: " << maxJumpTime << std::endl;
         break;
     case CANDY_ARROW_SPEED_UP:
         arrowMgr->getArrowSetting(id).speed *= 1.2f;
         arrowMgr->load(id);
-        std::cout<<"arrow speed up, now arrow speed: "<<arrowMgr->getArrowSetting(id).speed<<std::endl;
+        std::cout << "arrow speed up, now arrow speed: " << arrowMgr->getArrowSetting(id).speed << std::endl;
         break;
     case CANDY_ARROW_LOAD_TIME_DOWN:
         arrowMgr->getArrowSetting(id).loadTime *= 0.8f;
         arrowMgr->load(id);
-        std::cout<<"arrow load time down, now arrow load time: "<<arrowMgr->getArrowSetting(id).loadTime<<std::endl;
+        std::cout << "arrow load time down, now arrow load time: " << arrowMgr->getArrowSetting(id).loadTime << std::endl;
         break;
-    case CANDY_ARROW_STRENGTH_TIME_DOWN:  
+    case CANDY_ARROW_STRENGTH_TIME_DOWN:
         arrowMgr->getArrowSetting(id).strengthTime *= 0.8f;
         arrowMgr->load(id);
-        std::cout<<"arrow strength time down, now arrow strength time: "<<arrowMgr->getArrowSetting(id).strengthTime<<std::endl;
+        std::cout << "arrow strength time down, now arrow strength time: " << arrowMgr->getArrowSetting(id).strengthTime << std::endl;
         break;
     case CANDY_ARROW_SCALE_UP:
         arrowMgr->getArrowSetting(id).scale *= 1.2f;
         arrowMgr->load(id);
-        std::cout<<"arrow scale up, now arrow scale: "<<arrowMgr->getArrowSetting(id).scale<<std::endl;
+        std::cout << "arrow scale up, now arrow scale: " << arrowMgr->getArrowSetting(id).scale << std::endl;
         break;
     case CANDY_ARROW_FIRE:
         arrowMgr->getArrowSetting(id).isFire = true;
         arrowMgr->load(id);
-        std::cout<<"arrow fire"<<std::endl;
+        std::cout << "arrow fire" << std::endl;
         break;
     case CANDY_ARROW_LIVE_TIME_UP:
-        if(arrowMgr->getArrowSetting(id).type != ARROW_GROUND_SPIKE)
+        if (arrowMgr->getArrowSetting(id).type != ARROW_GROUND_SPIKE)
             break;
         arrowMgr->getArrowSetting(id).liveTime *= 1.2f;
         arrowMgr->load(id);
-        std::cout<<"arrow live time up, now arrow live time: "<<arrowMgr->getArrowSetting(id).liveTime<<std::endl;
+        std::cout << "arrow live time up, now arrow live time: " << arrowMgr->getArrowSetting(id).liveTime << std::endl;
         break;
     case CANDY_ARROW_REFLECT:
         arrowMgr->getArrowSetting(id).isReflect = true;
         arrowMgr->load(id);
-        std::cout<<"arrow reflect"<<std::endl;
+        std::cout << "arrow reflect" << std::endl;
         break;
     case CANDY_ARROW_LASER:
         arrowMgr->getArrowSetting(id).type = ARROW_LASER;
         arrowMgr->load(id);
-        std::cout<<"arrow laser"<<std::endl;
+        std::cout << "arrow laser" << std::endl;
         break;
     case CANDY_ARROW_GROUND_SPIKE:
-        std::cout<<"arrow ground spike, not implemented"<<std::endl;
+        std::cout << "arrow ground spike, not implemented" << std::endl;
         break;
     default:
         break;
