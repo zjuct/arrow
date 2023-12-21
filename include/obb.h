@@ -19,6 +19,7 @@ enum intersectType {
 class Obb {
 public:
     static Obb* obbgen(const std::vector<glm::vec3>& vertices, bool ground_parallel = true);
+    static Obb* Union(const std::vector<Obb*>& obbs);
 
     Obb(const glm::vec3& center = glm::vec3(0.0f), const glm::vec3& extends = glm::vec3(1.0f),
         const glm::mat3& rotate = glm::mat3(1.0f));
@@ -62,6 +63,20 @@ public:
     }
 
     void init();
+
+    int maxExtent() const {
+        if(extends[0] > extends[1]) {
+            if(extends[0] > extends[2])
+                return 0; 
+            else 
+                return 2;
+        } else {
+            if(extends[1] > extends[2])
+                return 1;
+            else
+                return 2;
+        }
+    }
 
     glm::vec3 center;
     glm::vec3 extends;

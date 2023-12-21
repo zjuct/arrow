@@ -627,3 +627,27 @@ void SchmidtOrthogonalization(glm::vec3 &v0, glm::vec3 &v1, glm::vec3 &v2)
     v1 = glm::normalize(v1);
     v2 = glm::cross(v0, v1);
 }
+
+// 创建一个能包围obbs中的所有OBB的OBB
+Obb* Obb::Union(const std::vector<Obb*>& obbs) {
+    std::vector<glm::vec3> vertices;
+    for(Obb* obb : obbs) {
+        glm::vec3 p0 = obb->center + obb->extends * obb->rotate * glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 p1 = obb->center + obb->extends * obb->rotate * glm::vec3(1.0f, 1.0f, -1.0f);
+        glm::vec3 p2 = obb->center + obb->extends * obb->rotate * glm::vec3(1.0f, -1.0f, 1.0f);
+        glm::vec3 p3 = obb->center + obb->extends * obb->rotate * glm::vec3(1.0f, -1.0f, -1.0f);
+        glm::vec3 p4 = obb->center + obb->extends * obb->rotate * glm::vec3(-1.0f, 1.0f, 1.0f);
+        glm::vec3 p5 = obb->center + obb->extends * obb->rotate * glm::vec3(-1.0f, 1.0f, -1.0f);
+        glm::vec3 p6 = obb->center + obb->extends * obb->rotate * glm::vec3(-1.0f, -1.0f, 1.0f);
+        glm::vec3 p7 = obb->center + obb->extends * obb->rotate * glm::vec3(-1.0f, -1.0f, -1.0f);
+        vertices.push_back(p0);
+        vertices.push_back(p1);
+        vertices.push_back(p2);
+        vertices.push_back(p3);
+        vertices.push_back(p4);
+        vertices.push_back(p5);
+        vertices.push_back(p6);
+        vertices.push_back(p7);
+    }
+    return obbgen(vertices);
+}
