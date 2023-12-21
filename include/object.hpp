@@ -182,11 +182,11 @@ public:
         updateModel();
     }
 
-    Obb* getObb() {
+    Obb* getObb() const{
         return obb;
     }
 
-    std::vector<Object*>& getChildren() {
+    const std::vector<Object*>& getChildren() const{
         return children;
     }
 

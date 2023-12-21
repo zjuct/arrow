@@ -60,3 +60,21 @@ IntersectPoint intersect(const Ray& ray, const Obb& obb) {
 IntersectPoint Ray::intersectWith(const Obb& obb) {
     return intersect(*this, obb);
 }
+
+IntersectPoint Ray::intersectWith(const Object& object) {
+    if(object.getObb())
+    {
+        return intersectWith(*object.getObb());
+    }
+    else
+    {
+        for(Object* c : object.getChildren())
+        {
+            IntersectPoint ip = intersectWith(*c);
+            if(ip.inter)
+                return ip;
+        }
+        return (IntersectPoint) { .inter = false };
+    }
+
+}

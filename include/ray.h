@@ -18,7 +18,7 @@ public:
     }
 
     IntersectPoint intersectWith(const Obb& obb);
-
+    IntersectPoint intersectWith(const Object& object);
     glm::vec3 o;        // 原点
     glm::vec3 d;        // 方向
 

@@ -1,6 +1,7 @@
 #include "arrow.hpp"
 #include "defs.h"
 #include "control.h"
+#include <ray.h>
 
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
@@ -52,12 +53,12 @@ void Arrow::update(float dt)
     }();
     if (state == ARROW_FLY)
     {
-        std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+        // std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
         if (pos.y <= FLOOR_Y - 100.f)
         {
             state = ARROW_ON_FLOOR;
         }
-        int checkTime = 3;
+        int checkTime = CHECK_TIME;
         float l = 0.0f, r = dt;
         // std::cout << "check" << std::endl;
         for (; checkTime--;)
@@ -119,9 +120,32 @@ void Arrow::update(float dt)
         updateModel();
         if (arrow.intersectWith(control->ground.getModel()))
         {
-            state = ARROW_HIT_WALL;
-            std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+            if (!isReflect)
+            {
+                state = ARROW_HIT_WALL;
+                std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+            }
+            else
+            {
+                Ray ray = Ray(pos - dir * 0.1f, dir);
+                IntersectPoint intersectPoint = ray.intersectWith(control->ground.getModel());
+                if (intersectPoint.inter)
+                {
+                    // pos = intersectPoint.p;
+                    std::cout << "n: " << intersectPoint.n.x << " " << intersectPoint.n.y << " " << intersectPoint.n.z << std::endl;
+                    std::cout << "pos_reflect: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+                    float speed = glm::length(velocity);
+                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+                    std::cout << "speed: " << speed << std::endl;
+                    dir = glm::normalize(glm::reflect(dir, intersectPoint.n));
+                    velocity = dir * speed;
+                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+                }
+            }
         }
+        dt -= r;
+        if (dt > EPS)
+            update(dt);
     }
     if (state == ARROW_LOADING)
     {
@@ -319,6 +343,8 @@ void ArrowManager::load(int playerId)
 {
     if (arrowSetting.find(playerId) == arrowSetting.end())
         assert(false);
+    if (arrowMap.count(playerId))
+        arrows.erase(arrowMap[playerId]);
     arrows[++arrowCnt] = arrows[arrowSetting[playerId]];
     arrowMap[playerId] = arrowCnt;
     arrows[arrowCnt].state = ARROW_LOADING;
@@ -331,8 +357,12 @@ bool ArrowManager::fire(int playerId)
     bool t = arrows[arrowMap[playerId]].fire();
     // std::cout << "fire time: " << pressTime << std::endl;
     // std::cout << "playerId: " << playerId << std::endl;
+
     if (t)
+    {
+        arrowMap.erase(playerId);
         load(playerId);
+    }
     return t;
 }
 
