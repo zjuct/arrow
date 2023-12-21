@@ -64,7 +64,7 @@ void Control::init() {
 	player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
 	players.push_back(player1);
 	Player player2;
-	player2.init("resource/assets/player2/player.obj", glm::vec3(0.0f, 0.0f, 0.0f));
+	player2.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
 	players.push_back(player2);
 	camera.follow(&players[PLAYER_ID]);
 

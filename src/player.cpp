@@ -2,6 +2,7 @@
 #include "shader.h"
 #include <defs.h>
 #include <control.h>
+#include <glm/glm.hpp>
 
 #include <vector>
 
@@ -22,12 +23,12 @@ void Player::init(const char *objfile, glm::vec3 position)
 {
 	static int cnt = 0;
 	id = cnt++;
+	this->poschanged = true;
 	this->position = position;
 	updatePlayerVectors();
 
 	obj = Scene::LoadObj(objfile);
 	std::vector<Mesh> &meshes = obj->getMesh();
-	// .obj中定义的顺序必须为body, head, larm, lleg, rarm, rleg
 	body = Object(OBJECT_MESH, &meshes[0], player_shader);
 	head = Object(OBJECT_MESH, &meshes[5], player_shader);
 	larm = Object(OBJECT_MESH, &meshes[3], player_shader);
@@ -118,36 +119,45 @@ void Player::draw()
 	rleg.draw();
 }
 
-bool Player::upBlocked()
-{
+bool Player::checkBlocked(enum intersectType type) {
 	for (auto obj : control->ground.getModel().getChildren()) {
-		if (body.getObb()->intersectWith(*(obj->getObb())) == 3) {
-			// obj->getObb()->drawFlag = true;
-			return true;
+		if (body.getObb()->intersectWith(*(obj->getObb())) == type ||
+				rleg.getObb()->intersectWith(*(obj->getObb())) == type ||
+				lleg.getObb()->intersectWith(*(obj->getObb())) == type)    // 小人踢墙，镜头抖动
+		//if (body.getObb()->intersectWith(*(obj->getObb())) == type)
+		{		
+				if (type == INTERSECT_UNDER) obj->getObb()->drawFlag = 100;
+				return true;
 		}
 	}
-	return false;
 }
-bool Player::downBlocked()
-{
-	for (auto obj : control->ground.getModel().getChildren()) {
-		if (body.getObb()->intersectWith(*(obj->getObb())) == 2) {
-			std::cout << body.getObb()->intersectWith(*(obj->getObb())) << std::endl;
-			std::cout << "down blocked." << std::endl;
-			obj->getObb()->drawFlag = true;
+bool Player::navigate(float speedfactor, float anglefactor, float dt) {
+	if (speed < 0.001) {
+		return false;
+	}
+
+	glm::vec3 oldDir = moveDir;
+	for (int i = 0; i < 6; ++i) {
+		glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		moveDir = m * glm::vec4(oldDir, 1.0);
+		position += moveDir * speed * speedfactor * dt;
+		updateModel();
+		if (!checkBlocked(INTERSECT_SOMETHING)) {
 			return true;
 		}
+		position -= moveDir * speed * speedfactor * dt;
 	}
-	return false;
-}
-bool Player::aroundBlocked()
-{
-	for (auto obj : control->ground.getModel().getChildren()) {
-		if (body.getObb()->intersectWith(*(obj->getObb())) == 1) {
-			// obj->getObb()->drawFlag = true;
+	for (int i = 0; i < 6; ++i) {
+		glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, -1.0f, 0.0f));
+		moveDir = m * glm::vec4(oldDir, 1.0);
+		position += moveDir * speed * speedfactor * dt;
+		updateModel();
+		if (!checkBlocked(INTERSECT_SOMETHING)) {
 			return true;
 		}
+		position -= moveDir * speed * speedfactor * dt;
 	}
+
 	return false;
 }
 void Player::update(float dt)
@@ -179,27 +189,24 @@ void Player::update(float dt)
 	if (fireTime < -1.0f)
 		fireTime = -1.0f;
 
-	jumpSpeed -= GRAVITY * dt;
-	if (jumpSpeed < 0)
-	{
-		jumpSpeed = (downBlocked()) ? 0 : jumpSpeed;
+	if (checkBlocked(INTERSECT_ON)) {
+		jumpSpeed = (jumpSpeed > 0)? jumpSpeed : 0;
+		jumpTime	= (jumpSpeed > 0)? jumpTime	 : 2;
+	} else {
+		jumpSpeed -= GRAVITY * dt;
 	}
-	if (jumpSpeed > 0)
-	{
-		jumpSpeed = (upBlocked()) ? -jumpSpeed : jumpSpeed;
+
+	if (checkBlocked(INTERSECT_UNDER)) {
+		jumpSpeed = -jumpSpeed;
 	}
 	position.y += jumpSpeed * dt;
 	// if(id == PLAYER_ID)
 	// 	std::cout<<"downBlocked: "<<downBlocked()<<" "<<"aroundBlocked: "<<aroundBlocked()<<std::endl;
 
-	if (aroundBlocked()) {		// 如果在位置更新前，就已经碰撞，需要允许人物能走出来
-		position += moveDir * speed * dt;
+	if (checkBlocked(INTERSECT_SOMETHING)) {		// 如果在位置更新前，就已经碰撞，需要允许人物能走出来
+		navigate(3.0, 2.0, dt);
 	} else {									// 否则，更新位置，如果发生碰撞则撤销
-		position += moveDir * speed * dt;
-		updateModel();
-		if (aroundBlocked()) {
-			position -= moveDir * speed * dt;
-		}
+		navigate(1.0, 1.0, dt);
 	}
 	
 	// std::cout<<"jumpSpeed: "<<jumpSpeed<<std::endl;

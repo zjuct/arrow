@@ -13,8 +13,8 @@
 #define WWIDTH  800
 #define WHEIGHT 600
 
-#define FLOOR_Y (0)
-#define WIND_RESISTANCE (0.1f)
+#define FLOOR_Y (-100.0f)
+#define WIND_RESISTANCE (0.0f)
 #define GRAVITY (9.8f)
 
 #define PLAYER_ID (1)
