@@ -206,7 +206,7 @@ public:
                     if(intersectWith(*c))
                         return c;
                 }
-                return 0;
+                return nullptr;
             }
         }
         else
@@ -217,8 +217,9 @@ public:
                 if(ret)
                     return ret;
             }
-            return 0;
+            return nullptr;
         }
+        return nullptr;
     }
 
 protected:

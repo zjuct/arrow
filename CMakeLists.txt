@@ -20,7 +20,6 @@ set(CMAKE_BUILD_TYPE "Debug")
 aux_source_directory(./src DIR_SRCS)
 aux_source_directory(./test TEST_SRCS)
 aux_source_directory(./server SERVER_SRCS)
-aux_source_directory(./src/utils UTIL_SRCS)
 
 list(TRANSFORM DIR_SRCS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/" OUTPUT_VARIABLE DIR_SRCS)
 # set(DIR_SRCS ./src/main.cpp)
@@ -34,7 +33,7 @@ list(TRANSFORM DIR_SRCS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/" OUTPUT_VARIABLE D
 # message(AUTHOR_WARNING "link path: ${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 # 添加源文件
-add_executable(arrow ${DIR_SRCS} ${TEST_SRCS} ${UTIL_SRCS})
+add_executable(arrow ${DIR_SRCS} ${TEST_SRCS})
 
 target_include_directories(arrow PRIVATE ./include)
 target_include_directories(arrow PRIVATE ./3rdparty)
