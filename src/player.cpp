@@ -1,7 +1,7 @@
 #include "player.h"
 #include "shader.h"
-#include <defs.h>
 #include <control.h>
+#include <defs.h>
 #include <glm/glm.hpp>
 
 #include <vector>
@@ -21,41 +21,41 @@ Player::~Player()
 
 void Player::init(const char *objfile, glm::vec3 position)
 {
-	static int cnt = 0;
-	id = cnt++;
-	this->poschanged = true;
-	this->position = position;
-	updatePlayerVectors();
+    static int cnt = 0;
+    id = cnt++;
+    this->poschanged = true;
+    this->position = position;
+    updatePlayerVectors();
 
-	obj = Scene::LoadObj(objfile);
-	std::vector<Mesh> &meshes = obj->getMesh();
-	body = Object(OBJECT_MESH, &meshes[0], player_shader);
-	head = Object(OBJECT_MESH, &meshes[5], player_shader);
-	larm = Object(OBJECT_MESH, &meshes[3], player_shader);
-	lleg = Object(OBJECT_MESH, &meshes[4], player_shader);
-	rarm = Object(OBJECT_MESH, &meshes[1], player_shader);
-	rleg = Object(OBJECT_MESH, &meshes[2], player_shader);
+    obj = Scene::LoadObj(objfile);
+    std::vector<Mesh> &meshes = obj->getMesh();
+    body = Object(OBJECT_MESH, &meshes[0], player_shader);
+    head = Object(OBJECT_MESH, &meshes[5], player_shader);
+    larm = Object(OBJECT_MESH, &meshes[3], player_shader);
+    lleg = Object(OBJECT_MESH, &meshes[4], player_shader);
+    rarm = Object(OBJECT_MESH, &meshes[1], player_shader);
+    rleg = Object(OBJECT_MESH, &meshes[2], player_shader);
 }
 
-void Player::processKeyboard(Movement direction)
+void Player::processKeyboard()
 {
-	// float velocity = speed * deltaTime;
-	if (direction == FORWARD)
-		// position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
-		moveDir = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-	if (direction == BACKWARD)
-		// position -= glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
-		moveDir = -glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-	if (direction == LEFT)
-		// position -= right * velocity;
-		moveDir = -right;
-	if (direction == RIGHT)
-		// position += right * velocity;
-		moveDir = right;
-	// if (direction == DOWN)
-	// 		position -= up * velocity;
-	if (direction == STILL)
-		moveDir = glm::vec3(0.0f);
+    // float velocity = speed * deltaTime;
+    inputDir = glm::vec3(0.0f);
+    if (control->frontPress)
+        inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+    if (control->backPress)
+        inputDir -= glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+    if (control->leftPress)
+        inputDir -= right;
+    if (control->rightPress)
+        inputDir += right;
+    if (inputDir != glm::vec3(0.0f))
+    {
+        this->state = PLAYER_RUN;
+        inputDir = glm::normalize(inputDir);
+    }
+    else
+        this->state = PLAYER_STILL;
 }
 void Player::jump()
 {
@@ -68,55 +68,55 @@ void Player::jump()
 }
 void Player::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
 {
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
 
-	yaw += xoffset;
-	pitch += yoffset;
+    yaw += xoffset;
+    pitch += yoffset;
 
-	// make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (constrainPitch)
-	{
-		if (pitch > 30.0f)
-			pitch = 30.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
-	}
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (constrainPitch)
+    {
+        if (pitch > 30.0f)
+            pitch = 30.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+    }
 
-	updatePlayerVectors();
+    updatePlayerVectors();
 }
 
 // 根据 pitch 和 yaw 修改 front right up 等
 void Player::updatePlayerVectors()
 {
-	// calculate the new Front vector
-	glm::vec3 f;
+    // calculate the new Front vector
+    glm::vec3 f;
 
-	// 这里调用的是 cmath 库中的三角函数，输入为弧度制
-	f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	f.y = glm::sin(glm::radians(pitch));
-	f.z = glm::sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	this->front = glm::normalize(f);
-	// also re-calculate the Right and Up vector
-	this->right = glm::normalize(glm::cross(front, control->camera.WorldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-	this->up = glm::normalize(glm::cross(right, front));
+    // 这里调用的是 cmath 库中的三角函数，输入为弧度制
+    f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    f.y = glm::sin(glm::radians(pitch));
+    f.z = glm::sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    this->front = glm::normalize(f);
+    // also re-calculate the Right and Up vector
+    this->right = glm::normalize(glm::cross(front, control->camera.WorldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    this->up = glm::normalize(glm::cross(right, front));
 }
 
 void Player::draw()
-{	
-	head.getObb()->drawFlag = true;
-	body.getObb()->drawFlag = true;
-	larm.getObb()->drawFlag = true;
-	lleg.getObb()->drawFlag = true;
-	rarm.getObb()->drawFlag = true;
-	rleg.getObb()->drawFlag = true;
-	updateModel();
-	head.draw();
-	body.draw();
-	larm.draw();
-	rarm.draw();
-	lleg.draw();
-	rleg.draw();
+{
+    head.getObb()->drawFlag = true;
+    body.getObb()->drawFlag = true;
+    larm.getObb()->drawFlag = true;
+    lleg.getObb()->drawFlag = true;
+    rarm.getObb()->drawFlag = true;
+    rleg.getObb()->drawFlag = true;
+    updateModel();
+    head.draw();
+    body.draw();
+    larm.draw();
+    rarm.draw();
+    lleg.draw();
+    rleg.draw();
 }
 
 bool Player::checkBlocked(enum intersectType type) {
@@ -130,154 +130,168 @@ bool Player::checkBlocked(enum intersectType type) {
 				return true;
 		}
 	}
-	return false;
+    return false;
 }
-bool Player::navigate(float speedfactor, float anglefactor, float dt) {
-	if (speed < 0.001) {
-		return false;
-	}
+bool Player::navigate(float speedfactor, float anglefactor, float dt)
+{
+    if (speed < 0.001)
+    {
+        return false;
+    }
 
-	glm::vec3 oldDir = moveDir;
-	for (int i = 0; i < 6; ++i) {
-		glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-		moveDir = m * glm::vec4(oldDir, 1.0);
-		position += moveDir * speed * speedfactor * dt;
-		updateModel();
-		if (!checkBlocked(INTERSECT_SOMETHING)) {
-			return true;
-		}
-		position -= moveDir * speed * speedfactor * dt;
-	}
-	for (int i = 0; i < 6; ++i) {
-		glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, -1.0f, 0.0f));
-		moveDir = m * glm::vec4(oldDir, 1.0);
-		position += moveDir * speed * speedfactor * dt;
-		updateModel();
-		if (!checkBlocked(INTERSECT_SOMETHING)) {
-			return true;
-		}
-		position -= moveDir * speed * speedfactor * dt;
-	}
+    glm::vec3 oldDir = inputDir;
+    for (int i = 0; i < 6; ++i)
+    {
+        glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        moveDir = m * glm::vec4(oldDir, 1.0);
+        position += moveDir * speed * speedfactor * dt;
+        updateModel();
+        if (!checkBlocked(INTERSECT_SOMETHING))
+        {
+            return true;
+        }
+        position -= moveDir * speed * speedfactor * dt;
+    }
+    for (int i = 0; i < 6; ++i)
+    {
+        glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, -1.0f, 0.0f));
+        moveDir = m * glm::vec4(oldDir, 1.0);
+        position += moveDir * speed * speedfactor * dt;
+        updateModel();
+        if (!checkBlocked(INTERSECT_SOMETHING))
+        {
+            return true;
+        }
+        position -= moveDir * speed * speedfactor * dt;
+    }
 
-	return false;
+    return false;
 }
 void Player::update(float dt)
 {
-	switch (this->state)
-	{
-	case PLAYER_STILL:
-		theta = 0.0f;
-		break;
-	case PLAYER_RUN:
-		// std::cout << "update" << std::endl;
-		theta += omega * dt * 3.0f;
-		if (theta > M_PIf / 6.0f)
-		{
-			theta = M_PIf / 6.0f;
-			omega = -omega;
-		}
-		else if (theta < -M_PIf / 6.0f)
-		{
-			theta = -M_PIf / 6.0f;
-			omega = -omega;
-		}
-		break;
-	}
-	if (fireTime > 0.0f)
-		fireTime -= dt / arrowMgr->getArrowSetting(id).loadTime;
-	else if (control->leftPress && id == PLAYER_ID)
-		fireTime -= dt / arrowMgr->getArrowSetting(id).strengthTime;
-	if (fireTime < -1.0f)
-		fireTime = -1.0f;
+	processKeyboard();
+    switch (this->state)
+    {
+    case PLAYER_STILL:
+        theta = 0.0f;
+        break;
+    case PLAYER_RUN:
+        // std::cout << "update" << std::endl;
+        theta += omega * dt * 3.0f;
+        if (theta > M_PIf / 6.0f)
+        {
+            theta = M_PIf / 6.0f;
+            omega = -omega;
+        }
+        else if (theta < -M_PIf / 6.0f)
+        {
+            theta = -M_PIf / 6.0f;
+            omega = -omega;
+        }
+        break;
+    }
+    if (fireTime > 0.0f)
+        fireTime -= dt / arrowMgr->getArrowSetting(id).loadTime;
+    else if (control->leftMousePress && id == PLAYER_ID)
+        fireTime -= dt / arrowMgr->getArrowSetting(id).strengthTime;
+    if (fireTime < -1.0f)
+        fireTime = -1.0f;
 
-	if (checkBlocked(INTERSECT_ON)) {
-		jumpSpeed = (jumpSpeed > 0)? jumpSpeed : 0;
-		jumpTime	= (jumpSpeed > 0)? jumpTime	 : 2;
-	} else {
-		jumpSpeed -= GRAVITY * dt;
-	}
+    if (checkBlocked(INTERSECT_ON))
+    {
+        jumpSpeed = (jumpSpeed > 0) ? jumpSpeed : 0;
+        jumpTime = (jumpSpeed > 0) ? jumpTime : 2;
+    }
+    else
+    {
+        jumpSpeed -= GRAVITY * dt;
+    }
 
-	if (checkBlocked(INTERSECT_UNDER)) {
-		jumpSpeed = -jumpSpeed;
-	}
-	position.y += jumpSpeed * dt;
-	// if(id == PLAYER_ID)
-	// 	std::cout<<"downBlocked: "<<downBlocked()<<" "<<"aroundBlocked: "<<aroundBlocked()<<std::endl;
+    if (checkBlocked(INTERSECT_UNDER))
+    {
+        jumpSpeed = -jumpSpeed;
+    }
+    position.y += jumpSpeed * dt;
+    // if(id == PLAYER_ID)
+    // 	std::cout<<"downBlocked: "<<downBlocked()<<" "<<"aroundBlocked: "<<aroundBlocked()<<std::endl;
 
-	if (checkBlocked(INTERSECT_SOMETHING)) {		// 如果在位置更新前，就已经碰撞，需要允许人物能走出来
-		navigate(3.0, 2.0, dt);
-	} else {									// 否则，更新位置，如果发生碰撞则撤销
-		navigate(1.0, 1.0, dt);
-	}
-	
-	// std::cout<<"jumpSpeed: "<<jumpSpeed<<std::endl;
-	if (position.y <= FLOOR_Y)
-	{
-		jumpSpeed = 0.0f;
-		position.y = FLOOR_Y;
-		jumpTime = 2;
-	}
-	// if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
-	// {
-	// 	jumpSpeed = 0.0f;
-	// 	position.y = FLOOR_Y;
-	// 	jumpTime = 2;
-	// }
+    if (checkBlocked(INTERSECT_SOMETHING))
+    { // 如果在位置更新前，就已经碰撞，需要允许人物能走出来
+        navigate(3.0, 2.0, dt);
+    }
+    else
+    { // 否则，更新位置，如果发生碰撞则撤销
+        navigate(1.0, 1.0, dt);
+    }
+
+    // std::cout<<"jumpSpeed: "<<jumpSpeed<<std::endl;
+    if (position.y <= FLOOR_Y)
+    {
+        jumpSpeed = 0.0f;
+        position.y = FLOOR_Y;
+        jumpTime = 2;
+    }
+    // if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
+    // {
+    // 	jumpSpeed = 0.0f;
+    // 	position.y = FLOOR_Y;
+    // 	jumpTime = 2;
+    // }
 }
 
 void Player::updateModel()
 {
 
-	glm::mat4 basemodel(1.0f);
-	basemodel = glm::translate(basemodel, position);
-	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
-	// 这里的 rotate 输入为弧度制
-	// if (state == PLAYER_RUN)
-	// 	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
-	// else
-	// 	basemodel = glm::rotate(basemodel, (float)glm::radians(lastyaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+    glm::mat4 basemodel(1.0f);
+    basemodel = glm::translate(basemodel, position);
+    basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
+    // 这里的 rotate 输入为弧度制
+    // if (state == PLAYER_RUN)
+    // 	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
+    // else
+    // 	basemodel = glm::rotate(basemodel, (float)glm::radians(lastyaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
 
-	// head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
-	glm::mat4 model = basemodel;
-	// model = glm::rotate(model, , right);
-	// model = glm::rotate(model, control->camera.Pitch, glm::vec3(0.0f, 0.0f, 1.0f));
-	head.setModel(model);
-	head.setModel_noscale(model);
+    // head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
+    glm::mat4 model = basemodel;
+    // model = glm::rotate(model, , right);
+    // model = glm::rotate(model, control->camera.Pitch, glm::vec3(0.0f, 0.0f, 1.0f));
+    head.setModel(model);
+    head.setModel_noscale(model);
 
-	// body: 世界坐标平移 * 局部坐标平移 * 整体模型转动
-	model = basemodel;
-	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	body.setModel(model);
-	body.setModel_noscale(model);
+    // body: 世界坐标平移 * 局部坐标平移 * 整体模型转动
+    model = basemodel;
+    // model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    body.setModel(model);
+    body.setModel_noscale(model);
 
-	// larm, rarm, lleg, rleg: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 手臂/腿部转动
-	model = basemodel;
-	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
-	larm.setModel(model);
-	larm.setModel_noscale(model);
+    // larm, rarm, lleg, rleg: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 手臂/腿部转动
+    model = basemodel;
+    // model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
+    larm.setModel(model);
+    larm.setModel_noscale(model);
 
-	model = basemodel;
-	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, -fireTime, glm::vec3(1.0f, 0.0f, 0.0f));
-	rarm.setModel(model);
-	rarm.setModel_noscale(model);
+    model = basemodel;
+    // model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, -fireTime, glm::vec3(1.0f, 0.0f, 0.0f));
+    rarm.setModel(model);
+    rarm.setModel_noscale(model);
 
-	model = basemodel;
-	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
-	lleg.setModel(model);
-	lleg.setModel_noscale(model);
+    model = basemodel;
+    // model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
+    lleg.setModel(model);
+    lleg.setModel_noscale(model);
 
-	model = basemodel;
-	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
-	rleg.setModel(model);
-	rleg.setModel_noscale(model);
+    model = basemodel;
+    // model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
+    rleg.setModel(model);
+    rleg.setModel_noscale(model);
 }
 
 void Player::fire()
 {
-	if (arrowMgr->fire(PLAYER_ID))
-		fireTime = 1.0f;
+    if (arrowMgr->fire(PLAYER_ID))
+        fireTime = 1.0f;
 }

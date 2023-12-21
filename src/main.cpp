@@ -88,7 +88,7 @@ int main()
         control->oldTime = currenttime;
         control->players[PLAYER_ID].update(control->dt);
         control->players[ANOTHER_PLAYER_ID].update(control->dt);
-        if (control->leftPress)
+        if (control->leftMousePress)
             control->leftPressTime += control->dt;
         else
             control->leftPressTime = 0.0f;

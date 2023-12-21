@@ -82,8 +82,12 @@ public:
 
 	bool end = false;
 
-	bool leftPress = false;
+	bool leftMousePress = false;
 	float leftPressTime = 0.0f;
+	bool frontPress = false;
+	bool backPress = false;
+	bool leftPress = false;
+	bool rightPress = false;
 
 #ifdef SAT_TEST
 	SatTest test;
