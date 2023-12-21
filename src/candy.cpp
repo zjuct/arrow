@@ -1,6 +1,7 @@
 #include "candy.hpp"
 #include "control.h"
 #include "defs.h"
+#include <ray.h>
 
 static Control *control = Control::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
@@ -127,7 +128,9 @@ void CandyManager::generateCandy()
     float x = rand() % 1000 / 1000.0f * MAP_SIZE - MAP_SIZE / 2.0f;
     float z = rand() % 1000 / 1000.0f * MAP_SIZE - MAP_SIZE / 2.0f;
     // std::cout << x << " " << z << std::endl;
-    float y = FLOOR_Y + 0.2f;
+    Ray ray(glm::vec3(x, 100.0f, z), glm::vec3(0.0f, -1.0f, 0.0f));
+    IntersectPoint intersectPoint=ray.intersectWith(control->ground.getModel());
+    float y = intersectPoint.p.y + 0.2f;
     glm::vec3 pos = glm::vec3(x, y, z);
     CandyType type = (CandyType)(rand() % CANDY_TYPE_NUM);
     generateCandy(pos, type);
