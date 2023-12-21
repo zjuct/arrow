@@ -47,7 +47,7 @@ public:
     float loadTime = 0.1f;
     float pressTime = 0.0f;
 
-    float liveTime = 1000.0f;
+    float liveTime = 10.0f;
     // float stopTime = 0.0f;
     float disappearTime = 5.0f;
 
@@ -111,9 +111,10 @@ public:
     void deleteArrow(int playerId);
     bool fire(int playerId);
     void load(int playerId);
-    Arrow &getArrow(int playerId)
+    
+    Arrow &getArrowSetting(int playerId)
     {
-        return arrows[arrowMap[playerId]];
+        return arrows[arrowSetting[playerId]];
     }
 };
 

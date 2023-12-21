@@ -135,9 +135,9 @@ void Player::update(float dt)
 		break;
 	}
 	if (fireTime > 0.0f)
-		fireTime -= dt / arrowMgr->getArrow(id).loadTime;
+		fireTime -= dt / arrowMgr->getArrowSetting(id).loadTime;
 	else if (control->leftPress && id == PLAYER_ID)
-		fireTime -= dt / arrowMgr->getArrow(id).strengthTime;
+		fireTime -= dt / arrowMgr->getArrowSetting(id).strengthTime;
 	if (fireTime < -1.0f)
 		fireTime = -1.0f;
 

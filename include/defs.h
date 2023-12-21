@@ -1,6 +1,8 @@
 #ifndef _DEF_H
 #define _DEF_H
 
+#define EPS (1e-3)
+
 #define M_PIf		3.14159265358979323846f	/* pi */
 #define M_PI_2f	1.57079632679489661923f	/* pi/2 */
 #define M_PI_4f	0.78539816339744830962f	/* pi/4 */
@@ -12,7 +14,7 @@
 #define WHEIGHT 600
 
 #define FLOOR_Y (0)
-#define WIND_RESISTANCE (0.1f)
+#define WIND_RESISTANCE (0.0f)
 #define GRAVITY (9.8f)
 
 #define PLAYER_ID (1)
@@ -22,6 +24,8 @@
 #define MAP_SIZE (10)
 
 #define OBB_SHOW 1          // OBB是否显示
+
+#define CHECK_TIME (3)  //碰撞二分次数
 
 constexpr glm::vec3 CAMERA_TO_PLAYER_OFFSET = glm::vec3(0.0f, 0.8f, 0.0f);
 
