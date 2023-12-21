@@ -94,6 +94,8 @@ int main()
             control->leftPressTime = 0.0f;
 
         control->pollKeyPress();
+
+        std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
 
     glfwTerminate();

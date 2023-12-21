@@ -124,7 +124,7 @@ void Arrow::update(float dt)
             if (!isReflect)
             {
                 state = ARROW_HIT_WALL;
-                std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+//                std::cout << "pos_hit_wall: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
             }
             else
             {
@@ -133,14 +133,14 @@ void Arrow::update(float dt)
                 if (intersectPoint.inter)
                 {
                     // pos = intersectPoint.p;
-                    std::cout << "n: " << intersectPoint.n.x << " " << intersectPoint.n.y << " " << intersectPoint.n.z << std::endl;
-                    std::cout << "pos_reflect: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+//                    std::cout << "n: " << intersectPoint.n.x << " " << intersectPoint.n.y << " " << intersectPoint.n.z << std::endl;
+//                    std::cout << "pos_reflect: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
                     float speed = glm::length(velocity);
-                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
-                    std::cout << "speed: " << speed << std::endl;
+//                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+//                    std::cout << "speed: " << speed << std::endl;
                     dir = glm::normalize(glm::reflect(dir, intersectPoint.n));
                     velocity = dir * speed;
-                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+//                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
                 }
             }
         }

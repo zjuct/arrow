@@ -59,12 +59,12 @@ void Player::processKeyboard(Movement direction)
 }
 void Player::jump()
 {
-	std::cout << "jump" << std::endl;
+//	std::cout << "jump" << std::endl;
 	if (jumpTime <= 0)
 		return;
 	--jumpTime;
 	jumpSpeed = 1.0f * jumpHeight;
-	std::cout << "time: " << jumpTime << std::endl;
+//	std::cout << "time: " << jumpTime << std::endl;
 }
 void Player::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
 {
@@ -130,6 +130,7 @@ bool Player::checkBlocked(enum intersectType type) {
 				return true;
 		}
 	}
+	return false;
 }
 bool Player::navigate(float speedfactor, float anglefactor, float dt) {
 	if (speed < 0.001) {

@@ -47,7 +47,7 @@ public:
     float loadTime = 0.1f;
     float pressTime = 0.0f;
 
-    float liveTime = 10.0f;
+    float liveTime = 2.0f;
     // float stopTime = 0.0f;
     float disappearTime = 5.0f;
 
