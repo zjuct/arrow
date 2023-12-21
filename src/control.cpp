@@ -73,7 +73,7 @@ void Control::init() {
 	// 箭
 	arrowMgr->init("resource/assets/weapon/knife.obj");
 	arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
-	// arrowMgr->bindArrow(PLAYER_ID, ARROW_LASER);
+	arrowMgr->bindArrow(PLAYER_ID, ARROW_LASER);
 	arrowMgr->getArrowSetting(PLAYER_ID).isReflect = true;
 	arrowMgr->load(PLAYER_ID);
 	arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);

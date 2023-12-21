@@ -116,7 +116,7 @@ void Arrow::update(float dt)
         }
         if (type == ARROW_NORMAL)
         {
-            glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
+            glm::vec3 g = glm::vec3(0.0f, -GRAVITY / 2.0f, 0.0f);
             glm::vec3 delta = velocity * r + g * r * r / 2.0f;
             delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, r));
             pos += delta;
@@ -158,7 +158,7 @@ void Arrow::update(float dt)
                     else if (type == ARROW_NORMAL)
                     {
                         velocity = dir * speed * ELASTICITY;
-                        if(glm::length(velocity) < EPS)
+                        if (glm::length(velocity) < EPS)
                         {
                             dir = glm::normalize(glm::reflect(dir, intersectPoint.n));
                             state = ARROW_HIT_WALL;
