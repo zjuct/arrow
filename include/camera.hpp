@@ -9,12 +9,11 @@
 #include <vector>
 
 // Default camera values
-const float YAW         = -90.0f;
-const float PITCH       =  0.0f;
-const float SPEED       =  2.5f;
-const float SENSITIVITY =  0.1f;
-const float ZOOM        =  45.0f;
-
+const float YAW = -90.0f;
+const float PITCH = 0.0f;
+const float SPEED = 2.5f;
+const float SENSITIVITY = 0.1f;
+const float ZOOM = 45.0f;
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera
@@ -29,7 +28,7 @@ public:
     // camera options
     float Zoom;
 
-    Player* player;
+    Player *player;
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f))
@@ -55,19 +54,26 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
-    void follow(Player* player) {
+    void follow(Player *player)
+    {
         this->player = player;
     }
 
-    void updateCamera() {
+    void updateCamera()
+    {
         glm::vec3 offset = CAMERA_TO_PLAYER_OFFSET;
         glm::vec3 position = player->position;
-        glm::vec3 front    = player->front;
-        glm::vec3 right    = player->right;
-        this->Position = position + offset - ((2.5f - front.y) * front) + (0.3f * right);
-        this->Front    = front;
+        glm::vec3 front = player->front;
+        glm::vec3 right = player->right;
+        glm::vec3 offsetRight = CAMERA_TO_PLAYER_OFFSET_RIGHT * right;
+        this->Position = position + offset + offsetRight;// - ((2.5f - front.y) * front);
+        this->Front = front;
+        calcPosition();
         updateCameraVectors();
     }
+
+    void calcPosition();
+    
 
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(float yoffset)
@@ -83,8 +89,8 @@ private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()
     {
-        Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up    = glm::normalize(glm::cross(Right, Front));
+        Right = glm::normalize(glm::cross(Front, WorldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        Up = glm::normalize(glm::cross(Right, Front));
     }
 };
 
