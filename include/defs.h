@@ -20,6 +20,7 @@
 #define PLAYER_ID (1)
 #define ANOTHER_PLAYER_ID (0)
 #define AIM_DISTANCE (20.0f)
+#define ELASTICITY (0.5f)
 
 #define MAP_SIZE (10)
 

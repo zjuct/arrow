@@ -151,15 +151,19 @@ void Arrow::update(float dt)
                 IntersectPoint intersectPoint = ray.intersectWith(*interObj);
                 if (intersectPoint.inter)
                 {
-                    // pos = intersectPoint.p;
-                    //                    std::cout << "n: " << intersectPoint.n.x << " " << intersectPoint.n.y << " " << intersectPoint.n.z << std::endl;
-                    //                    std::cout << "pos_reflect: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
                     float speed = glm::length(velocity);
-                    //                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
-                    //                    std::cout << "speed: " << speed << std::endl;
                     dir = glm::normalize(glm::reflect(dir, intersectPoint.n));
-                    velocity = dir * speed;
-                    //                    std::cout << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << std::endl;
+                    if (type == ARROW_LASER)
+                        velocity = dir * speed;
+                    else if (type == ARROW_NORMAL)
+                    {
+                        velocity = dir * speed * ELASTICITY;
+                        if(glm::length(velocity) < EPS)
+                        {
+                            dir = glm::normalize(glm::reflect(dir, intersectPoint.n));
+                            state = ARROW_HIT_WALL;
+                        }
+                    }
                 }
             }
         }
