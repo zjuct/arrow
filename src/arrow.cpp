@@ -69,7 +69,7 @@ void Arrow::update(float dt)
             if (type == ARROW_NORMAL)
             {
                 glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
-                glm::vec3 delta = dir * speed * mid + g * mid * mid / 2.0f;
+                glm::vec3 delta = velocity * mid + g * mid * mid / 2.0f;
                 delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, mid));
                 pos += delta;
                 dir = glm::normalize(delta);
@@ -77,7 +77,7 @@ void Arrow::update(float dt)
             else if (type == ARROW_LASER)
             {
                 glm::vec3 g = glm::vec3(0.0f, 0.0f, 0.0f);
-                glm::vec3 delta = dir * speed * mid + g * mid * mid / 2.0f;
+                glm::vec3 delta = velocity * mid + g * mid * mid / 2.0f;
                 // delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, mid));
                 pos += delta;
                 dir = glm::normalize(delta);
@@ -97,18 +97,24 @@ void Arrow::update(float dt)
         if (type == ARROW_NORMAL)
         {
             glm::vec3 g = glm::vec3(0.0f, -GRAVITY, 0.0f);
-            glm::vec3 delta = dir * speed * r + g * r * r / 2.0f;
+            glm::vec3 delta = velocity * r + g * r * r / 2.0f;
             delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, r));
             pos += delta;
             dir = glm::normalize(delta);
+            velocity = velocity + g * r;
+            velocity = velocity * float(pow((1 - WIND_RESISTANCE) / weight, r));
+            dir = glm::normalize(velocity);
         }
         else if (type == ARROW_LASER)
         {
             glm::vec3 g = glm::vec3(0.0f, 0.0f, 0.0f);
-            glm::vec3 delta = dir * speed * r + g * r * r / 2.0f;
+            glm::vec3 delta = velocity * r + g * r * r / 2.0f;
             // delta = delta * float(pow((1 - WIND_RESISTANCE) / weight, r));
             pos += delta;
             dir = glm::normalize(delta);
+            velocity = velocity + g * r;
+            velocity = velocity * float(pow((1 - WIND_RESISTANCE) / weight, r));
+            dir = glm::normalize(velocity);
         }
         updateModel();
         if (arrow.intersectWith(control->ground.getModel()))
@@ -174,6 +180,7 @@ bool Arrow::fire()
     if (type == ARROW_NORMAL)
         this->speed *= strength;
     std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+    velocity = dir * speed;
     return true;
 }
 

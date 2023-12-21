@@ -58,6 +58,7 @@ public:
 
     glm::vec3 pos;
     glm::vec3 dir;
+    glm::vec3 velocity;
 
     ArrowState state = ARROW_HOLD;
     ArrowType type = ARROW_NORMAL;
