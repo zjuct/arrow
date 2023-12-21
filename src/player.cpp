@@ -180,15 +180,17 @@ void Player::update(float dt)
 		fireTime = -1.0f;
 
 	jumpSpeed -= GRAVITY * dt;
-	// if (jumpSpeed < 0)
-	// {
-	// 	jumpSpeed = (downBlocked()) ? 0 : jumpSpeed;
-	// }
-	// if (jumpSpeed > 0)
-	// {
-	// 	jumpSpeed = (upBlocked()) ? -jumpSpeed : jumpSpeed;
-	// }
+	if (jumpSpeed < 0)
+	{
+		jumpSpeed = (downBlocked()) ? 0 : jumpSpeed;
+	}
+	if (jumpSpeed > 0)
+	{
+		jumpSpeed = (upBlocked()) ? -jumpSpeed : jumpSpeed;
+	}
 	position.y += jumpSpeed * dt;
+	// if(id == PLAYER_ID)
+	// 	std::cout<<"downBlocked: "<<downBlocked()<<" "<<"aroundBlocked: "<<aroundBlocked()<<std::endl;
 
 	if (aroundBlocked()) {		// 如果在位置更新前，就已经碰撞，需要允许人物能走出来
 		position += moveDir * speed * dt;

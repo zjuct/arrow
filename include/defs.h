@@ -1,7 +1,7 @@
 #ifndef _DEF_H
 #define _DEF_H
 
-#define EPS 1e-2
+#define EPS 0.1f
 
 #define M_PIf		3.14159265358979323846f	/* pi */
 #define M_PI_2f	1.57079632679489661923f	/* pi/2 */
