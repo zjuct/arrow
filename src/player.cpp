@@ -204,7 +204,7 @@ void Player::updateModel()
 	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
 	lleg.setModel(model);
-	rleg.setModel_noscale(model);
+	lleg.setModel_noscale(model);
 
 	model = basemodel;
 	// model = glm::rotate(model, control->camera.Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
