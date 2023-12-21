@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <obb.h>
 
-struct IntersactPoint {
+struct IntersectPoint {
     bool inter;         // 是否相交
     glm::vec3 p;        // 交点
     glm::vec3 n;        // 交点法线
@@ -17,9 +17,8 @@ public:
 
     }
 
-    IntersactPoint intersactWith(const Obb& obb);
+    IntersectPoint intersectWith(const Obb& obb);
 
-private:
     glm::vec3 o;        // 原点
     glm::vec3 d;        // 方向
 

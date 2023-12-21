@@ -147,11 +147,11 @@ public:
         }
     }
 
-    const glm::mat4& getGModel() {
+    const glm::mat4& getGModel() const  {
         return gmodel;
     }
 
-    const glm::mat4& getGModelNoscale() {
+    const glm::mat4& getGModelNoscale() const {
         return gmodel_noscale;
     }
 
