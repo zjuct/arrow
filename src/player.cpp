@@ -145,18 +145,21 @@ void Player::update(float dt)
 	position.y += jumpSpeed * dt;
 	position += moveDir * speed * dt;
 	// std::cout<<"jumpSpeed: "<<jumpSpeed<<std::endl;
-	if (position.y <= FLOOR_Y)
+	if (position.y <= FLOOR_Y )
 	{
 		jumpSpeed = 0.0f;
-		position.y = FLOOR_Y;
+		position.y = FLOOR_Y ;
 		jumpTime = 2;
 	}
-	// if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
-	// {
-	// 	jumpSpeed = 0.0f;
-	// 	position.y = FLOOR_Y;
-	// 	jumpTime = 2;
-	// }
+	std::cout<<"interl: "<<lleg.intersectWith(control->ground.getModel())<<" ";
+	std::cout<<"interr: "<<rleg.intersectWith(control->ground.getModel())<<std::endl;
+
+	if (lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
+	{
+		jumpSpeed = 0.1f;
+		// position.y = FLOOR_Y;
+		jumpTime = 2;
+	}
 }
 
 void Player::updateModel()
