@@ -66,13 +66,13 @@ public:
         glm::vec3 front = player->front;
         glm::vec3 right = player->right;
         glm::vec3 offsetRight = CAMERA_TO_PLAYER_OFFSET_RIGHT * right;
-        this->Position = position + offset + offsetRight;// - ((2.5f - front.y) * front);
+        // this->Position = // - ((2.5f - front.y) * front);
         this->Front = front;
-        calcPosition();
+        calcPosition(position + offset + offsetRight);
         updateCameraVectors();
     }
 
-    void calcPosition();
+    void calcPosition(glm::vec3 pos);
     
 
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis

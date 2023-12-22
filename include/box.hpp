@@ -14,6 +14,7 @@
 // 如果需要带normal, texcoords的box，用.obj
 class Box: public Shape {
 public:
+    Box(){}
     Box(const glm::vec3& c): color(c) {
         generate();
         bind();

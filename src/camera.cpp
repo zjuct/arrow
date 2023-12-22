@@ -3,7 +3,7 @@
 
 static Control* control = Control::getInstance();
 
-void Camera::calcPosition()
+void Camera::calcPosition(glm::vec3 Position)
 {
     Ray ray = Ray(Position, -Front);
     IntersectPoint point = ray.intersectWith(control->ground.getModel());
@@ -12,5 +12,5 @@ void Camera::calcPosition()
     {
         length = glm::length(point.p - Position) * 0.9f;
     }
-    Position = Position - length * Front;
+    this->Position = Position - length * Front;
 }

@@ -9,8 +9,6 @@
 #include "shader.h"
 #include "texturemgr.hpp"
 
-using namespace std;
-
 #define SEGMENTS (100)
 
 enum AimState 
@@ -39,7 +37,7 @@ enum ButtonState {
 
 class Button {
   public:
-  Button(glm::vec3 _position, float _width, float _height, bool _has_texture = false, string _texname = "", glm::vec3 _color = glm::vec3(1.0f))
+  Button(glm::vec3 _position, float _width, float _height, bool _has_texture = false, std::string _texname = "", glm::vec3 _color = glm::vec3(1.0f))
   : position(_position), width(_width), height(_height), has_texture(_has_texture), texname(_texname), color(_color)
   {
   }
@@ -52,7 +50,7 @@ class Button {
   float height;
   glm::vec3 color;
   bool has_texture;
-  string texname;
+  std::string texname;
   ButtonState state;
 
   unsigned int VAO, VBO, EBO;

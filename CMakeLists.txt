@@ -44,6 +44,7 @@ find_library(A glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 target_link_libraries(arrow 
     PUBLIC ${A}
+    PRIVATE User32 Gdi32 Shell32
 )
 
 # 设置编译选项 -Wno-volatile

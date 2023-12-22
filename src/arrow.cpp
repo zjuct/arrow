@@ -53,8 +53,8 @@ void Arrow::update(float dt)
     }();
     if (state == ARROW_FLY)
     {
-        std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
-        std::cout << "liveTime: " << liveTime << std::endl;
+        // std::cout << "pos_update: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+        // std::cout << "liveTime: " << liveTime << std::endl;
         if (pos.y <= FLOOR_Y)
         {
             state = ARROW_ON_FLOOR;

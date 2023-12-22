@@ -47,6 +47,10 @@ public:
 	// 相机
 	Camera camera;
 
+	// box
+	Box skybox;
+	Object skybox_obj;
+
 	// 玩家(跟Player中保持同步)
 	std::vector<Player> players;
 
