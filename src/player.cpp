@@ -197,6 +197,28 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
 
     return false;
 }
+
+void Player::updatey(float dt)
+{   
+    float radix = 1.0f;
+    float oldy = position.y;
+    for (int ct = 0; ct < CHECK_TIME; ++ct)
+    {
+        position.y = oldy + jumpSpeed * dt * radix;
+        updateModel();
+
+        if ((jumpSpeed > 0) ? checkBlocked(INTERSECT_ON) : checkBlocked(INTERSECT_UNDER))
+        {
+            if (ct > 0) printf("jump backtrace time %d\n", ct);
+            radix *= 0.5;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
 void Player::update(float dt)
 {
     processKeyboard();
@@ -240,9 +262,12 @@ void Player::update(float dt)
 
     if (checkBlocked(INTERSECT_UNDER))
     {
-        jumpSpeed = -jumpSpeed;
+        jumpSpeed = -jumpSpeed;   
     }
-    position.y += jumpSpeed * dt;
+
+    // position.y += jumpSpeed * dt;
+    updatey(dt);
+
     // if(id == PLAYER_ID)
     // 	std::cout<<"downBlocked: "<<downBlocked()<<" "<<"aroundBlocked: "<<aroundBlocked()<<std::endl;
 
