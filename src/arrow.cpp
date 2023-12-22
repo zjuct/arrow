@@ -377,7 +377,7 @@ void ArrowManager::update(float dt)
             it++;
         }
     }
-    if (control->leftPress)
+    if (control->leftMousePress)
     {
         Arrow &arrow = arrows[arrowMap[PLAYER_ID]];
         if (arrow.state == ARROW_HOLD)

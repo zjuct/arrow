@@ -9,6 +9,7 @@
 #include <mutex>
 #include <windows.h>
 #include <thread>
+#include <chrono>
 
 void printVec3(const glm::vec3 &v)
 {
@@ -48,6 +49,8 @@ void init()
 
     glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
+
+long long beginTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 int main()
 {
     init();
@@ -59,7 +62,10 @@ int main()
         updateMutex.lock();
         glfwPollEvents();
         // std::cout << "BackendMain" << std::endl;
-        float currenttime = glfwGetTime();
+        
+        float currenttime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000.0f;
+        // float currenttime = glfwGetTime();
+        // std::cout<<currenttime<<std::endl;
         static int first = 0;
         if (first == 0)
         {

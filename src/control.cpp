@@ -6,6 +6,7 @@
 #include <iostream>
 #include <mutex>
 #include <windows.h>
+#include <chrono>
 
 int current_player = 1;
 
@@ -264,6 +265,9 @@ void Control::handleScroll(double xoffset, double yoffset)
 
 std::mutex updateMutex;
 
+auto oldtime = std::chrono::system_clock::now();
+auto newtime = std::chrono::system_clock::now();
+
 int BackendMain()
 {
 	
@@ -273,9 +277,14 @@ int BackendMain()
     // glfwMakeContextCurrent(control->window);
     while (!glfwWindowShouldClose(control->window))
     {
+        newtime = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
+        oldtime = newtime;
+        float dt = elapsed_seconds.count();
+        // std::cout<<"fps:"<<1.0f/dt<<std::endl;
 
         updateMutex.lock();
-		std::cout << "BackendMain" << std::endl;
+		// std::cout << "BackendMain" << std::endl;
         ui->updateModel();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -306,7 +315,7 @@ int BackendMain()
         skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
 
-		std::cout<<"draw"<<std::endl;
+		// std::cout<<"draw"<<std::endl;
         updateMutex.unlock();
 
         glDepthMask(GL_FALSE);
