@@ -350,6 +350,7 @@ void ArrowManager::update(float dt)
             std::cout << "hitPlayerId: " << it->second.hitPlayerId << std::endl;
             std::cout << "posOffset: " << posOffset.x << " " << posOffset.y << " " << posOffset.z << std::endl;
             std::cout << "dirOffset: " << dirOffset.x << " " << dirOffset.y << " " << dirOffset.z << std::endl;
+            control->players[it->second.hitPlayerId].getHit(it->second);
         }
         if (it->second.state == ARROW_DISAPPEAR)
         {
