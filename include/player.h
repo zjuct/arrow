@@ -34,6 +34,7 @@ public:
     };
 
     void draw();
+    void updateModel();
     void update(float dt);
 
     void setState(PlayerState state)
@@ -95,7 +96,6 @@ public:
 private:
     bool checkBlocked(enum intersectType type);
     bool navigate(float speedfactor, float anglefactor, float dt);
-    void updateModel();
     void updatePlayerVectors();
 
     Scene *obj; // 用于析构

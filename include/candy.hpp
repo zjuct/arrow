@@ -80,6 +80,7 @@ public:
     void update(float dt);
     void init(const char *objfile);
     void draw();
+    void updateModel();
     void generateCandy(glm::vec3 pos, CandyType type);
     void generateCandy();
 

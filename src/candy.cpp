@@ -22,7 +22,6 @@ void Candy::draw()
 {
     if (type == CANDY_NONE)
         return;
-    updateModel();
     // printMat4(candy->getGModelNoscale());
     candy.draw();
 }
@@ -90,6 +89,15 @@ void CandyManager::draw()
         candy.draw();
     }
 }
+
+void CandyManager::updateModel()
+{
+    for (auto &candy : candies)
+    {
+        candy.updateModel();
+    }
+}
+
 
 void CandyManager::update(float dt)
 {

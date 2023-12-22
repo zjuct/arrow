@@ -10,6 +10,7 @@ class Ground {
 
   void init(const char* objectfile);
   void draw();
+  void updateModel();
   Object& getModel()
   {
     return model;

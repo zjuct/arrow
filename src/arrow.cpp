@@ -19,7 +19,6 @@ void Arrow::draw()
         return;
     if (state == ARROW_LOADING)
         return;
-    updateModel();
     // std::cout << "state: " << state << std::endl;
     // std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
     switch (type)
@@ -223,7 +222,6 @@ void Arrow::update(glm::vec3 pos, glm::vec3 dir)
     {
         this->pos = pos;
         this->dir = dir;
-        updateModel();
     }
 }
 
@@ -326,6 +324,14 @@ void ArrowManager::draw()
     for (auto &[_, arrow] : arrows)
     {
         arrow.draw();
+    }
+}
+
+void ArrowManager::updateModel()
+{
+    for (auto &[_, arrow] : arrows)
+    {
+        arrow.updateModel();
     }
 }
 

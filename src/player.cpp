@@ -133,7 +133,6 @@ void Player::draw()
     lleg.getObb()->drawFlag = true;
     rarm.getObb()->drawFlag = true;
     rleg.getObb()->drawFlag = true;
-    updateModel();
     head.draw();
     body.draw();
     larm.draw();

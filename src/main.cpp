@@ -1,12 +1,14 @@
-#include "glm/gtc/matrix_transform.hpp"
-#include "shader.h"
 #include "control.h"
-#include "light.hpp"
-#include "texturemgr.hpp"
 #include "defs.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "light.hpp"
+#include "shader.h"
+#include "texturemgr.hpp"
 
 #include <iostream>
+#include <mutex>
 #include <windows.h>
+#include <thread>
 
 void printVec3(const glm::vec3 &v)
 {
@@ -14,70 +16,81 @@ void printVec3(const glm::vec3 &v)
 }
 
 static Control *control = Control::getInstance();
-static UI      *ui      = UI::getInstance();
+static UI *ui = UI::getInstance();
 
-extern DWORD WINAPI BackendMain(LPVOID lpParameter);
+extern int BackendMain();
 
+extern std::mutex updateMutex;
 
+void init()
+{
+    // 初始化glfw，使用OpenGL 3.3
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // 创建窗口，设置OpenGL context
+    control->window = glfwCreateWindow(control->wwidth, control->wheight, "Solar System", NULL, NULL);
+    if (control->window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return;
+    }
+
+    
+    glfwSetKeyCallback(control->window, keyCB);
+    glfwSetFramebufferSizeCallback(control->window, fbSizeCB);
+    glfwSetCursorPosCallback(control->window, mouseMoveCB);
+    glfwSetScrollCallback(control->window, scrollCB);
+    glfwSetMouseButtonCallback(control->window, mousePressCB);
+
+    glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 int main()
 {
-    control->init();
-    ui->init();
-
-    CreateThread(NULL, 0, BackendMain, NULL, 0, NULL);
+    init();
+    std::thread backend(BackendMain);
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
-        
 
-		glfwPollEvents();
-        
-        control->camera.updateCamera();
-        
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // 设置view和projection矩阵
-        default_shader->use();
-        glm::mat4 projection = glm::perspective(glm::radians(control->camera.Zoom), (float)control->wwidth / (float)control->wheight, 0.1f, 100.0f);
-        default_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-        glm::mat4 view = control->camera.GetViewMatrix();
-        default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-        default_shader->setvec3fv("viewPos", glm::value_ptr(control->camera.Position));
-        // default_shader->setBool("dirLight.enable", true);
-        // default_shader->setBool("pointLight.enable", true);
-        control->dirLight.configShader(default_shader);
-        // control->pointLight.configShader(default_shader);
-
-        diffuse_shader->use();
-        diffuse_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-        diffuse_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-
-        segment_shader->use();
-        segment_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-        segment_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-
-        glDepthMask(GL_FALSE);
-        skybox_shader->use();
-        view = glm::mat4(glm::mat3(view));
-        skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-        skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-
-        control->skybox_obj.draw();
-        glDepthMask(GL_TRUE);
-
-        ui->draw();
-
-#ifdef SAT_TEST
-        control->test.draw(diffuse_shader);
-#endif
-        glfwSwapBuffers(control->window);
+        updateMutex.lock();
+        glfwPollEvents();
+        // std::cout << "BackendMain" << std::endl;
+        float currenttime = glfwGetTime();
+        static int first = 0;
+        if (first == 0)
+        {
+            control->oldTime = currenttime;
+            first = 1;
+        }
+        control->dt = currenttime - control->oldTime;
+        control->oldTime = currenttime;
+        if (ui->gstate == GLOBAL_GAME)
+        {
+            control->pollKeyPress();
+            control->players[PLAYER_ID].update(control->dt);
+            control->players[ANOTHER_PLAYER_ID].update(control->dt);
+            control->camera.updateCamera();
+            control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
+            control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
+            control->arrowMgr->update(control->dt);
+            control->candyMgr->update(control->dt);
+            if (control->leftMousePress)
+                control->leftPressTime += control->dt;
+            else
+                control->leftPressTime = 0.0f;
+        }
+        updateMutex.unlock();
+        Sleep(10);
 
         
 
         // std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
+    backend.join();
 
     glfwTerminate();
     return 0;

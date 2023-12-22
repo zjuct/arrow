@@ -106,6 +106,7 @@ public:
 
     void init(const char *objfile);
     void draw();
+    void updateModel();
     void update(float dt);
     // void stop();
     // void disappear();

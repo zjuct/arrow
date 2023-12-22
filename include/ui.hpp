@@ -71,6 +71,7 @@ class UI {
 
   void init();
   void draw();
+  void updateModel();
 
   Shader *shader;
   Aim aim;
