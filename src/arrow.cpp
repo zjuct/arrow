@@ -84,7 +84,7 @@ void Arrow::update(float dt)
                 pos += delta;
                 dir = glm::normalize(delta);
             }
-            updateModel();
+            updateModel_obb();
             const Object *interObj = arrow.intersectWith(control->ground.getModel());
             if (interObj)
             {
@@ -135,7 +135,7 @@ void Arrow::update(float dt)
             velocity = velocity * float(pow((1 - WIND_RESISTANCE) / weight, r));
             dir = glm::normalize(velocity);
         }
-        updateModel();
+        updateModel_obb();
         const Object *interObj = arrow.intersectWith(control->ground.getModel());
         if (interObj)
         {
@@ -286,6 +286,40 @@ void Arrow::updateModel()
         break;
     case ARROW_GROUND_SPIKE:
         arrow_ground_spike.setModel(model);
+        break;
+    }
+}
+
+void Arrow::updateModel_obb()
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, pos);
+    // 旋转到dir方向
+    glm::vec3 axis;
+    float angle;
+    axis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(dir.x, 0.0f, dir.z));
+    angle = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(glm::vec3(dir.x, 0.0f, dir.z))));
+    if (axis.y < 0.0f)
+    {
+        angle = -angle;
+    }
+    axis = glm::vec3(0.0f, 1.0f, 0.0f);
+    model = glm::rotate(model, angle, axis);
+    axis = glm::vec3(1.0f, 0.0f, 0.0f);
+    angle = glm::acos(dir.y);
+    model = glm::rotate(model, angle, axis);
+    // model = glm::rotate(model, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    switch (type)
+    {
+    case ARROW_NORMAL:
+        arrow_normal.setLModelObb(model);
+        break;
+    case ARROW_LASER:
+        arrow_laser.setLModelObb(model);
+        break;
+    case ARROW_GROUND_SPIKE:
+        arrow_ground_spike.setLModelObb(model);
         break;
     }
 }

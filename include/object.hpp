@@ -121,11 +121,8 @@ public:
     }
 
     void setLModelObb(const glm::mat4& model) {
-        if(parent) {
-            gmodel_obb = parent->gmodel_noscale * model;
-        } else {
-            gmodel_obb = model;
-        }
+        lmodel_obb = model;
+        updateModel_obb();
     }
 
     void mulleft(const glm::mat4& m) {
@@ -188,6 +185,17 @@ public:
         }
     }
 
+    void updateModel_obb() {
+        if(parent) {
+            gmodel_obb = parent->gmodel_obb * lmodel_obb;
+        } else {
+            gmodel_obb = lmodel_obb;
+        }
+        for(Object* c : children) {
+            c->updateModel_obb();
+        }
+    }
+
     Object()
         : type(OBJECT_NONE), shape(nullptr), lmodel_noscale(glm::mat4(1.0f)),
         lmodel(glm::mat4(1.0f)), parent(nullptr), shader(nullptr), obb(nullptr) {
@@ -242,6 +250,7 @@ protected:
     glm::mat4 gmodel_noscale;
     glm::mat4 lmodel_noscale;
 
+    glm::mat4 lmodel_obb;
     glm::mat4 gmodel_obb;       // used for collision detect
 
     Object* parent;
