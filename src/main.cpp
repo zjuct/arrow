@@ -13,10 +13,12 @@ void printVec3(const glm::vec3 &v)
 }
 
 static Control *control = Control::getInstance();
+static UI      *ui      = UI::getInstance();
 
 int main()
 {
     control->init();
+    ui->init();
 
     Box skybox(glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 skybox_model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f));
@@ -60,21 +62,8 @@ int main()
 
         skybox_obj.draw();
         glDepthMask(GL_TRUE);
-        control->ground.draw();
-        for (auto& player : control->players)
-            player.draw();
-
-        control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
-        control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
-        control->arrowMgr->update(control->dt);
-        control->arrowMgr->draw();
-
-        control->candyMgr->update(control->dt);
-        control->candyMgr->draw();
-
-        glDisable(GL_DEPTH_TEST);
-        control->ui.draw();
-        glEnable(GL_DEPTH_TEST);
+        
+        ui->draw();
         
 #ifdef SAT_TEST
         control->test.draw(diffuse_shader);
@@ -86,14 +75,21 @@ int main()
         float currenttime = glfwGetTime();
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
+        if (ui->gstate == GLOBAL_GAME)
+        {
         control->players[PLAYER_ID].update(control->dt);
         control->players[ANOTHER_PLAYER_ID].update(control->dt);
+        control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
+        control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
+        control->arrowMgr->update(control->dt);
+        control->candyMgr->update(control->dt);
         if (control->leftMousePress)
             control->leftPressTime += control->dt;
         else
             control->leftPressTime = 0.0f;
 
         control->pollKeyPress();
+        }
 
         // std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }

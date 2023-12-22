@@ -6,6 +6,7 @@
 #include <iostream>
 
 static Control* control = Control::getInstance();
+static UI*			ui			= UI::getInstance();
 
 Control* Control::getInstance() {
 	static Control control;
@@ -57,9 +58,6 @@ void Control::init() {
 
 	Shader::initShader();
 
-	// 初始化用户界面
-	ui.init();
-
 	Player player1;
 	player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
 	players.push_back(player1);
@@ -88,22 +86,24 @@ void Control::init() {
 }
 
 void mousePressCB(GLFWwindow* window, int button, int action, int mods) {
-	control->handleMousePress(button, action);
+	if (ui->gstate == GLOBAL_GAME) control->handleMousePress(button, action);
+	ui->handleMousePress(button, action);
 }
 
 void mouseMoveCB(GLFWwindow* window, double xpos, double ypos) {
-	control->handleMouseMove(xpos, ypos);
+	if (ui->gstate == GLOBAL_GAME) control->handleMouseMove(xpos, ypos);
+	ui->handleMouseMove(xpos, ypos);
 }
 
 void keyCB(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-	control->handleKeyInput(key, action);
+	if (ui->gstate == GLOBAL_GAME) control->handleKeyInput(key, action);
 }
 
 void scrollCB(GLFWwindow* window, double xoffset, double yoffset) {
-	control->handleScroll(xoffset, yoffset);
+	if (ui->gstate == GLOBAL_GAME) control->handleScroll(xoffset, yoffset);
 }
 
 void fbSizeCB(GLFWwindow* window, int width, int height) {
@@ -122,7 +122,6 @@ void Control::handleMousePress(int button, int action) {
 			break;
 		case GLFW_MOUSE_BUTTON_LEFT:
 			std::cerr << "[DEBUG] Left button pressed." << std::endl;
-			ui.aim.setState(AimState::AIM_FIRE);
 			leftMousePress = true;
 			break;
 		}
@@ -139,7 +138,6 @@ void Control::handleMousePress(int button, int action) {
 			leftMousePress = false;
 			// arrowMgr->fire(PLAYER_ID);
 			players[PLAYER_ID].fire();
-			ui.aim.setState(AimState::AIM_STILL);
 			break;
 		}
 	}

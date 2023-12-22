@@ -22,11 +22,11 @@ Player::~Player()
 
 void Player::init(const char *objfile, glm::vec3 position)
 {
-    static int cnt = 0;
-    id = cnt++;
-    this->poschanged = true;
-    this->position = position;
-    updatePlayerVectors();
+	static int cnt = 0;
+	id = cnt++;
+	this->position = position;
+    jumpSpeed = 0.0f;
+	updatePlayerVectors();
 
     obj = Scene::LoadObj(objfile);
     std::vector<Mesh> &meshes = obj->getMesh();
@@ -160,35 +160,39 @@ bool Player::checkBlocked(enum intersectType type)
 }
 bool Player::navigate(float speedfactor, float anglefactor, float dt)
 {
-    if (speed < 0.001)
+    if (glm::dot(inputDir, inputDir) < EPS)
     {
         return false;
     }
 
-    glm::vec3 oldDir = inputDir;
+    glm::vec3 moveDir;
     for (int i = 0; i < 6; ++i)
     {
         glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-        moveDir = m * glm::vec4(oldDir, 1.0);
-        position += moveDir * speed * speedfactor * dt;
+        moveDir = m * glm::vec4(inputDir, 1.0);
+        // position += moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
+				position += moveDir * speed * speedfactor * dt;
         updateModel();
         if (!checkBlocked(INTERSECT_SOMETHING))
         {
             return true;
         }
-        position -= moveDir * speed * speedfactor * dt;
+        // position -= moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
+				position -= moveDir * speed * speedfactor * dt;
     }
     for (int i = 0; i < 6; ++i)
     {
         glm::mat4 m = glm::rotate(glm::mat4(1.0), M_PIf * anglefactor * i / 10.0f, glm::vec3(0.0f, -1.0f, 0.0f));
-        moveDir = m * glm::vec4(oldDir, 1.0);
-        position += moveDir * speed * speedfactor * dt;
+        moveDir = m * glm::vec4(inputDir, 1.0);
+        // position += moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
+				position += moveDir * speed * speedfactor * dt;
         updateModel();
         if (!checkBlocked(INTERSECT_SOMETHING))
         {
             return true;
         }
-        position -= moveDir * speed * speedfactor * dt;
+        // position -= moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
+				position -= moveDir * speed * speedfactor * dt;
     }
 
     return false;
@@ -244,6 +248,7 @@ void Player::update(float dt)
 
     if (checkBlocked(INTERSECT_SOMETHING))
     { // 如果在位置更新前，就已经碰撞，需要允许人物能走出来
+				// printf("escape.\n");
         navigate(3.0, 2.0, dt);
     }
     else

@@ -44,9 +44,6 @@ public:
 	void pollKeyPress();
 	glm::vec3 getAim();
 
-	// UI 界面
-	UI ui;
-
 	// 相机
 	Camera camera;
 
