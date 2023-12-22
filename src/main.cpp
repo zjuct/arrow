@@ -73,6 +73,8 @@ int main()
         }
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
+
+        ui->update();
         if (ui->gstate == GLOBAL_GAME)
         {
             control->pollKeyPress();

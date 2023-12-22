@@ -95,6 +95,7 @@ public:
 
 private:
     bool checkBlocked(enum intersectType type);
+    void updatey(float dt);
     bool navigate(float speedfactor, float anglefactor, float dt);
     void updatePlayerVectors();
 
