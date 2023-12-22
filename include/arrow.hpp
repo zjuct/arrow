@@ -114,7 +114,7 @@ public:
     void updateModel_obb();
     // void stop();
     // void disappear();
-    void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 50.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 0.1f);
+    void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 15.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 0.1f);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
     void deleteArrow(int playerId);
     bool fire(int playerId);

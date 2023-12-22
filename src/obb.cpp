@@ -147,7 +147,7 @@ void Obb::draw(Shader *shader)
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
-    model = object->getGModel() * model;
+    model = object->getGmodelObb() * model;
     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
 
     material.configShader(shader);
@@ -169,7 +169,7 @@ void Obb::drawLine(Shader *shader)
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
-    model = object->getGModel() * model;
+    model = object->getGmodelObb() * model;
     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(VAOline);
@@ -190,10 +190,12 @@ int Obb::intersectWith(Obb &other)
     glm::vec3 translateMat = object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     glm::vec3 otherTranslateMat = other.object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-    glm::vec3 v = other.center + otherTranslateMat - this->center - translateMat;
-
     glm::mat3 rotateMat = this->object->getGmodelObb();
     glm::mat3 otherRotateMat = other.object->getGmodelObb();
+
+    glm::vec3 center1 = (otherRotateMat * other.center) + otherTranslateMat;
+    glm::vec3 center2 = (rotateMat * this->center) + translateMat;
+    glm::vec3 v = center1 - center2;
 
     // A旋转后的轴
     glm::vec3 VAx = rotateMat * this->rotate * glm::vec3(1.0f, 0.0f, 0.0f);

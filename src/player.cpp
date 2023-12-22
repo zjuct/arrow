@@ -131,12 +131,12 @@ void Player::updatePlayerVectors()
 
 void Player::draw()
 {
-    head.getObb()->drawFlag = true;
-    body.getObb()->drawFlag = true;
-    larm.getObb()->drawFlag = true;
-    lleg.getObb()->drawFlag = true;
-    rarm.getObb()->drawFlag = true;
-    rleg.getObb()->drawFlag = true;
+//    head.getObb()->drawFlag = true;
+//    body.getObb()->drawFlag = true;
+//    larm.getObb()->drawFlag = true;
+//    lleg.getObb()->drawFlag = true;
+//    rarm.getObb()->drawFlag = true;
+//    rleg.getObb()->drawFlag = true;
     head.draw();
     body.draw();
     larm.draw();
@@ -282,6 +282,7 @@ void Player::updateModel()
     basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
     if (state == PLAYER_DEAD)
         basemodel = glm::rotate(basemodel, (float)glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    
     // 这里的 rotate 输入为弧度制
     // if (state == PLAYER_RUN)
     // 	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
