@@ -5,7 +5,9 @@ project(arrow)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
 
-
+if(UNIX)
+    message("unix")
+endif()
 
 # 设置编译选项
 set(CMAKE_CXX_STANDARD 20)
@@ -44,8 +46,18 @@ find_library(A glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 target_link_libraries(arrow 
     PUBLIC ${A}
-    PRIVATE User32 Gdi32 Shell32
 )
+
+if(UNIX)
+    target_link_libraries(arrow
+        -lGL
+        -lm
+        -lXrandr
+        -lX11
+        -lpthread
+        -ldl
+    )
+endif()
 
 # 设置编译选项 -Wno-volatile
 target_compile_options(arrow PRIVATE -Wno-volatile)

@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <mutex>
-#include <windows.h>
 #include <thread>
 #include <chrono>
 
@@ -65,7 +64,7 @@ int main()
         
         float currenttime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000.0f;
         // float currenttime = glfwGetTime();
-        // std::cout<<currenttime<<std::endl;
+        std::cout<<currenttime<<std::endl;
         static int first = 0;
         if (first == 0)
         {
@@ -90,9 +89,7 @@ int main()
                 control->leftPressTime = 0.0f;
         }
         updateMutex.unlock();
-        Sleep(10);
-
-        
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         // std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
