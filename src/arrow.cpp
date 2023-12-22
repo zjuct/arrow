@@ -166,11 +166,7 @@ void Arrow::update(float dt)
                 }
             }
         }
-        if (dt - r > EPS)
-        {
-            update(dt - r);
-            dt = r;
-        }
+        updateModel_obb(); 
         for (auto &player : control->players)
         {
             if (player.id == attackerId)
@@ -180,6 +176,11 @@ void Arrow::update(float dt)
                 state = ARROW_HIT_PLAYER;
                 hitPlayerId = player.id;
             }
+        }
+        if (dt - r > EPS)
+        {
+            update(dt - r);
+            dt = r;
         }
     }
     if (state == ARROW_LOADING)
