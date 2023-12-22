@@ -208,7 +208,7 @@ void Player::updatey(float dt)
     for (int ct = 0; ct < CHECK_TIME; ++ct)
     {
         position.y = oldy + jumpSpeed * dt * radix;
-        updateModel();
+        updateModel_obb();
 
         if ((jumpSpeed > 0) ? checkBlocked(INTERSECT_ON) : checkBlocked(INTERSECT_UNDER))
         {
