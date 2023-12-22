@@ -75,6 +75,8 @@ int main()
         float currenttime = glfwGetTime();
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
+
+        ui->update();
         if (ui->gstate == GLOBAL_GAME)
         {
         control->players[PLAYER_ID].update(control->dt);

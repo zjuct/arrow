@@ -26,11 +26,24 @@ class Aim {
   void draw(Shader* shader);
 
   void init();
-
+  void update();
   void setState(enum AimState s);
 
   unsigned int VAO, VBO, EBO;
   enum AimState state = AIM_STILL;
+};
+
+class Background {
+  public:
+  Background() : texname("resource/assets/background/background.png")
+  {
+
+  }
+  void init();
+  void draw(Shader *shader);
+
+  unsigned int VAO, VBO, EBO;
+  string texname;
 };
 
 enum ButtonState {
@@ -39,13 +52,21 @@ enum ButtonState {
 
 class Button {
   public:
+  Button()
+  {
+
+  }
   Button(glm::vec3 _position, float _width, float _height, bool _has_texture = false, string _texname = "", glm::vec3 _color = glm::vec3(1.0f))
-  : position(_position), width(_width), height(_height), has_texture(_has_texture), texname(_texname), color(_color)
+  : position(_position), width(_width), height(_height), has_texture(_has_texture), texname(_texname), color(_color), clicked(false), state(BUTTON_OFF)
   {
   }
   
   void init();
+  void update();
   void draw(Shader *shader);
+
+  void handleMousePress(int button, int action);
+	void handleMouseMove(double xposIn, double yposIn);
 
   glm::vec3 position;
   float width;
@@ -54,6 +75,7 @@ class Button {
   bool has_texture;
   string texname;
   ButtonState state;
+  bool clicked;
 
   unsigned int VAO, VBO, EBO;
 };
@@ -72,10 +94,13 @@ class UI {
 	void handleScroll(double xoffset, double yoffset);
 
   void init();
+  void update();
   void draw();
 
   Shader *shader;
   Aim aim;
+  Button bt;
+  Background bg;
   std::vector<Button> btns;
   bool leftPress;
   bool rightPress;
