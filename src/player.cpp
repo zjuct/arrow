@@ -131,12 +131,12 @@ void Player::updatePlayerVectors()
 
 void Player::draw()
 {
-    head.getObb()->drawFlag = true;
-    body.getObb()->drawFlag = true;
-    larm.getObb()->drawFlag = true;
-    lleg.getObb()->drawFlag = true;
-    rarm.getObb()->drawFlag = true;
-    rleg.getObb()->drawFlag = true;
+    // head.getObb()->drawFlag = true;
+    // body.getObb()->drawFlag = true;
+    // larm.getObb()->drawFlag = true;
+    // lleg.getObb()->drawFlag = true;
+    // rarm.getObb()->drawFlag = true;
+    // rleg.getObb()->drawFlag = true;
     updateModel();
     head.draw();
     body.draw();
@@ -344,11 +344,12 @@ void Player::getCandy(CandyType type)
 
 void Player::getHit(const Arrow &arrow)
 {
-    hp -= arrowMgr->getArrowSetting(arrow.id).speed * arrowMgr->getArrowSetting(arrow.id).damage;
+    std::cout << "id: " << id << " hp: " << hp << std::endl;
+    hp -= arrow.speed * arrow.damage;
     if (hp <= 0)
     {
         hp = 0;
         state = PLAYER_DEAD;
     }
-    std::cout<<"id: "<<id<<" hp: "<<hp<<std::endl;
+    std::cout << "id: " << id << " hp: " << hp << std::endl;
 }
