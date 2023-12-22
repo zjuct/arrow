@@ -279,8 +279,8 @@ void Button::handleMouseMove(double xposIn, double yposIn)
     if (xpos > position.x && xpos < position.x + width &&
         ypos < position.y && ypos > position.y - height)
     {
-        state = BUTTON_ON;
-        std::cout << "set button on" << std::endl;
+      state = BUTTON_ON;
+      std::cout << "set button on" << std::endl;
     }
     else
         state = BUTTON_OFF;
