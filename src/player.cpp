@@ -171,7 +171,7 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
         moveDir = m * glm::vec4(inputDir, 1.0);
         // position += moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
 				position += moveDir * speed * speedfactor * dt;
-        updateModel();
+        // updateModel();
         if (!checkBlocked(INTERSECT_SOMETHING))
         {
             return true;
@@ -185,7 +185,7 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
         moveDir = m * glm::vec4(inputDir, 1.0);
         // position += moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
 				position += moveDir * speed * speedfactor * dt;
-        updateModel();
+        // updateModel();
         if (!checkBlocked(INTERSECT_SOMETHING))
         {
             return true;

@@ -166,8 +166,7 @@ void Control::handleMouseMove(double xposIn, double yposIn)
 
 void Control::pollKeyPress()
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    
 }
 
 void Control::handleKeyInput(int key, int action)

@@ -41,7 +41,7 @@ class Background {
   void draw(Shader *shader);
 
   unsigned int VAO, VBO, EBO;
-  string texname;
+  std::string texname;
 };
 
 enum ButtonState {
@@ -54,7 +54,7 @@ class Button {
   {
 
   }
-  Button(glm::vec3 _position, float _width, float _height, bool _has_texture = false, string _texname = "", glm::vec3 _color = glm::vec3(1.0f))
+  Button(glm::vec3 _position, float _width, float _height, bool _has_texture = false, std::string _texname = "", glm::vec3 _color = glm::vec3(1.0f))
   : position(_position), width(_width), height(_height), has_texture(_has_texture), texname(_texname), color(_color), clicked(false), state(BUTTON_OFF)
   {
   }

@@ -60,6 +60,7 @@ int main()
 
         updateMutex.lock();
         glfwPollEvents();
+        
         // std::cout << "BackendMain" << std::endl;
         
         float currenttime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000.0f;
@@ -77,18 +78,17 @@ int main()
         ui->update();
         if (ui->gstate == GLOBAL_GAME)
         {
-            control->pollKeyPress();
             control->players[PLAYER_ID].update(control->dt);
             control->players[ANOTHER_PLAYER_ID].update(control->dt);
             control->camera.updateCamera();
             control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
             control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
+            updateMutex.unlock();
+            updateMutex.lock();
             control->arrowMgr->update(control->dt);
+            updateMutex.unlock();
+            updateMutex.lock();
             control->candyMgr->update(control->dt);
-            if (control->leftMousePress)
-                control->leftPressTime += control->dt;
-            else
-                control->leftPressTime = 0.0f;
         }
         updateMutex.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
