@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(arrow)
 
-# 设置目标为Mingw
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
 
 if(UNIX)
-    message("unix")
+	set(UNIX_LIBS -lGL -lX11 -lpthread -lXrandr -LXi -ldl)
+else()
+	set(UNIX_LIBS "")
 endif()
 
 # 设置编译选项
@@ -24,15 +24,6 @@ aux_source_directory(./test TEST_SRCS)
 aux_source_directory(./server SERVER_SRCS)
 
 list(TRANSFORM DIR_SRCS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/" OUTPUT_VARIABLE DIR_SRCS)
-# set(DIR_SRCS ./src/main.cpp)
-
-# message(AUTHOR_WARNING "source files: ${DIR_SRCS}")
-
-# message(AUTHOR_WARNING "include path: ${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-
-# link_directories(./lib)
-# message(AUTHOR_WARNING "link path: ${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 # 添加源文件
 add_executable(arrow ${DIR_SRCS} ${TEST_SRCS})
@@ -46,28 +37,19 @@ find_library(A glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 target_link_libraries(arrow 
     PUBLIC ${A}
+		${UNIX_LIBS}
 )
 
-if(UNIX)
-    target_link_libraries(arrow
-        -lGL
-        -lm
-        -lXrandr
-        -lX11
-        -lpthread
-        -ldl
-    )
-endif()
 
 # 设置编译选项 -Wno-volatile
 target_compile_options(arrow PRIVATE -Wno-volatile)
 
 set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
+if(WIN32)
+  add_subdirectory(tools)
+	add_executable(server ${SERVER_SRCS})
 
-add_subdirectory(tools)
-
-add_executable(server ${SERVER_SRCS})
-
-set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 

@@ -5,7 +5,6 @@
 
 #include <iostream>
 #include <mutex>
-#include <windows.h>
 #include <chrono>
 
 int current_player = 1;
@@ -329,4 +328,5 @@ int BackendMain()
 #endif
         glfwSwapBuffers(control->window);
     }
+    return 0;
 }
