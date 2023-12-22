@@ -312,6 +312,7 @@
   void UI::init()
   { 
     gstate = GLOBAL_INIT;
+    glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     shader = flat_shader;
     aim.init();
     bt = Button(glm::vec3(0.2f, 0.0f, 0.0f), 0.6f, 0.5f, true, "resource/assets/button/btn.png");
@@ -329,6 +330,7 @@
       if (bt.clicked)
       {
         gstate = GLOBAL_GAME;
+        glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       }
     }
 
@@ -339,7 +341,6 @@
     shader->use();
     switch (gstate) {
       case GLOBAL_GAME:
-        glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         control->ground.draw();
         for (auto& player : control->players)
             player.draw();
@@ -349,7 +350,6 @@
         break;
         
       case GLOBAL_INIT:
-        glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         bg.draw(shader);
         bt.draw(shader);
       break;
