@@ -385,12 +385,12 @@ void ArrowManager::update(float dt)
             glm::vec3 hitPos = it->second.pos;
             glm::vec3 hitDir = it->second.dir;
             glm::vec3 posOffset = hitPos - control->players[it->second.hitPlayerId].position;
-            glm::vec3 dirOffset = hitDir - control->players[it->second.hitPlayerId].right;
-            arrowHit[it->second.hitPlayerId].push_back({it->second.id, {posOffset, dirOffset}});
+            glm::vec3 right = control->players[it->second.hitPlayerId].right;
+            float rightAngle = glm::atan(right.z, right.x);
+            arrowHit[it->second.hitPlayerId].push_back({it->second.id, posOffset, hitDir, rightAngle});
             std::cout << "id: " << it->second.id << std::endl;
             std::cout << "hitPlayerId: " << it->second.hitPlayerId << std::endl;
             std::cout << "posOffset: " << posOffset.x << " " << posOffset.y << " " << posOffset.z << std::endl;
-            std::cout << "dirOffset: " << dirOffset.x << " " << dirOffset.y << " " << dirOffset.z << std::endl;
             control->players[it->second.hitPlayerId].getHit(it->second);
         }
         if (it->second.state == ARROW_DISAPPEAR)
@@ -399,7 +399,7 @@ void ArrowManager::update(float dt)
             {
                 for (auto &arrow : arrowHit[it->second.hitPlayerId])
                 {
-                    if (arrow.first == it->second.id)
+                    if (std::get<0>(arrow) == it->second.id)
                     {
                         arrowHit[it->second.hitPlayerId].erase(arrowHit[it->second.hitPlayerId].begin() + (&arrow - &arrowHit[it->second.hitPlayerId][0]));
                         break;
@@ -479,9 +479,13 @@ void ArrowManager::updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir)
     {
         glm::vec3 playerPos = control->players[playerId].position;
         glm::vec3 playerDir = control->players[playerId].right;
-        for (auto &[arrowId, offset] : arrowHit[playerId])
+        float playerRightAngle = glm::atan(playerDir.z, playerDir.x);
+        for (auto &[arrowId, offset, dir, rightAngle] : arrowHit[playerId])
         {
-            arrows[arrowId].update(playerPos + offset.first, playerDir + offset.second);
+            float angle = playerRightAngle - rightAngle;
+            glm::vec3 nowOffset = glm::rotate(glm::mat4(1.0f), -angle, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::vec4(offset, 1.0f);
+            glm::vec3 nowDir = glm::rotate(glm::mat4(1.0f), -angle, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::vec4(dir, 1.0f);
+            arrows[arrowId].update(playerPos + nowOffset, nowDir);
         }
     }
 }

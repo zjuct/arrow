@@ -102,7 +102,7 @@ public:
     std::map<int, Arrow> arrows;
     std::map<int, int> arrowMap;
     std::map<int, int> arrowSetting;
-    std::map<int, std::vector<std::pair<int, std::pair<glm::vec3, glm::vec3>>>> arrowHit;
+    std::map<int, std::vector<std::tuple<int, glm::vec3, glm::vec3, float>>> arrowHit;
 
     ArrowManager() {}
     ~ArrowManager() {}
