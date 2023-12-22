@@ -84,7 +84,7 @@ void Arrow::update(float dt)
                 pos += delta;
                 dir = glm::normalize(delta);
             }
-            updateModel();
+            updateModel_obb();
             const Object *interObj = arrow.intersectWith(control->ground.getModel());
             if (interObj)
             {
@@ -135,7 +135,7 @@ void Arrow::update(float dt)
             velocity = velocity * float(pow((1 - WIND_RESISTANCE) / weight, r));
             dir = glm::normalize(velocity);
         }
-        updateModel();
+        updateModel_obb();
         const Object *interObj = arrow.intersectWith(control->ground.getModel());
         if (interObj)
         {
@@ -166,11 +166,7 @@ void Arrow::update(float dt)
                 }
             }
         }
-        if (dt - r > EPS)
-        {
-            update(dt - r);
-            dt = r;
-        }
+        updateModel_obb(); 
         for (auto &player : control->players)
         {
             if (player.id == attackerId)
@@ -180,6 +176,11 @@ void Arrow::update(float dt)
                 state = ARROW_HIT_PLAYER;
                 hitPlayerId = player.id;
             }
+        }
+        if (dt - r > EPS)
+        {
+            update(dt - r);
+            dt = r;
         }
     }
     if (state == ARROW_LOADING)
@@ -290,6 +291,40 @@ void Arrow::updateModel()
     }
 }
 
+void Arrow::updateModel_obb()
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, pos);
+    // 旋转到dir方向
+    glm::vec3 axis;
+    float angle;
+    axis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(dir.x, 0.0f, dir.z));
+    angle = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(glm::vec3(dir.x, 0.0f, dir.z))));
+    if (axis.y < 0.0f)
+    {
+        angle = -angle;
+    }
+    axis = glm::vec3(0.0f, 1.0f, 0.0f);
+    model = glm::rotate(model, angle, axis);
+    axis = glm::vec3(1.0f, 0.0f, 0.0f);
+    angle = glm::acos(dir.y);
+    model = glm::rotate(model, angle, axis);
+    // model = glm::rotate(model, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    switch (type)
+    {
+    case ARROW_NORMAL:
+        arrow_normal.setLModelObb(model);
+        break;
+    case ARROW_LASER:
+        arrow_laser.setLModelObb(model);
+        break;
+    case ARROW_GROUND_SPIKE:
+        arrow_ground_spike.setLModelObb(model);
+        break;
+    }
+}
+
 ArrowManager *ArrowManager::getInstance()
 {
     static ArrowManager instance;
@@ -356,6 +391,7 @@ void ArrowManager::update(float dt)
             std::cout << "hitPlayerId: " << it->second.hitPlayerId << std::endl;
             std::cout << "posOffset: " << posOffset.x << " " << posOffset.y << " " << posOffset.z << std::endl;
             std::cout << "dirOffset: " << dirOffset.x << " " << dirOffset.y << " " << dirOffset.z << std::endl;
+            control->players[it->second.hitPlayerId].getHit(it->second);
         }
         if (it->second.state == ARROW_DISAPPEAR)
         {

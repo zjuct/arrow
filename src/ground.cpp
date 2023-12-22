@@ -23,5 +23,4 @@ void Ground::updateModel() {
   mod = glm::translate(mod, glm::vec3(0.0f, -0.131677f, 0.0f));
   model.setModel(mod);
   model.setModel_noscale(mod);
-  model.updateModel();
 }

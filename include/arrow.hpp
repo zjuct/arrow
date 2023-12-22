@@ -48,14 +48,16 @@ public:
     float loadTime = 0.1f;
     float pressTime = 0.0f;
 
-    float liveTime = 10.0f;
+    float liveTime = 20.0f;
     // float stopTime = 0.0f;
-    float disappearTime = 5.0f;
+    float disappearTime = 10.0f;
 
     float strengthMax = 3.0f;
     float strengthMin = 1.0f;
     float strengthTime = 2.0f;
     float strength = 1.0f;
+
+    float damage = 1.0f;
 
     glm::vec3 pos;
     glm::vec3 dir;
@@ -80,6 +82,7 @@ public:
     void update(float dt);
     void update(glm::vec3 pos, glm::vec3 dir);
     void updateModel();
+    void updateModel_obb();
     bool fire();
     // void stop();
     // void disappear();
@@ -108,6 +111,7 @@ public:
     void draw();
     void updateModel();
     void update(float dt);
+    void updateModel_obb();
     // void stop();
     // void disappear();
     void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 15.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 0.1f);

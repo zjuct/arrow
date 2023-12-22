@@ -139,9 +139,8 @@ public:
         model = glm::translate(model, position);
         model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 
-        lmodel = model;
-        lmodel_noscale = glm::translate(glm::mat4(1.0f), position);
-        updateModel();
+        setModel(model);
+        setModel_noscale(glm::translate(glm::mat4(1.0f), position));
     }
 
     void configShader(Shader* shader) {
