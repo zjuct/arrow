@@ -57,8 +57,6 @@ public:
     float strengthTime = 2.0f;
     float strength = 1.0f;
 
-    float damage = 10.0f;
-
     glm::vec3 pos;
     glm::vec3 dir;
     glm::vec3 velocity;

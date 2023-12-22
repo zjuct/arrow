@@ -44,8 +44,6 @@ void Player::processKeyboard()
     if (id == PLAYER_ID)
     {
         inputDir = glm::vec3(0.0f);
-        if (state == PLAYER_DEAD)
-            return;
         if (control->frontPress)
             inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
         if (control->backPress)
@@ -65,8 +63,6 @@ void Player::processKeyboard()
     else if (id == ANOTHER_PLAYER_ID)
     {
         inputDir = glm::vec3(0.0f);
-        if (state == PLAYER_DEAD)
-            return;
         if (control->another_frontPress)
             inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
         if (control->another_backPress)
@@ -276,8 +272,6 @@ void Player::updateModel()
     glm::mat4 basemodel(1.0f);
     basemodel = glm::translate(basemodel, position);
     basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
-    if (state == PLAYER_DEAD)
-        basemodel = glm::rotate(basemodel, (float)glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     // 这里的 rotate 输入为弧度制
     // if (state == PLAYER_RUN)
     // 	basemodel = glm::rotate(basemodel, (float)glm::radians(yaw+90), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -329,26 +323,89 @@ void Player::fire()
         fireTime = 1.0f;
 }
 
+// enum CandyType
+// {
+//     CANDY_NONE = -1,
+//     CANDY_SPEED_UP,
+//     CANDY_JUMP_HEIGHT_UP,
+//     CANDY_JUMP_TIME_UP,
+//     CANDY_ARROW_SPEED_UP,
+//     CANDY_ARROW_LOAD_TIME_DOWN,
+//     CANDY_ARROW_STRENGTH_TIME_DOWN,
+//     CANDY_ARROW_SCALE_UP,
+//     CANDY_ARROW_FIRE,
+//     CANDY_ARROW_LIVE_TIME_UP,
+//     CANDY_ARROW_REFLECT,
+//     CANDY_ARROW_LASER,
+//     CANDY_ARROW_GROUND_SPIKE,
+//     CANDY_TYPE_NUM,
+//     CANDY_DISAPPEARING,
+//     CANDY_DISAPPEAR,
+// };
+
 void Player::getCandy(CandyType type)
 {
-    exp += candyExp;
-    if (exp >= expToLevelUp[level])
+    switch (type)
     {
-        exp -= expToLevelUp[level];
-        level++;
-        maxHp += 5;
-        hp = maxHp;
-        std::cout << "level up: " << level << std::endl;
+    case CANDY_SPEED_UP:
+        speed *= 1.2f;
+        std::cout << "speed up, now speed: " << speed << std::endl;
+        break;
+    case CANDY_JUMP_HEIGHT_UP:
+        jumpHeight *= 1.2f;
+        std::cout << "jump height up, now jump height: " << jumpHeight << std::endl;
+        break;
+    case CANDY_JUMP_TIME_UP:
+        jumpTime += 1;
+        maxJumpTime += 1;
+        std::cout << "jump time up, now jump time: " << maxJumpTime << std::endl;
+        break;
+    case CANDY_ARROW_SPEED_UP:
+        arrowMgr->getArrowSetting(id).speed *= 1.2f;
+        arrowMgr->load(id);
+        std::cout << "arrow speed up, now arrow speed: " << arrowMgr->getArrowSetting(id).speed << std::endl;
+        break;
+    case CANDY_ARROW_LOAD_TIME_DOWN:
+        arrowMgr->getArrowSetting(id).loadTime *= 0.8f;
+        arrowMgr->load(id);
+        std::cout << "arrow load time down, now arrow load time: " << arrowMgr->getArrowSetting(id).loadTime << std::endl;
+        break;
+    case CANDY_ARROW_STRENGTH_TIME_DOWN:
+        arrowMgr->getArrowSetting(id).strengthTime *= 0.8f;
+        arrowMgr->load(id);
+        std::cout << "arrow strength time down, now arrow strength time: " << arrowMgr->getArrowSetting(id).strengthTime << std::endl;
+        break;
+    case CANDY_ARROW_SCALE_UP:
+        arrowMgr->getArrowSetting(id).scale *= 1.2f;
+        arrowMgr->load(id);
+        std::cout << "arrow scale up, now arrow scale: " << arrowMgr->getArrowSetting(id).scale << std::endl;
+        break;
+    case CANDY_ARROW_FIRE:
+        arrowMgr->getArrowSetting(id).isFire = true;
+        arrowMgr->load(id);
+        std::cout << "arrow fire" << std::endl;
+        break;
+    case CANDY_ARROW_LIVE_TIME_UP:
+        if (arrowMgr->getArrowSetting(id).type != ARROW_GROUND_SPIKE)
+            break;
+        arrowMgr->getArrowSetting(id).liveTime *= 1.2f;
+        arrowMgr->load(id);
+        std::cout << "arrow live time up, now arrow live time: " << arrowMgr->getArrowSetting(id).liveTime << std::endl;
+        break;
+    case CANDY_ARROW_REFLECT:
+        arrowMgr->getArrowSetting(id).isReflect = true;
+        arrowMgr->load(id);
+        std::cout << "arrow reflect" << std::endl;
+        break;
+    case CANDY_ARROW_LASER:
+        arrowMgr->getArrowSetting(id).type = ARROW_LASER;
+        arrowMgr->load(id);
+        std::cout << "arrow laser" << std::endl;
+        break;
+    case CANDY_ARROW_GROUND_SPIKE:
+        std::cout << "arrow ground spike, not implemented" << std::endl;
+        break;
+    default:
+        break;
     }
-}
-
-void Player::getHit(const Arrow &arrow)
-{
-    hp -= arrowMgr->getArrowSetting(arrow.id).speed * arrowMgr->getArrowSetting(arrow.id).damage;
-    if (hp <= 0)
-    {
-        hp = 0;
-        state = PLAYER_DEAD;
-    }
-    std::cout<<"id: "<<id<<" hp: "<<hp<<std::endl;
 }

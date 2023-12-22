@@ -16,8 +16,6 @@ enum Movement
     STILL,
 };
 
-class Arrow;
-
 class Player
 {
 public:
@@ -33,7 +31,6 @@ public:
     {
         PLAYER_STILL = 0,
         PLAYER_RUN,
-		PLAYER_DEAD,
     };
 
     void draw();
@@ -88,25 +85,12 @@ public:
     {
         return body;
     }
-    Object &getHead()
-    {
-        return head;
-    }
-    void getCandy(CandyType type);
-    int id;
-    int getHp()
-    {
-        return hp + 0.5f;
-    }
-	int getMaxHp()
+	Object& getHead()
 	{
-		return maxHp;
+		return head;
 	}
-    int getLevel()
-    {
-        return level;
-    }
-	void getHit(const Arrow& arrow);
+	void getCandy(CandyType type);
+    int id;
 
 private:
     bool checkBlocked(enum intersectType type);
@@ -127,7 +111,7 @@ private:
     float sensitivity;
 
     int jumpTime = 2;
-    int maxJumpTime = 2;
+	int maxJumpTime = 2;
     bool floating = false;
     float jumpHeight = 3.0f;
     float jumpSpeed = 0.0f;
@@ -143,17 +127,6 @@ private:
 
     float frontSpeed = 0.0f;
     float rightSpeed = 0.0f;
-
-    float hp = 100.0f;
-    float maxHp = 100.0f;
-    float hpRecover = 0.1f;
-    float hpRecoverTime = 0.0f;
-    int exp = 0;
-    int level = 1;
-    int maxLevel = 20;
-    int expToLevelUp[20] = {0, 110, 120, 130, 140, 150, 160, 170, 180, 190,
-                            200, 210, 220, 230, 240, 250, 260, 270, 280, 290};
-	int candyExp = 10;
 };
 
 #endif
