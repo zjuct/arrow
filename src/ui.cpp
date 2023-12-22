@@ -279,7 +279,7 @@ void Button::init()
         ypos < position.y && ypos > position.y - height)
     {
       state = BUTTON_ON;
-      cout << "set button on" << endl;
+      std::cout << "set button on" << std::endl;
     }
     else 
     state = BUTTON_OFF;

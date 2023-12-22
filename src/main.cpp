@@ -46,7 +46,6 @@ void init()
     glfwSetScrollCallback(control->window, scrollCB);
     glfwSetMouseButtonCallback(control->window, mousePressCB);
 
-    glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 long long beginTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
