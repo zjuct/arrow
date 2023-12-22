@@ -187,13 +187,13 @@ void Obb::drawLine(Shader *shader)
 int Obb::intersectWith(Obb &other)
 {
 
-    glm::vec3 translateMat = object->getGModelNoscale() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec3 otherTranslateMat = other.object->getGModelNoscale() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 translateMat = object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 otherTranslateMat = other.object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     glm::vec3 v = other.center + otherTranslateMat - this->center - translateMat;
 
-    glm::mat3 rotateMat = this->object->getGModelNoscale();
-    glm::mat3 otherRotateMat = other.object->getGModelNoscale();
+    glm::mat3 rotateMat = this->object->getGmodelObb();
+    glm::mat3 otherRotateMat = other.object->getGmodelObb();
 
     // A旋转后的轴
     glm::vec3 VAx = rotateMat * this->rotate * glm::vec3(1.0f, 0.0f, 0.0f);

@@ -171,7 +171,7 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
         moveDir = m * glm::vec4(inputDir, 1.0);
         // position += moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
 				position += moveDir * speed * speedfactor * dt;
-        updateModel();
+        updateModel_obb();
         if (!checkBlocked(INTERSECT_SOMETHING))
         {
             return true;
@@ -185,7 +185,7 @@ bool Player::navigate(float speedfactor, float anglefactor, float dt)
         moveDir = m * glm::vec4(inputDir, 1.0);
         // position += moveDir * speed * glm::dot(moveDir, inputDir) * speedfactor * dt;
 				position += moveDir * speed * speedfactor * dt;
-        updateModel();
+        updateModel_obb();
         if (!checkBlocked(INTERSECT_SOMETHING))
         {
             return true;
@@ -319,6 +319,39 @@ void Player::updateModel()
     model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
     rleg.setModel(model);
     rleg.setModel_noscale(model);
+}
+
+// 补丁: 碰撞检测时试探性地移动应改变gmodel_obb，而非lmodel，以防止模型抖动
+void Player::updateModel_obb()
+{
+    glm::mat4 basemodel(1.0f);
+    basemodel = glm::translate(basemodel, position);
+    basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
+
+    // head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
+    glm::mat4 model = basemodel;
+    head.setLModelObb(model);
+
+    // body: 世界坐标平移 * 局部坐标平移 * 整体模型转动
+    model = basemodel;
+    body.setLModelObb(model);
+
+    // larm, rarm, lleg, rleg: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 手臂/腿部转动
+    model = basemodel;
+    model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
+    larm.setLModelObb(model);
+
+    model = basemodel;
+    model = glm::rotate(model, -fireTime, glm::vec3(1.0f, 0.0f, 0.0f));
+    rarm.setLModelObb(model);
+
+    model = basemodel;
+    model = glm::rotate(model, -theta, glm::vec3(1.0f, 0.0f, 0.0f));
+    lleg.setLModelObb(model);
+
+    model = basemodel;
+    model = glm::rotate(model, theta, glm::vec3(1.0f, 0.0f, 0.0f));
+    rleg.setLModelObb(model);
 }
 
 void Player::fire()

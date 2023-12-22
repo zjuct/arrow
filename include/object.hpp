@@ -116,7 +116,16 @@ public:
 
     void setModel_noscale(const glm::mat4& model) {
         lmodel_noscale = model;
+        setLModelObb(model);        // 正常更新模型位置时，同时更新Obb
         updateModel();
+    }
+
+    void setLModelObb(const glm::mat4& model) {
+        if(parent) {
+            gmodel_obb = parent->gmodel_noscale * model;
+        } else {
+            gmodel_obb = model;
+        }
     }
 
     void mulleft(const glm::mat4& m) {
@@ -152,6 +161,10 @@ public:
 
     const glm::mat4& getGModelNoscale() const {
         return gmodel_noscale;
+    }
+
+    const glm::mat4& getGmodelObb() const {
+        return gmodel_obb;
     }
 
     virtual void update(float dt) {}
@@ -228,6 +241,8 @@ protected:
     glm::mat4 lmodel;       // local
     glm::mat4 gmodel_noscale;
     glm::mat4 lmodel_noscale;
+
+    glm::mat4 gmodel_obb;       // used for collision detect
 
     Object* parent;
     std::vector<Object*> children;

@@ -37,6 +37,8 @@ public:
     void updateModel();
     void update(float dt);
 
+    void updateModel_obb();
+
     void setState(PlayerState state)
     {
         this->state = state;
