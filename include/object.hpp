@@ -166,6 +166,7 @@ public:
 
     virtual void update(float dt) {}
 
+private:
     void updateModel() {
         if(parent) {
             /*
@@ -195,6 +196,7 @@ public:
             c->updateModel_obb();
         }
     }
+public:
 
     Object()
         : type(OBJECT_NONE), shape(nullptr), lmodel_noscale(glm::mat4(1.0f)),
