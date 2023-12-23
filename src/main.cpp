@@ -98,9 +98,11 @@ int main()
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
-//        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if(ui->gstate == GLOBAL_INIT) {
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+        }
 
-//        std::cout << "fps: " << 1.0f / control->dt << std::endl;
+        std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
     frontend.join();
 
