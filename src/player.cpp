@@ -437,14 +437,16 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), &player->level, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, &player->exp, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, &player->id, sizeof(int));
+    std::cout<<"pack Id: "<<*(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3)<<std::endl;
 }
 
 void PlayerSyncPackage::update(Player *player)
 {
-    int id = player->id;
+    // int id = player->id;
     int packageId = *(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3);
-    if (id != packageId)
-        return;
+    // std::cout<<"update Id: "<<packageId<<std::endl;
+    // if (id != packageId)
+    //     return;
     memcpy(&player->position, data, sizeof(glm::vec3));
     memcpy(&player->front, data + sizeof(glm::vec3), sizeof(glm::vec3));
     memcpy(&player->right, data + sizeof(glm::vec3) * 2, sizeof(glm::vec3));
@@ -454,6 +456,7 @@ void PlayerSyncPackage::update(Player *player)
     memcpy(&player->hp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2, sizeof(int));
     memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
     memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));
+    memcpy(&player->id, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, sizeof(int));
 }
 
 int PlayerSyncPackage::getId()

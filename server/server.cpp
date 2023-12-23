@@ -1,13 +1,14 @@
-#include <winsock2.h>
-#include <sync.hpp>
-#include <iostream>
-#include <windows.h>
+#include <control.h>
 #include <defs.h>
-#include <vector>
+#include <iostream>
+#include <map>
 #include <mutex>
 #include <player.h>
-#include <control.h>    
+#include <sync.hpp>
 #include <thread>
+#include <vector>
+#include <windows.h>
+#include <winsock2.h>
 
 SOCKET sock;
 using namespace std;
@@ -26,12 +27,12 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
     return FALSE;
 }
 
-static Control *control = Control::getInstance();
+// static Control *control = Control::getInstance();
 
 vector<client> clients;
 mutex clientsMtx;
 vector<thread> recvThreads;
-
+map<int, Player> players;
 
 void sendThread()
 {
@@ -42,17 +43,13 @@ void sendThread()
             break;
         }
         clientsMtx.lock();
-        for (int i = 0; i < clients.size(); i++)
+        for (auto &player  : players)
         {
-            SyncPackage *package = new PlayerSyncPackage(&control->players[clients[i].id]);
-            for(int j = 0; j < clients.size(); j++)
+            SyncPackage *package = new PlayerSyncPackage(&player.second);
+            for (int j = 0; j < clients.size(); j++)
             {
-                if (i == j)
-                {
-                    continue;
-                }
                 package->send(clients[j].sock);
-                std::cout<<"send to "<<j<<std::endl;
+                std::cout << "send to " << j << std::endl;
             }
         }
         clientsMtx.unlock();
@@ -72,9 +69,9 @@ void recvThread(int client_id, SOCKET client_sock)
         char buf[16];
         memset(buf, 0, sizeof(buf));
         int ret = recv(client_sock, buf, sizeof(buf), 0);
-        package.type = *(SyncType*)(buf);
-        package.timestamp = *(long long*)(buf + 4);
-        package.size = *(int*)(buf + 12);
+        package.type = *(SyncType *)(buf);
+        package.timestamp = *(long long *)(buf + 4);
+        package.size = *(int *)(buf + 12);
         // std::cout << "recv1 " << ret << std::endl;
         // std::cout << package.type << " " << package.timestamp << " " << package.size << std::endl;
         if (ret == SOCKET_ERROR)
@@ -92,11 +89,13 @@ void recvThread(int client_id, SOCKET client_sock)
             std::cout << "Error: " << WSAGetLastError() << endl;
             break;
         }
-        std::cout<<"recv from "<<client_id<<std::endl;
+        // std::cout << "recv from " << client_id << std::endl;
         if (package.type == Sync_Player)
         {
             PlayerSyncPackage *player_package = (PlayerSyncPackage *)&package;
-            player_package->update(&control->players[client_id]);
+            int id = player_package->getId();
+            std::cout<<"sync player "<<id<<std::endl;
+            player_package->update(&players[id]);
         }
     }
 }
@@ -136,7 +135,7 @@ int main()
     thread send(sendThread);
     cout << "Server started" << endl;
     int client_id = 0;
-    
+
     while (true)
     {
         if (exit_flag)
@@ -157,7 +156,6 @@ int main()
         client_t.ip = client_addr.sin_addr.s_addr;
         client_t.port = client_addr.sin_port;
         client_t.sock = client_sock;
-        control->players.push_back(Player());
         clientsMtx.lock();
         clients.push_back(client_t);
         clientsMtx.unlock();

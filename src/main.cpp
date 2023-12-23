@@ -58,7 +58,6 @@ int main()
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
-
         updateMutex.lock();
         glfwPollEvents();
         // std::cout << "BackendMain" << std::endl;

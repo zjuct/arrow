@@ -376,3 +376,5 @@ CMakeFiles/*
 Makefile
 compile_commands.json
 tools/CmakeFiles/*
+
+.VSCodeCounter/

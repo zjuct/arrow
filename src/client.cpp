@@ -26,6 +26,7 @@ extern int init;
 
 void recvThread()
 {
+    std::cout << "recvThread" << std::endl;
     while (true)
     {
         SyncPackage package;
@@ -36,6 +37,7 @@ void recvThread()
         {
             PlayerSyncPackage *player_package = (PlayerSyncPackage *)&package;
             player_package->update(&control->players[player_package->getId()]);
+            std::cout<<"id: "<<player_package->getId()<<std::endl;
             break;
         }
         default:
@@ -66,8 +68,8 @@ int clientThread()
     std::cout << "Connected to server" << std::endl;
 
     while (!init)
-        ;
-    std::thread(recvThread);
+        std::cout << "init" << std::endl;
+    std::thread recv(recvThread);
     while (!glfwWindowShouldClose(control->window))
     {
         SyncPackage *package = new PlayerSyncPackage(&control->players[current_player]);
