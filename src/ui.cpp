@@ -280,7 +280,7 @@ void Button::handleMouseMove(double xposIn, double yposIn)
         ypos < position.y && ypos > position.y - height)
     {
       state = BUTTON_ON;
-      std::cout << "set button on" << std::endl;
+//      std::cout << "set button on" << std::endl;
     }
     else
         state = BUTTON_OFF;
@@ -431,6 +431,9 @@ void UI::draw()
             player.draw();
         control->arrowMgr->draw();
         control->candyMgr->draw();
+//        for(Obb* obb: control->grid.obbs) {
+//            obb->drawLine(segment_shader);
+//        }
         aim.draw(shader);
         break;
 

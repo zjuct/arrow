@@ -22,10 +22,12 @@ Control::Control()
 {
 }
 
+bool backendinitfin = false;
+bool gladinit = false;
+
 void Control::init()
 {
     srand((unsigned)time(NULL));
-
     
     glfwMakeContextCurrent(window);
 
@@ -43,6 +45,7 @@ void Control::init()
 
     // 初始化视口
     glViewport(0, 0, control->wwidth, control->wheight);
+
 
     Shader::initShader();
 
@@ -63,7 +66,9 @@ void Control::init()
 
     // 箭
     arrowMgr->init("resource/assets/weapon/knife.obj");
-    arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
+    arrowMgr->bindArrow(PLAYER_ID, ARROW_LASER);
+    arrowMgr->getArrowSetting(PLAYER_ID).isReflect = 1;
+    arrowMgr->load(PLAYER_ID);
     arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
 
     // 道具
@@ -72,6 +77,9 @@ void Control::init()
 #ifdef SAT_TEST
     test.init();
 #endif
+    grid.init(ground.getModel().getChildren(), 1.0f);
+    
+    gladinit = true;
 }
 
 void mousePressCB(GLFWwindow *window, int button, int action, int mods)
@@ -266,7 +274,7 @@ std::mutex updateMutex;
 auto oldtime = std::chrono::system_clock::now();
 auto newtime = std::chrono::system_clock::now();
 
-int BackendMain()
+int FrontendMain()
 {
 	
     control->init();
@@ -279,7 +287,7 @@ int BackendMain()
         std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
         oldtime = newtime;
         float dt = elapsed_seconds.count();
-        // std::cout<<"fps:"<<1.0f/dt<<std::endl;
+        //std::cout<<"fps:"<<1.0f/dt<<std::endl;
 
         updateMutex.lock();
 		// std::cout << "BackendMain" << std::endl;

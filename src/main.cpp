@@ -18,9 +18,12 @@ void printVec3(const glm::vec3 &v)
 static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
 
-extern int BackendMain();
+extern int FrontendMain();
 
 extern std::mutex updateMutex;
+extern bool backendinitfin;
+extern bool gladinit;
+
 
 void init()
 {
@@ -48,11 +51,16 @@ void init()
 
 }
 
-long long beginTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+long long beginTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 int main()
 {
     init();
-    std::thread backend(BackendMain);
+    std::thread frontend(FrontendMain);
+
+    while(!gladinit);
+
+    backendinitfin = true;
+
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
@@ -62,7 +70,7 @@ int main()
         
         // std::cout << "BackendMain" << std::endl;
         
-        float currenttime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000.0f;
+        float currenttime = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000000000.0f;
         // float currenttime = glfwGetTime();
 //        std::cout<<currenttime<<std::endl;
         static int first = 0;
@@ -90,11 +98,11 @@ int main()
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        // std::cout << "fps: " << 1.0f / control->dt << std::endl;
+//        std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
-    backend.join();
+    frontend.join();
 
     glfwTerminate();
     return 0;

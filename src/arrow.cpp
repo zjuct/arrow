@@ -85,7 +85,12 @@ void Arrow::update(float dt)
                 dir = glm::normalize(delta);
             }
             updateModel_obb();
+
+#if GRID_ENABLE
+            const Object *interObj = control->grid.intersectWith(arrow);
+#else
             const Object *interObj = arrow.intersectWith(control->ground.getModel());
+#endif
             if (interObj)
             {
                 if (isReflect)
@@ -136,7 +141,11 @@ void Arrow::update(float dt)
             dir = glm::normalize(velocity);
         }
         updateModel_obb();
+#if GRID_ENABLE
+        const Object *interObj = control->grid.intersectWith(arrow);
+#else
         const Object *interObj = arrow.intersectWith(control->ground.getModel());
+#endif
         if (interObj)
         {
             if (!isReflect)
