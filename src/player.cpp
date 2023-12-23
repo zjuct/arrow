@@ -437,7 +437,7 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), &player->level, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, &player->exp, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, &player->id, sizeof(int));
-    std::cout<<"pack Id: "<<*(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3)<<std::endl;
+    // std::cout<<"pack Id: "<<*(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3)<<std::endl;
 }
 
 void PlayerSyncPackage::update(Player *player)

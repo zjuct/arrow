@@ -55,8 +55,8 @@ int clientThread()
     sock = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in addr;
     addr.sin_family = AF_INET;
-    // std::string ip = "10.162.69.158";
-    std::string ip = "127.0.0.1";
+    std::string ip = "10.162.69.158";
+    // std::string ip = "127.0.0.1";
     addr.sin_addr.s_addr = inet_addr(ip.c_str());
     int port = SERVER_PORT;
     addr.sin_port = htons(port);

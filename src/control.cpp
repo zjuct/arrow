@@ -279,8 +279,6 @@ int BackendMain()
     while (!glfwWindowShouldClose(control->window))
     {
         
-        std::cout<<control->players[0].position.x<<" "<<control->players[0].position.y<<" "<<control->players[0].position.z<<std::endl;
-        
         newtime = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
         oldtime = newtime;
