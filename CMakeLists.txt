@@ -9,6 +9,8 @@ else()
 	set(UNIX_LIBS "")
 endif()
 
+set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
+
 # 设置编译选项
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -38,6 +40,7 @@ find_library(A glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 target_link_libraries(arrow 
     PUBLIC ${A}
 		${UNIX_LIBS}
+		ws2_32
 )
 
 
@@ -47,8 +50,12 @@ target_compile_options(arrow PRIVATE -Wno-volatile)
 set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
-  add_subdirectory(tools)
-	add_executable(server ${SERVER_SRCS})
+  	# add_subdirectory(tools)
+	add_subdirectory(server)
+	# add_executable(server ${DIR_SRCS} ${TEST_SRCS} ${SERVER_SRCS})
+	# target_include_directories(server PRIVATE ./include)
+	# target_include_directories(server PRIVATE ./3rdparty)
+	# target_include_directories(server PRIVATE ./test)
 
 	set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

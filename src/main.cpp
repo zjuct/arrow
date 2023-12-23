@@ -19,6 +19,7 @@ static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
 
 extern int BackendMain();
+extern int clientThread();
 
 extern std::mutex updateMutex;
 
@@ -53,13 +54,13 @@ int main()
 {
     init();
     std::thread backend(BackendMain);
+    std::thread client(clientThread);
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
 
         updateMutex.lock();
         glfwPollEvents();
-        
         // std::cout << "BackendMain" << std::endl;
         
         float currenttime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000.0f;

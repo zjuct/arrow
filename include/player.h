@@ -33,7 +33,7 @@ public:
     {
         PLAYER_STILL = 0,
         PLAYER_RUN,
-		PLAYER_DEAD,
+        PLAYER_DEAD,
     };
 
     void draw();
@@ -83,7 +83,6 @@ public:
     glm::vec3 front;
     glm::vec3 right;
     glm::vec3 up;
-    bool poschanged;
 
     void fire();
     // void press();
@@ -101,15 +100,21 @@ public:
     {
         return hp + 0.5f;
     }
-	int getMaxHp()
-	{
-		return maxHp;
-	}
+    int getMaxHp()
+    {
+        return maxHp;
+    }
     int getLevel()
     {
         return level;
     }
-	void getHit(const Arrow& arrow);
+    void getHit(const Arrow &arrow);
+    float yaw;
+    float pitch;
+
+    float hp = 100.0f;
+    int exp = 0;
+    int level = 1;
 
 private:
     bool checkBlocked(enum intersectType type);
@@ -124,8 +129,6 @@ private:
     Object larm, rarm;
     Object lleg, rleg;
 
-    float yaw;
-    float pitch;
     float speed;
     float sensitivity;
 
@@ -147,16 +150,13 @@ private:
     float frontSpeed = 0.0f;
     float rightSpeed = 0.0f;
 
-    float hp = 100.0f;
     float maxHp = 100.0f;
     float hpRecover = 0.1f;
     float hpRecoverTime = 0.0f;
-    int exp = 0;
-    int level = 1;
     int maxLevel = 20;
     int expToLevelUp[20] = {0, 110, 120, 130, 140, 150, 160, 170, 180, 190,
                             200, 210, 220, 230, 240, 250, 260, 270, 280, 290};
-	int candyExp = 10;
+    int candyExp = 10;
 };
 
 #endif
