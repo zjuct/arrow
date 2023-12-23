@@ -18,6 +18,7 @@
 #include <light.hpp>
 #include <defs.h>
 #include <ui.hpp>
+#include <grid.h>
 #include <ctime>
 #include <vector>
 
@@ -56,6 +57,9 @@ public:
 
 	// 场景
 	Ground ground;
+
+	// 场景网格
+	Grid grid;
 
 	// 箭
 	ArrowManager *arrowMgr = ArrowManager::getInstance();

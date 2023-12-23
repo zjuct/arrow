@@ -78,6 +78,8 @@ public:
         }
     }
 
+    std::vector<glm::vec3> getBoxPoint() const;
+
     glm::vec3 center;
     glm::vec3 extends;
     glm::mat3 rotate;       // 旋转矩阵

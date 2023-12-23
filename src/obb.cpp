@@ -653,3 +653,18 @@ Obb* Obb::Union(const std::vector<Obb*>& obbs) {
     }
     return obbgen(vertices);
 }
+
+std::vector<glm::vec3> Obb::getBoxPoint() const {
+    std::vector<glm::vec3> gv;
+
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, center);
+    model = model * glm::mat4(rotate);
+    model = glm::scale(model, extends);
+    model = object->getGmodelObb() * model;
+    for(glm::vec3 vert : vertices) {
+        glm::vec3 v = glm::vec3(model * glm::vec4(vert, 1.0f));
+        gv.push_back(v);
+    }
+    return gv;
+}

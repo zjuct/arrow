@@ -18,9 +18,12 @@ void printVec3(const glm::vec3 &v)
 static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
 
-extern int BackendMain();
+extern int FrontendMain();
 
 extern std::mutex updateMutex;
+extern bool backendinitfin;
+extern bool gladinit;
+
 
 void init()
 {
@@ -52,7 +55,39 @@ long long beginTime = std::chrono::duration_cast<std::chrono::milliseconds>(std:
 int main()
 {
     init();
-    std::thread backend(BackendMain);
+    std::thread frontend(FrontendMain);
+
+    while(!gladinit);
+
+    control->skybox = Box(glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 skybox_model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    control->skybox_obj = Object(OBJECT_BOX, &control->skybox, skybox_shader, skybox_model);
+    control->skybox_obj.material.skybox_texname = "resource/assets/skybox_zjg";
+
+    Player player1;
+    player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+    control->players.push_back(player1);
+    Player player2;
+    player2.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+    control->players.push_back(player2);
+    control->camera.follow(&(control->players[PLAYER_ID]));
+
+    control->ground.init("resource/assets/scene/scene.obj");
+
+    // 箭
+    control->arrowMgr->init("resource/assets/weapon/knife.obj");
+    control->arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
+    control->arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
+
+    // 道具
+    control->candyMgr->init("resource/assets/weapon/knife.obj");
+
+#ifdef SAT_TEST
+    test.init();
+#endif
+//    control->grid.init(control->ground.getModel().getChildren(), 1.0f);
+    backendinitfin = true;
+
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
@@ -94,7 +129,7 @@ int main()
 
         // std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
-    backend.join();
+    frontend.join();
 
     glfwTerminate();
     return 0;

@@ -9,6 +9,10 @@ else()
 	set(UNIX_LIBS "")
 endif()
 
+if(WIN32)
+	set(CMAKE_GENERATOR "MinGW Makefiles" CACHE INTERNAL "" FORCE)
+endif()
+
 # 设置编译选项
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -46,10 +50,10 @@ target_compile_options(arrow PRIVATE -Wno-volatile)
 
 set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-if(WIN32)
-  add_subdirectory(tools)
-	add_executable(server ${SERVER_SRCS})
-
-	set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
+# if(WIN32)
+#   add_subdirectory(tools)
+# 	add_executable(server ${SERVER_SRCS})
+# 
+# 	set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+# endif()
 
