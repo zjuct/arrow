@@ -51,7 +51,7 @@ void init()
 
 }
 
-long long beginTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+long long beginTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 int main()
 {
     init();
@@ -59,33 +59,6 @@ int main()
 
     while(!gladinit);
 
-    control->skybox = Box(glm::vec3(0.0f, 0.0f, 0.0f));
-    glm::mat4 skybox_model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f));
-    control->skybox_obj = Object(OBJECT_BOX, &control->skybox, skybox_shader, skybox_model);
-    control->skybox_obj.material.skybox_texname = "resource/assets/skybox_zjg";
-
-    Player player1;
-    player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
-    control->players.push_back(player1);
-    Player player2;
-    player2.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
-    control->players.push_back(player2);
-    control->camera.follow(&(control->players[PLAYER_ID]));
-
-    control->ground.init("resource/assets/scene/scene.obj");
-
-    // 箭
-    control->arrowMgr->init("resource/assets/weapon/knife.obj");
-    control->arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
-    control->arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
-
-    // 道具
-    control->candyMgr->init("resource/assets/weapon/knife.obj");
-
-#ifdef SAT_TEST
-    test.init();
-#endif
-//    control->grid.init(control->ground.getModel().getChildren(), 1.0f);
     backendinitfin = true;
 
     // 渲染循环
@@ -97,7 +70,7 @@ int main()
         
         // std::cout << "BackendMain" << std::endl;
         
-        float currenttime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000.0f;
+        float currenttime = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000000000.0f;
         // float currenttime = glfwGetTime();
 //        std::cout<<currenttime<<std::endl;
         static int first = 0;
@@ -125,9 +98,9 @@ int main()
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        // std::cout << "fps: " << 1.0f / control->dt << std::endl;
+//        std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
     frontend.join();
 

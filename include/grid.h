@@ -11,8 +11,6 @@ public:
     const Object* intersectWith(const Object& obj);
     const Object* intersectWith(Obb& obb);
 
-    std::vector<Obb*> obbs;
-
 private:
     struct GridIndex {
         int i, j, k;

@@ -56,8 +56,7 @@ void Grid::buildGrid(const std::vector<Object*> objs) {
             max_extent = glm::max(max_extent, v);
         }
     }
-    int cnt = 0;
-    // 用每个网格与每个obb求教，如果obb与网格相交，则将对应的object放入该网格
+    // 用每个网格与每个obb求交，如果obb与网格相交，则将对应的object放入该网格
     for(float x = min_extent.x; x < max_extent.x; x += extent) {
         std::vector<std::vector<std::vector<Object*>>> xgrid;
         for(float y = min_extent.y; y < max_extent.y; y += extent) {
@@ -66,14 +65,9 @@ void Grid::buildGrid(const std::vector<Object*> objs) {
                 std::vector<Object*> zgrid;
                 glm::vec3 min_point(x, y, z);
                 glm::vec3 center = min_point + extent / 2.0f;
-//                Obb* obb = new Obb(center, glm::vec3(extent / 2.0f));
                 Obb obb(center, glm::vec3(extent / 2.0f));
-                obb.init();
                 for(Object* obj : objs) {
-//                    for(int i = 0; i < 10000; i++) {}
-//                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     if(obb.intersectWith(*(obj->getObb()))) {
-                        cnt++;
                         zgrid.push_back(obj);
                     }
                 }
@@ -83,15 +77,7 @@ void Grid::buildGrid(const std::vector<Object*> objs) {
         }
         grid.push_back(xgrid);
     }
-    std::cout << cnt << std::endl;
 
-//    for(int i = 0; i < grid.size(); i++) {
-//        for(int j = 0; j < grid[i].size(); j++) {
-//            for(int k = 0; k < grid[i][j].size(); k++) {
-//                std::cout << "grid[i][j][k].size(): " << grid[i][j][k].size() << std::endl;
-//            }
-//        }
-//    }
 }
 
 std::vector<Object*> Grid::getNeighbours(const Obb& obb) {

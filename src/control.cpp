@@ -46,39 +46,40 @@ void Control::init()
     // 初始化视口
     glViewport(0, 0, control->wwidth, control->wheight);
 
-    gladinit = true;
 
     Shader::initShader();
 
-//    skybox = Box(glm::vec3(0.0f, 0.0f, 0.0f));
-//    glm::mat4 skybox_model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f));
-//    skybox_obj = Object(OBJECT_BOX, &skybox, skybox_shader, skybox_model);
-//    skybox_obj.material.skybox_texname = "resource/assets/skybox_zjg";
-//
-//    Player player1;
-//    player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
-//    players.push_back(player1);
-//    Player player2;
-//    player2.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
-//    players.push_back(player2);
-//    camera.follow(&players[PLAYER_ID]);
-//
-//    ground.init("resource/assets/scene/scene.obj");
-//
-//    // 箭
-//    arrowMgr->init("resource/assets/weapon/knife.obj");
-//    arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
-//    arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
-//
-//    // 道具
-//    candyMgr->init("resource/assets/weapon/knife.obj");
-//
-//#ifdef SAT_TEST
-//    test.init();
-//#endif
-//    grid.init(ground.getModel().getChildren(), 1.0f);
+    skybox = Box(glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 skybox_model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    skybox_obj = Object(OBJECT_BOX, &skybox, skybox_shader, skybox_model);
+    skybox_obj.material.skybox_texname = "resource/assets/skybox_zjg";
 
-    while(!backendinitfin);
+    Player player1;
+    player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+    players.push_back(player1);
+    Player player2;
+    player2.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+    players.push_back(player2);
+    camera.follow(&players[PLAYER_ID]);
+
+    ground.init("resource/assets/scene/scene.obj");
+
+    // 箭
+    arrowMgr->init("resource/assets/weapon/knife.obj");
+    arrowMgr->bindArrow(PLAYER_ID, ARROW_LASER);
+    arrowMgr->getArrowSetting(PLAYER_ID).isReflect = 1;
+    arrowMgr->load(PLAYER_ID);
+    arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
+
+    // 道具
+    candyMgr->init("resource/assets/weapon/knife.obj");
+
+#ifdef SAT_TEST
+    test.init();
+#endif
+    grid.init(ground.getModel().getChildren(), 1.0f);
+    
+    gladinit = true;
 }
 
 void mousePressCB(GLFWwindow *window, int button, int action, int mods)
@@ -279,7 +280,6 @@ int FrontendMain()
     control->init();
     ui->init();
 
-//    while(1);
     // glfwMakeContextCurrent(control->window);
     while (!glfwWindowShouldClose(control->window))
     {
@@ -287,7 +287,7 @@ int FrontendMain()
         std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
         oldtime = newtime;
         float dt = elapsed_seconds.count();
-        // std::cout<<"fps:"<<1.0f/dt<<std::endl;
+        //std::cout<<"fps:"<<1.0f/dt<<std::endl;
 
         updateMutex.lock();
 		// std::cout << "BackendMain" << std::endl;

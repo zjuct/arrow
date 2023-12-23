@@ -129,7 +129,7 @@ Obb *Obb::obbgen(const std::vector<glm::vec3> &vertices, bool ground_parallel)
 }
 
 Obb::Obb(const glm::vec3 &center, const glm::vec3 &extends, const glm::mat3 &rotate)
-    : center(center), extends(extends), rotate(rotate)
+    : center(center), extends(extends), rotate(rotate), object(nullptr)
 {
 }
 
@@ -147,7 +147,8 @@ void Obb::draw(Shader *shader)
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
-    model = object->getGmodelObb() * model;
+    if(object)
+        model = object->getGmodelObb() * model;
     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
 
     material.configShader(shader);
@@ -169,7 +170,8 @@ void Obb::drawLine(Shader *shader)
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
-    model = object->getGmodelObb() * model;
+    if(object)
+        model = object->getGmodelObb() * model;
     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(VAOline);
@@ -187,11 +189,11 @@ void Obb::drawLine(Shader *shader)
 int Obb::intersectWith(Obb &other)
 {
 
-    glm::vec3 translateMat = object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec3 otherTranslateMat = other.object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 translateMat = object ? object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) : glm::vec3(0.0f);
+    glm::vec3 otherTranslateMat = other.object ? other.object->getGmodelObb() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) : glm::vec3(0.0f);
 
-    glm::mat3 rotateMat = this->object->getGmodelObb();
-    glm::mat3 otherRotateMat = other.object->getGmodelObb();
+    glm::mat3 rotateMat = object ? glm::mat3(this->object->getGmodelObb()) : glm::mat3(1.0f);
+    glm::mat3 otherRotateMat = other.object ? glm::mat3(other.object->getGmodelObb()) : glm::mat3(1.0f);
 
     glm::vec3 center1 = (otherRotateMat * other.center) + otherTranslateMat;
     glm::vec3 center2 = (rotateMat * this->center) + translateMat;
@@ -661,7 +663,8 @@ std::vector<glm::vec3> Obb::getBoxPoint() const {
     model = glm::translate(model, center);
     model = model * glm::mat4(rotate);
     model = glm::scale(model, extends);
-    model = object->getGmodelObb() * model;
+    if(object) 
+        model = object->getGmodelObb() * model;
     for(glm::vec3 vert : vertices) {
         glm::vec3 v = glm::vec3(model * glm::vec4(vert, 1.0f));
         gv.push_back(v);

@@ -28,6 +28,8 @@
 
 #define CHECK_TIME (3)  //碰撞二分次数
 
+#define GRID_ENABLE 1
+
 #define CAMERA_TO_PLAYER_OFFSET (glm::vec3(0.0f, 0.8f, 0.0f))
 
 constexpr float CAMERA_TO_PLAYER_OFFSET_RIGHT = 0.3f;
