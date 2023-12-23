@@ -36,8 +36,10 @@ void recvThread()
         case Sync_Player:
         {
             PlayerSyncPackage *player_package = (PlayerSyncPackage *)&package;
+            if (player_package->getId() == current_player)
+                break;
             player_package->update(&control->players[player_package->getId()]);
-            std::cout<<"id: "<<player_package->getId()<<std::endl;
+            std::cout << "id: " << player_package->getId() << std::endl;
             break;
         }
         default:
