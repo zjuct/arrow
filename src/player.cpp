@@ -442,8 +442,8 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
 void PlayerSyncPackage::update(Player *player)
 {
     int id = player->id;
-    int packageId = *(int *)(data+sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3);
-    if(id != packageId)
+    int packageId = *(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3);
+    if (id != packageId)
         return;
     memcpy(&player->position, data, sizeof(glm::vec3));
     memcpy(&player->front, data + sizeof(glm::vec3), sizeof(glm::vec3));
@@ -454,4 +454,9 @@ void PlayerSyncPackage::update(Player *player)
     memcpy(&player->hp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2, sizeof(int));
     memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
     memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));
+}
+
+int PlayerSyncPackage::getId()
+{
+    return *(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3);
 }

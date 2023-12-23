@@ -52,6 +52,7 @@ void sendThread()
                     continue;
                 }
                 package->send(clients[j].sock);
+                std::cout<<"send to "<<j<<std::endl;
             }
         }
         clientsMtx.unlock();
@@ -74,8 +75,8 @@ void recvThread(int client_id, SOCKET client_sock)
         package.type = *(SyncType*)(buf);
         package.timestamp = *(long long*)(buf + 4);
         package.size = *(int*)(buf + 12);
-        std::cout << "recv1 " << ret << std::endl;
-        std::cout << package.type << " " << package.timestamp << " " << package.size << std::endl;
+        // std::cout << "recv1 " << ret << std::endl;
+        // std::cout << package.type << " " << package.timestamp << " " << package.size << std::endl;
         if (ret == SOCKET_ERROR)
         {
             std::cout << "Error: " << WSAGetLastError() << endl;
@@ -83,8 +84,9 @@ void recvThread(int client_id, SOCKET client_sock)
         }
         package.data = new char[package.size];
         ret = recv(client_sock, package.data, package.size, 0);
-        std::cout << "recv2 " << ret << std::endl;
-        std::cout << package.data << std::endl;
+        assert(ret == package.size);
+        // std::cout << "recv2 " << ret << std::endl;
+        // std::cout << package.data << std::endl;
         if (ret == SOCKET_ERROR)
         {
             std::cout << "Error: " << WSAGetLastError() << endl;

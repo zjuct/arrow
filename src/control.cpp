@@ -266,11 +266,14 @@ std::mutex updateMutex;
 auto oldtime = std::chrono::system_clock::now();
 auto newtime = std::chrono::system_clock::now();
 
+int init = 0;
 int BackendMain()
 {
 	
     control->init();
     ui->init();
+
+    init = 1;
 
     // glfwMakeContextCurrent(control->window);
     while (!glfwWindowShouldClose(control->window))
