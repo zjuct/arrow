@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <winsock2.h>
 
+#define CLIENT (1)
+
 // void clientInit()
 // {
 //     WSADATA wsaData;
@@ -35,12 +37,45 @@ void recvThread()
         {
         case Sync_Player:
         {
-            PlayerSyncPackage *player_package = (PlayerSyncPackage *)&package;
+            PlayerSyncPackage *player_package = new PlayerSyncPackage(package);
             if (player_package->getId() == current_player)
                 break;
             player_package->update(&control->players[player_package->getId()]);
-            std::cout << "id: " << player_package->getId() << std::endl;
+            // std::cout << "id: " << player_package->getId() << std::endl;
             break;
+        }
+        case Sync_Arrow:
+        {
+            ArrowSyncPackage *arrow_package = new ArrowSyncPackage(package);
+            if(arrow_package->getId() == current_player)
+                break;
+            int player_id = arrow_package->getId();
+            arrow_package->update(&control->arrowMgr->arrows[control->arrowMgr->arrowMap[player_id]]);
+            std::cout << "id: " << arrow_package->getId() << std::endl;
+            break;
+        }
+        case Sync_Func:
+        {
+            // FUNC_ARROW_BIND,
+            // FUNC_ARROW_LOAD,
+            // FUNC_ARROW_FIRE,
+            // FUNC_ARROW_UPDATE,
+            FuncSyncPackage *func_package = new FuncSyncPackage(package);
+            switch (func_package->funcType)
+            {
+            case FUNC_ARROW_BIND:
+                control->arrowMgr->bindArrow(*func_package);
+                break;
+            case FUNC_ARROW_LOAD:
+                control->arrowMgr->load(*func_package);
+                break;
+            case FUNC_ARROW_FIRE:
+                control->arrowMgr->fire(*func_package);
+                break;
+            case FUNC_ARROW_UPDATE:
+                // control->arrowMgr->updateArrow(*func_package);
+                break;
+            }
         }
         default:
             break;
@@ -48,15 +83,15 @@ void recvThread()
     }
 }
 
-int clientThread()
+void clientInit()
 {
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
     sock = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in addr;
     addr.sin_family = AF_INET;
-    std::string ip = "10.162.69.158";
-    // std::string ip = "127.0.0.1";
+    // std::string ip = "10.162.69.158";
+    std::string ip = "127.0.0.1";
     addr.sin_addr.s_addr = inet_addr(ip.c_str());
     int port = SERVER_PORT;
     addr.sin_port = htons(port);
@@ -64,10 +99,14 @@ int clientThread()
     if (ret == SOCKET_ERROR)
     {
         std::cout << "Error: " << WSAGetLastError() << std::endl;
-        return 0;
+        return;
     }
 
     std::cout << "Connected to server" << std::endl;
+}
+
+int clientThread()
+{
 
     while (!init)
         std::cout << "init" << std::endl;
@@ -75,6 +114,8 @@ int clientThread()
     while (!glfwWindowShouldClose(control->window))
     {
         SyncPackage *package = new PlayerSyncPackage(&control->players[current_player]);
+        package->send(sock);
+        package = new ArrowSyncPackage(&control->arrowMgr->arrows[control->arrowMgr->arrowMap[current_player]]);
         package->send(sock);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
     }

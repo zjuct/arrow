@@ -88,6 +88,8 @@ public:
     // void disappear();
 };
 
+class FuncSyncPackage;
+
 class ArrowManager
 {
 public:
@@ -115,10 +117,14 @@ public:
     // void stop();
     // void disappear();
     void bindArrow(int playerId, ArrowType type = ARROW_NORMAL, float speed = 15.0f, float scale = 1.0f, float weight = 1.0f, float loadTime = 0.1f);
+    void bindArrow(FuncSyncPackage &package);
     void updateArrow(int playerId, glm::vec3 pos, glm::vec3 dir);
+    // void updateArrow(FuncSyncPackage &package);
     void deleteArrow(int playerId);
     bool fire(int playerId);
+    void fire(FuncSyncPackage &package);
     void load(int playerId);
+    void load(FuncSyncPackage &package);
 
     Arrow &getArrowSetting(int playerId)
     {

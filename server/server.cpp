@@ -33,6 +33,7 @@ vector<client> clients;
 mutex clientsMtx;
 vector<thread> recvThreads;
 map<int, Player> players;
+map<int, Arrow> arrowMap;
 
 void sendThread()
 {
@@ -43,13 +44,22 @@ void sendThread()
             break;
         }
         clientsMtx.lock();
-        for (auto &player  : players)
+        for (auto &player : players)
         {
             SyncPackage *package = new PlayerSyncPackage(&player.second);
             for (int j = 0; j < clients.size(); j++)
             {
                 package->send(clients[j].sock);
-                std::cout << "send to " << j << std::endl;
+                // std::cout << "send to " << j << std::endl;
+            }
+        }
+        for (auto &arrow : arrowMap)
+        {
+            SyncPackage *package = new ArrowSyncPackage(&arrow.second);
+            for (int j = 0; j < clients.size(); j++)
+            {
+                package->send(clients[j].sock);
+                // std::cout << "send to " << j << std::endl;
             }
         }
         clientsMtx.unlock();
@@ -65,13 +75,20 @@ void recvThread(int client_id, SOCKET client_sock)
         {
             break;
         }
-        SyncPackage package;
+        SyncPackage* package;
         char buf[16];
         memset(buf, 0, sizeof(buf));
         int ret = recv(client_sock, buf, sizeof(buf), 0);
-        package.type = *(SyncType *)(buf);
-        package.timestamp = *(long long *)(buf + 4);
-        package.size = *(int *)(buf + 12);
+        SyncType type = *(SyncType *)(buf);
+        if(type == Sync_Player)
+            package = new PlayerSyncPackage();
+        if(type == Sync_Arrow)
+            package = new ArrowSyncPackage();
+        if(type == Sync_Func)
+            package = new FuncSyncPackage();
+        package->type = *(SyncType *)(buf);
+        package->timestamp = *(long long *)(buf + 4);
+        package->size = *(int *)(buf + 12);
         // std::cout << "recv1 " << ret << std::endl;
         // std::cout << package.type << " " << package.timestamp << " " << package.size << std::endl;
         if (ret == SOCKET_ERROR)
@@ -79,9 +96,14 @@ void recvThread(int client_id, SOCKET client_sock)
             std::cout << "Error: " << WSAGetLastError() << endl;
             break;
         }
-        package.data = new char[package.size];
-        ret = recv(client_sock, package.data, package.size, 0);
-        assert(ret == package.size);
+        package->data = new char[package->size];
+        ret = recv(client_sock, package->data, package->size, 0);
+        if (ret != package->size)
+        {
+            std::cout << "Error: " << WSAGetLastError() << std::endl;
+            break;
+        }
+        // assert(ret == package.size);
         // std::cout << "recv2 " << ret << std::endl;
         // std::cout << package.data << std::endl;
         if (ret == SOCKET_ERROR)
@@ -90,12 +112,33 @@ void recvThread(int client_id, SOCKET client_sock)
             break;
         }
         // std::cout << "recv from " << client_id << std::endl;
-        if (package.type == Sync_Player)
+        if (package->type == Sync_Player)
         {
-            PlayerSyncPackage *player_package = (PlayerSyncPackage *)&package;
+            PlayerSyncPackage *player_package = (PlayerSyncPackage *)package;
             int id = player_package->getId();
-            std::cout<<"sync player "<<id<<std::endl;
+            // std::cout<<"sync player "<<id<<std::endl;
             player_package->update(&players[id]);
+        }
+        if (package->type == Sync_Arrow)
+        {
+            ArrowSyncPackage *arrow_package = (ArrowSyncPackage *)package;
+            int id = arrow_package->getId();
+            // std::cout<<"sync arrow "<<id<<std::endl;
+            arrow_package->update(&arrowMap[id]);
+        }
+        if (package->type == Sync_Func)
+        {
+            FuncSyncPackage *func_package = (FuncSyncPackage *)package;
+            std::cout << "sync func" << std::endl;
+            std::cout << func_package->funcType << std::endl;
+            for (int i = 0; i < clients.size(); i++)
+            {
+                if (clients[i].id != client_id)
+                {
+                    func_package->send(clients[i].sock);
+                    break;
+                }
+            }
         }
     }
 }
