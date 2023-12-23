@@ -68,7 +68,14 @@ void recvThread(int client_id, SOCKET client_sock)
             break;
         }
         SyncPackage package;
-        int ret = recv(client_sock, (char *)&package, sizeof(SyncType) + sizeof(long long) + sizeof(int), 0);
+        char buf[16];
+        memset(buf, 0, sizeof(buf));
+        int ret = recv(client_sock, buf, sizeof(buf), 0);
+        package.type = *(SyncType*)(buf);
+        package.timestamp = *(long long*)(buf + 4);
+        package.size = *(int*)(buf + 12);
+        std::cout << "recv1 " << ret << std::endl;
+        std::cout << package.type << " " << package.timestamp << " " << package.size << std::endl;
         if (ret == SOCKET_ERROR)
         {
             std::cout << "Error: " << WSAGetLastError() << endl;
@@ -76,6 +83,8 @@ void recvThread(int client_id, SOCKET client_sock)
         }
         package.data = new char[package.size];
         ret = recv(client_sock, package.data, package.size, 0);
+        std::cout << "recv2 " << ret << std::endl;
+        std::cout << package.data << std::endl;
         if (ret == SOCKET_ERROR)
         {
             std::cout << "Error: " << WSAGetLastError() << endl;
