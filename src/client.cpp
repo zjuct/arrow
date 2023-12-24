@@ -50,8 +50,14 @@ void recvThread()
             if(arrow_package->getId() == current_player)
                 break;
             int player_id = arrow_package->getId();
+            if(!control->arrowMgr->arrowMap.count(player_id))
+            {
+                control->arrowMgr->bindArrow(player_id);
+                arrow_package->update(&control->arrowMgr->arrows[control->arrowMgr->arrowSetting[player_id]]);
+                control->arrowMgr->load(player_id);
+            }
             arrow_package->update(&control->arrowMgr->arrows[control->arrowMgr->arrowMap[player_id]]);
-            std::cout << "id: " << arrow_package->getId() << std::endl;
+            // std::cout << "id: " << arrow_package->getId() << std::endl;
             break;
         }
         case Sync_Func:
@@ -61,7 +67,8 @@ void recvThread()
             // FUNC_ARROW_FIRE,
             // FUNC_ARROW_UPDATE,
             FuncSyncPackage *func_package = new FuncSyncPackage(package);
-            switch (func_package->funcType)
+            FuncType funcType = func_package->getFuncType();
+            switch (funcType)
             {
             case FUNC_ARROW_BIND:
                 control->arrowMgr->bindArrow(*func_package);
@@ -107,7 +114,6 @@ void clientInit()
 
 int clientThread()
 {
-
     while (!init)
         std::cout << "init" << std::endl;
     std::thread recv(recvThread);
@@ -117,7 +123,7 @@ int clientThread()
         package->send(sock);
         package = new ArrowSyncPackage(&control->arrowMgr->arrows[control->arrowMgr->arrowMap[current_player]]);
         package->send(sock);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 30));
     }
     return 0;
 }

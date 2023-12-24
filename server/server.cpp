@@ -63,7 +63,7 @@ void sendThread()
             }
         }
         clientsMtx.unlock();
-        Sleep(10);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 30));
     }
 }
 
@@ -116,21 +116,21 @@ void recvThread(int client_id, SOCKET client_sock)
         {
             PlayerSyncPackage *player_package = (PlayerSyncPackage *)package;
             int id = player_package->getId();
-            // std::cout<<"sync player "<<id<<std::endl;
+            std::cout<<"sync player "<<id<<std::endl;
             player_package->update(&players[id]);
         }
         if (package->type == Sync_Arrow)
         {
             ArrowSyncPackage *arrow_package = (ArrowSyncPackage *)package;
             int id = arrow_package->getId();
-            // std::cout<<"sync arrow "<<id<<std::endl;
+            std::cout<<"sync arrow "<<id<<std::endl;
             arrow_package->update(&arrowMap[id]);
         }
         if (package->type == Sync_Func)
         {
             FuncSyncPackage *func_package = (FuncSyncPackage *)package;
             std::cout << "sync func" << std::endl;
-            std::cout << func_package->funcType << std::endl;
+            std::cout << func_package->getFuncType() << std::endl;
             for (int i = 0; i < clients.size(); i++)
             {
                 if (clients[i].id != client_id)

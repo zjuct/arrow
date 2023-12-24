@@ -424,7 +424,7 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
     // position, front, right, up, yaw, pitch, hp, level, exp, id
     type = Sync_Player;
     timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    size = sizeof(glm::vec3) * 4 + sizeof(float) * 3 + sizeof(int) * 3;
+    size = sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4;
     data = new char[size];
     memset(data, 0, size);
     memcpy(data, &player->position, sizeof(glm::vec3));

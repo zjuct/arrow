@@ -120,18 +120,16 @@ public:
 class FuncSyncPackage : public SyncPackage
 {
 public:
-    FuncType funcType;
     FuncSyncPackage() {}
     FuncSyncPackage(SyncPackage &package):SyncPackage(package){}
     template <typename T, typename... args>
     FuncSyncPackage(FuncType funcType, T *param, args... arg)
     {
         type = Sync_Func;
-        this->funcType = funcType;
         timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         size = 0;
-        getSize(param, arg...);
-        data = new char[size + sizeof(FuncType)];
+        getSize(&funcType, param, arg...);
+        data = new char[size];
         init(0, &funcType, param, arg...);
     }
 
@@ -164,7 +162,7 @@ public:
     template <typename T, typename... args>
     void get(T *param, args... arg)
     {
-        getfrom(0, &funcType, param, arg...);
+        getfrom(sizeof (FuncType), param, arg...);
     }
 
     template <typename T, typename... args>
@@ -178,6 +176,13 @@ public:
     void getfrom(int offset, T *param)
     {
         memcpy(param, data + offset, sizeof(T));
+    }
+
+    FuncType getFuncType()
+    {
+        FuncType funcType;
+        memcpy(&funcType, data, sizeof(FuncType));
+        return funcType;
     }
 };
 

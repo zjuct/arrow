@@ -489,6 +489,8 @@ bool ArrowManager::fire(int playerId)
     FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_ARROW_FIRE, &playerId, &arrow.pos, &arrow.dir);
     if (playerId == PLAYER_ID)
         funcSyncPackage.send(sock);
+    std::cout<<"pos: "<<arrow.pos.x<<" "<<arrow.pos.y<<" "<<arrow.pos.z<<std::endl;
+    std::cout<<"dir: "<<arrow.dir.x<<" "<<arrow.dir.y<<" "<<arrow.dir.z<<std::endl;
     bool t = arrows[arrowMap[playerId]].fire();
     // std::cout << "fire time: " << pressTime << std::endl;
     // std::cout << "playerId: " << playerId << std::endl;
@@ -505,6 +507,8 @@ void ArrowManager::fire(FuncSyncPackage &funcSyncPackage)
     int playerId;
     glm::vec3 pos, dir;
     funcSyncPackage.get(&playerId, &pos, &dir);
+    std::cout<<"pos: "<<pos.x<<" "<<pos.y<<" "<<pos.z<<std::endl;
+    std::cout<<"dir: "<<dir.x<<" "<<dir.y<<" "<<dir.z<<std::endl;
     updateArrow(playerId, pos, dir);
     fire(playerId);
 }
@@ -557,10 +561,10 @@ void ArrowManager::deleteArrow(int playerId)
 
 ArrowSyncPackage::ArrowSyncPackage(Arrow *arrow)
 {
-    // pos, dir, speed, scale, weight, isReflect, liveTime, disappearTime, id
+    // pos, dir, speed, scale, weight, isReflect, liveTime, disappearTime, id, type
     type = Sync_Arrow;
     timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    size = sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int) * 2;
+    size = sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int) * 3 + sizeof(ArrowType);
     data = new char[size];
     memset(data, 0, size);
     memcpy(data, &arrow->pos, sizeof(glm::vec3));
@@ -572,6 +576,7 @@ ArrowSyncPackage::ArrowSyncPackage(Arrow *arrow)
     memcpy(data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool), &arrow->liveTime, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int), &arrow->disappearTime, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int) * 2, &arrow->attackerId, sizeof(int));
+    memcpy(data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int) * 3, &arrow->type, sizeof(ArrowType));
 }
 
 void ArrowSyncPackage::update(Arrow *arrow)
@@ -585,6 +590,7 @@ void ArrowSyncPackage::update(Arrow *arrow)
     memcpy(&arrow->liveTime, data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool), sizeof(int));
     memcpy(&arrow->disappearTime, data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int), sizeof(int));
     memcpy(&arrow->attackerId, data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int) * 2, sizeof(int));
+    memcpy(&arrow->type, data + sizeof(glm::vec3) * 2 + sizeof(float) * 3 + sizeof(bool) + sizeof(int) * 3, sizeof(ArrowType));
 }
 
 int ArrowSyncPackage::getId()
