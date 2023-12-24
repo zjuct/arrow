@@ -38,7 +38,14 @@ void Player::init(const char *objfile, glm::vec3 position)
     rarm = Object(OBJECT_MESH, &meshes[1], player_shader);
     rleg = Object(OBJECT_MESH, &meshes[2], player_shader);
 }
-
+void Player::rebirth()
+{
+    state = PLAYER_STILL;
+    hp = maxHp;
+    position = glm::vec3(0.0f, 0.0f, 0.0f);
+    jumpSpeed = 0.0f;
+    updatePlayerVectors();
+}
 void Player::processKeyboard()
 {
     // float velocity = speed * deltaTime;
@@ -65,30 +72,32 @@ void Player::processKeyboard()
     }
     else if (id == ANOTHER_PLAYER_ID)
     {
-        inputDir = glm::vec3(0.0f);
-        if (state == PLAYER_DEAD)
-            return;
-        if (control->another_frontPress)
-            inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-        if (control->another_backPress)
-            inputDir -= glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-        if (control->another_leftPress)
-            inputDir -= right;
-        if (control->another_rightPress)
-            inputDir += right;
-        if (inputDir != glm::vec3(0.0f))
-        {
-            this->state = PLAYER_RUN;
-            inputDir = glm::normalize(inputDir);
-        }
-        else
-            this->state = PLAYER_STILL;
+        // inputDir = glm::vec3(0.0f);
+        // if (state == PLAYER_DEAD)
+        //     return;
+        // if (control->another_frontPress)
+        //     inputDir += glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+        // if (control->another_backPress)
+        //     inputDir -= glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+        // if (control->another_leftPress)
+        //     inputDir -= right;
+        // if (control->another_rightPress)
+        //     inputDir += right;
+        // if (inputDir != glm::vec3(0.0f))
+        // {
+        //     this->state = PLAYER_RUN;
+        //     inputDir = glm::normalize(inputDir);
+        // }
+        // else
+        //     this->state = PLAYER_STILL;
     }
 }
 void Player::jump()
 {
     //	std::cout << "jump" << std::endl;
     if (jumpTime <= 0)
+        return;
+    if(state == PLAYER_DEAD)
         return;
     --jumpTime;
     jumpSpeed = 1.0f * jumpHeight;
@@ -390,6 +399,8 @@ void Player::updateModel_obb()
 
 void Player::fire()
 {
+    if(state == PLAYER_DEAD)
+        return;
     if (arrowMgr->fire(PLAYER_ID))
         fireTime = 1.0f;
 }

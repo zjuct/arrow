@@ -29,6 +29,7 @@ public:
     void processKeyboard();
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void jump();
+    void rebirth();
     enum PlayerState
     {
         PLAYER_STILL = 0,

@@ -3,9 +3,9 @@
 #include <control.h>
 #include <texturemgr.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <mutex>
-#include <chrono>
 
 int current_player = 1;
 
@@ -26,7 +26,6 @@ void Control::init()
 {
     srand((unsigned)time(NULL));
 
-    
     glfwMakeContextCurrent(window);
 
     // 初始化GLAD
@@ -166,7 +165,6 @@ void Control::handleMouseMove(double xposIn, double yposIn)
 
 void Control::pollKeyPress()
 {
-    
 }
 
 void Control::handleKeyInput(int key, int action)
@@ -253,6 +251,19 @@ void Control::handleKeyInput(int key, int action)
             current_player = (current_player ^ 1);
             camera.follow(&players[PLAYER_ID]);
         }
+        static int cnt_1 = 0;
+        if (key == GLFW_KEY_1)
+        {
+            if (players[PLAYER_ID].state == Player::PLAYER_DEAD)
+            {
+                ++cnt_1;
+                if (cnt_1 >= 5)
+                {
+                    players[PLAYER_ID].rebirth();
+                    cnt_1 = 0;
+                }
+            }
+        }
     }
 }
 
@@ -269,7 +280,7 @@ auto newtime = std::chrono::system_clock::now();
 int init = 0;
 int BackendMain()
 {
-	
+
     control->init();
     ui->init();
 
@@ -278,7 +289,7 @@ int BackendMain()
     // glfwMakeContextCurrent(control->window);
     while (!glfwWindowShouldClose(control->window))
     {
-        
+
         newtime = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
         oldtime = newtime;
@@ -286,7 +297,7 @@ int BackendMain()
         // std::cout<<"fps:"<<1.0f/dt<<std::endl;
 
         updateMutex.lock();
-		// std::cout << "BackendMain" << std::endl;
+        // std::cout << "BackendMain" << std::endl;
         ui->updateModel();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -317,7 +328,7 @@ int BackendMain()
         skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
 
-		// std::cout<<"draw"<<std::endl;
+        // std::cout<<"draw"<<std::endl;
         updateMutex.unlock();
 
         glDepthMask(GL_FALSE);
