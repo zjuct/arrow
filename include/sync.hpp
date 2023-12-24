@@ -22,7 +22,7 @@ enum FuncType
     FUNC_ARROW_LOAD,
     FUNC_ARROW_FIRE,
     FUNC_ARROW_UPDATE,
-
+    FUNC_PLAYER_REBIRTH,
 };
 
 class SyncPackage
@@ -121,7 +121,7 @@ class FuncSyncPackage : public SyncPackage
 {
 public:
     FuncSyncPackage() {}
-    FuncSyncPackage(SyncPackage &package):SyncPackage(package){}
+    FuncSyncPackage(SyncPackage &package) : SyncPackage(package) {}
     template <typename T, typename... args>
     FuncSyncPackage(FuncType funcType, T *param, args... arg)
     {
@@ -162,7 +162,7 @@ public:
     template <typename T, typename... args>
     void get(T *param, args... arg)
     {
-        getfrom(sizeof (FuncType), param, arg...);
+        getfrom(sizeof(FuncType), param, arg...);
     }
 
     template <typename T, typename... args>

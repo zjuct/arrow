@@ -3,6 +3,7 @@
 #include <control.h>
 #include <defs.h>
 #include <glm/glm.hpp>
+#include <winsock2.h>
 
 #include <vector>
 
@@ -12,6 +13,8 @@
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
+
+extern SOCKET sock;
 
 Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
 {
@@ -42,8 +45,9 @@ void Player::rebirth()
 {
     state = PLAYER_STILL;
     hp = maxHp;
-    position = glm::vec3(0.0f, 0.0f, 0.0f);
+    position = glm::vec3(0.0f, 1.0f, 0.0f);
     jumpSpeed = 0.0f;
+    jumpTime = 0;
     updatePlayerVectors();
 }
 void Player::processKeyboard()

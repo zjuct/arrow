@@ -82,6 +82,14 @@ void recvThread()
             case FUNC_ARROW_UPDATE:
                 // control->arrowMgr->updateArrow(*func_package);
                 break;
+            case FUNC_PLAYER_REBIRTH:
+            {
+                int id = -1;
+                func_package->get(&id);
+                control->players[id].rebirth();
+                break;
+
+            }
             }
         }
         default:
