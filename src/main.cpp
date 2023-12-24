@@ -5,10 +5,10 @@
 #include "shader.h"
 #include "texturemgr.hpp"
 
+#include <chrono>
 #include <iostream>
 #include <mutex>
 #include <thread>
-#include <chrono>
 
 void printVec3(const glm::vec3 &v)
 {
@@ -19,6 +19,8 @@ static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
 
 extern int FrontendMain();
+extern int clientThread();
+extern void clientInit();
 
 extern std::mutex updateMutex;
 extern bool backendinitfin;
@@ -42,37 +44,37 @@ void init()
         return;
     }
 
-    
     glfwSetKeyCallback(control->window, keyCB);
     glfwSetFramebufferSizeCallback(control->window, fbSizeCB);
     glfwSetCursorPosCallback(control->window, mouseMoveCB);
     glfwSetScrollCallback(control->window, scrollCB);
     glfwSetMouseButtonCallback(control->window, mousePressCB);
-
 }
 
 long long beginTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-int main()
+int main(int argc, char **argv)
 {
+    if (argc > 1)
+    {
+        current_player = atoi(argv[1]);
+    }
+    clientInit();
     init();
+
+
     std::thread frontend(FrontendMain);
-
     while(!gladinit);
-
-    backendinitfin = true;
-
+    std::thread client(clientThread);
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
-
         updateMutex.lock();
         glfwPollEvents();
-        
         // std::cout << "BackendMain" << std::endl;
         
         float currenttime = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000000000.0f;
         // float currenttime = glfwGetTime();
-//        std::cout<<currenttime<<std::endl;
+        //        std::cout<<currenttime<<std::endl;
         static int first = 0;
         if (first == 0)
         {
@@ -86,10 +88,16 @@ int main()
         if (ui->gstate == GLOBAL_GAME)
         {
             control->players[PLAYER_ID].update(control->dt);
-            control->players[ANOTHER_PLAYER_ID].update(control->dt);
+            // control->players[ANOTHER_PLAYER_ID].update(control->dt);
             control->camera.updateCamera();
             control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
-            control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
+            for (int i = 0; i < control->players.size(); i++)
+            {
+                if (i == PLAYER_ID)
+                    continue;
+                control->arrowMgr->updateArrow(i, control->players[i].getWeaponPos(), control->players[i].front);
+            }
+            // control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
             updateMutex.unlock();
             updateMutex.lock();
             control->arrowMgr->update(control->dt);

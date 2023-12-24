@@ -3,14 +3,18 @@
 #include <control.h>
 #include <texturemgr.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <mutex>
-#include <chrono>
+#include <sync.hpp>
+#include <winsock2.h>
 
 int current_player = 1;
 
 static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
+
+extern SOCKET sock;
 
 Control *Control::getInstance()
 {
@@ -66,10 +70,8 @@ void Control::init()
 
     // 箭
     arrowMgr->init("resource/assets/weapon/knife.obj");
-    arrowMgr->bindArrow(PLAYER_ID, ARROW_LASER);
-    arrowMgr->getArrowSetting(PLAYER_ID).isReflect = 1;
-    arrowMgr->load(PLAYER_ID);
-    arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
+    arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
+    // arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
 
     // 道具
     candyMgr->init("resource/assets/weapon/knife.obj");
@@ -174,7 +176,6 @@ void Control::handleMouseMove(double xposIn, double yposIn)
 
 void Control::pollKeyPress()
 {
-    
 }
 
 void Control::handleKeyInput(int key, int action)
@@ -261,6 +262,21 @@ void Control::handleKeyInput(int key, int action)
             current_player = (current_player ^ 1);
             camera.follow(&players[PLAYER_ID]);
         }
+        static int cnt_1 = 0;
+        if (key == GLFW_KEY_1)
+        {
+            if (players[PLAYER_ID].state == Player::PLAYER_DEAD)
+            {
+                ++cnt_1;
+                if (cnt_1 >= 5)
+                {
+                    players[PLAYER_ID].rebirth();
+                    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_PLAYER_REBIRTH, &PLAYER_ID);
+                    funcSyncPackage.send(sock);
+                    cnt_1 = 0;
+                }
+            }
+        }
     }
 }
 
@@ -274,15 +290,19 @@ std::mutex updateMutex;
 auto oldtime = std::chrono::system_clock::now();
 auto newtime = std::chrono::system_clock::now();
 
+int init = 0;
 int FrontendMain()
 {
-	
+
     control->init();
     ui->init();
+
+    init = 1;
 
     // glfwMakeContextCurrent(control->window);
     while (!glfwWindowShouldClose(control->window))
     {
+
         newtime = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
         oldtime = newtime;
@@ -290,7 +310,7 @@ int FrontendMain()
         //std::cout<<"fps:"<<1.0f/dt<<std::endl;
 
         updateMutex.lock();
-		// std::cout << "BackendMain" << std::endl;
+        // std::cout << "BackendMain" << std::endl;
         ui->updateModel();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -321,7 +341,7 @@ int FrontendMain()
         skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
 
-		// std::cout<<"draw"<<std::endl;
+        // std::cout<<"draw"<<std::endl;
         updateMutex.unlock();
 
         glDepthMask(GL_FALSE);

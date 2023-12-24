@@ -36,4 +36,7 @@ constexpr float CAMERA_TO_PLAYER_OFFSET_RIGHT = 0.3f;
 
 extern int current_player;
 
+
+#define SERVER_PORT (2333)
+
 #endif
