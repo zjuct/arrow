@@ -20,7 +20,7 @@ static UI *ui = UI::getInstance();
 
 extern int FrontendMain();
 extern int clientThread();
-extern void clientInit();
+extern void clientInit(std::string ip);
 
 extern std::mutex updateMutex;
 extern bool backendinitfin;
@@ -58,7 +58,12 @@ int main(int argc, char **argv)
     {
         current_player = atoi(argv[1]);
     }
-    clientInit();
+    std::string ip = "127.0.0.1";
+    if(argc>2)
+    {
+        ip = argv[2];
+    }
+    clientInit(ip);
     init();
 
 
