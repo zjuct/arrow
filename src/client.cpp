@@ -25,6 +25,7 @@ SOCKET sock;
 extern int current_player;
 
 extern int init;
+extern std::mutex updateMutex;
 
 void recvThread()
 {
@@ -33,6 +34,7 @@ void recvThread()
     {
         SyncPackage package;
         package.recv(sock);
+        updateMutex.lock();
         switch (package.type)
         {
         case Sync_Player:
@@ -47,10 +49,10 @@ void recvThread()
         case Sync_Arrow:
         {
             ArrowSyncPackage *arrow_package = new ArrowSyncPackage(package);
-            if(arrow_package->getId() == current_player)
+            if (arrow_package->getId() == current_player)
                 break;
             int player_id = arrow_package->getId();
-            if(!control->arrowMgr->arrowMap.count(player_id))
+            if (!control->arrowMgr->arrowMap.count(player_id))
             {
                 control->arrowMgr->bindArrow(player_id);
                 arrow_package->update(&control->arrowMgr->arrows[control->arrowMgr->arrowSetting[player_id]]);
@@ -88,13 +90,13 @@ void recvThread()
                 func_package->get(&id);
                 control->players[id].rebirth();
                 break;
-
             }
             }
         }
         default:
             break;
         }
+        updateMutex.unlock();
     }
 }
 
