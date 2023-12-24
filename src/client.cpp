@@ -112,12 +112,19 @@ void clientInit(std::string ip)
     addr.sin_addr.s_addr = inet_addr(ip.c_str());
     int port = SERVER_PORT;
     addr.sin_port = htons(port);
-    int ret = connect(sock, (sockaddr *)&addr, sizeof(addr));
-    if (ret == SOCKET_ERROR)
+    for(;;)
     {
-        std::cout << "Error: " << WSAGetLastError() << std::endl;
-        return;
+        int ret = connect(sock, (sockaddr *)&addr, sizeof(addr));
+        if (ret == SOCKET_ERROR)
+        {
+            std::cout << "waiting for server" << std::endl;
+        }
+        else
+        {
+            break;
+        }
     }
+    
 
     std::cout << "Connected to server" << std::endl;
 }
