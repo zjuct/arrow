@@ -316,9 +316,6 @@ int FrontendMain()
 
     init = 1;
 
-    debug_shader->use();
-    debug_shader->setInt("depthMap", 0);
-
     // glfwMakeContextCurrent(control->window);
     while (!glfwWindowShouldClose(control->window))
     {
@@ -328,69 +325,75 @@ int FrontendMain()
         oldtime = newtime;
         float dt = elapsed_seconds.count();
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#if !SHADOW_ENABLE
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        control->configShader();
-        glDepthMask(GL_FALSE);
-        control->skybox_obj.draw(skybox_shader);
-        glDepthMask(GL_TRUE);
-        ui->draw(default_shader);
-#else
+        // 锁定，将当前状态保存到局部
+        updateMutex.lock();
 
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
         lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, control->dirLight.near_plane, control->dirLight.far_plane);
         lightView = glm::lookAt(-10.0f * control->dirLight.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
+
+        int wwidth = control->wwidth;
+        int wheight = control->wheight;
+
+        glm::mat4 projection = glm::perspective(glm::radians(control->camera.Zoom), (float)control->wwidth / (float)control->wheight, 0.1f, 100.0f);
+        glm::mat4 view = control->camera.GetViewMatrix();
+        glm::vec3 viewPos = control->camera.Position;
+
+        updateMutex.unlock();
+
+        // 用局部状态配置着色器参数
         shadowmap_shader->use();
         shadowmap_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 
-        // 渲染深度贴图
-//        control->configShader();
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, control->depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        ui->draw(shadowmap_shader);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        segment_shader->use();
+        segment_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        segment_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
 
-        glViewport(0, 0, control->wwidth, control->wheight);
+        glm::mat4 sky_view = glm::mat4(glm::mat3(view));
+        skybox_shader->use();
+        skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(sky_view));
+
+        // 渲染阴影贴图
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+//        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+//        glBindFramebuffer(GL_FRAMEBUFFER, control->depthMapFBO);
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        ui->draw(shadowmap_shader);
+//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 用深度贴图渲染阴影
+        glViewport(0, 0, wwidth, wheight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // render Depth map to quad for visual debugging
-        // ---------------------------------------------
-//        debug_shader->use();
-//        debug_shader->setFloat("near_plane", control->dirLight.near_plane);
-//        debug_shader->setFloat("far_plane", control->dirLight.far_plane);
-//        glActiveTexture(GL_TEXTURE0);
+        glDepthMask(GL_FALSE);
+        control->skybox_obj.draw(skybox_shader);
+        glDepthMask(GL_TRUE);
+
+//        shadow_shader->use();
+//        shadow_shader->setBool("dirLight.enable", false);
+//        shadow_shader->setBool("pointLight.enable", false);
+//        shadow_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+//        shadow_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+//        shadow_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
+//        shadow_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+//        shadow_shader->setInt("shadowMap", 3);
+//        glActiveTexture(GL_TEXTURE3);
 //        glBindTexture(GL_TEXTURE_2D, control->depthMap);
-//        renderQuad();
+//        control->dirLight.configShader(shadow_shader);      // TODO: 互斥
 
-//        glViewport(0, 0, control->wwidth, control->wheight);
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glDepthMask(GL_FALSE);
-//        control->skybox_obj.draw(skybox_shader);
-//        glDepthMask(GL_TRUE);
-//
-        // 用深度贴图渲染阴影
-        glm::mat4 projection = glm::perspective(glm::radians(control->camera.Zoom), (float)control->wwidth / (float)control->wheight, 0.1f, 100.0f);
-        glm::mat4 view = control->camera.GetViewMatrix();
-        shadow_shader->use();
-        shadow_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-        shadow_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-        shadow_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-        shadow_shader->setInt("shadowMap", 3);
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, control->depthMap);
-        control->dirLight.configShader(shadow_shader);
-        ui->draw(shadow_shader);
+        default_shader->use();
+        default_shader->setBool("dirLight.enable", false);
+        default_shader->setBool("pointLight.enable", false);
+        default_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+        default_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
+        control->dirLight.configShader(default_shader);
 
-#endif
+        ui->draw(default_shader);
 
-#ifdef SAT_TEST
-        control->test.draw(diffuse_shader);
-#endif
         glfwSwapBuffers(control->window);
     }
     return 0;

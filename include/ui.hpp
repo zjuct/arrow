@@ -104,6 +104,7 @@ class UI {
   bool rightPress;
 
   GlobalState gstate;
+  GlobalState gstate_last;
 
   private:
 	UI();

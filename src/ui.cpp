@@ -390,6 +390,7 @@ void UI::init()
 
 void UI::update()
 {
+    gstate_last = gstate;
     if (gstate == GLOBAL_GAME)
     {
     }

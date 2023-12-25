@@ -1,4 +1,3 @@
-
 #version 330 core
 out vec4 FragColor;
 
@@ -78,13 +77,6 @@ void main() {
 //    }
 
     FragColor = vec4(result, 1.0);
-
-//    vec3 projCoords = fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
-//    float currentDepth = projCoords.z;
-
-//    vec3 projCoords = fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
-//    float depth = texture(shadowMap, projCoords.xy).r;
-//    FragColor = vec4(depth, depth, depth, 1.0f);
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
