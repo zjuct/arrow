@@ -374,6 +374,8 @@ void Player::updateModel_obb()
     glm::mat4 basemodel(1.0f);
     basemodel = glm::translate(basemodel, position);
     basemodel = glm::rotate(basemodel, (float)glm::radians(yaw + 90), glm::vec3(0.0f, -1.0f, 0.0f));
+    if (state == PLAYER_DEAD)
+        basemodel = glm::rotate(basemodel, (float)glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // head: 世界坐标平移 * 局部坐标平移 * 整体模型转动 * 头俯仰角转动
     glm::mat4 model = basemodel;
