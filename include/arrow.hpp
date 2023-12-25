@@ -78,7 +78,7 @@ public:
     // Arrow(const Arrow &arrow);
 
     // void init(const char* objfile);
-    void draw();
+    void draw(Shader* shader);
     void update(float dt);
     void update(glm::vec3 pos, glm::vec3 dir);
     void updateModel();
@@ -110,7 +110,7 @@ public:
     ~ArrowManager() {}
 
     void init(const char *objfile);
-    void draw();
+    void draw(Shader* shader);
     void updateModel();
     void update(float dt);
     void updateModel_obb();

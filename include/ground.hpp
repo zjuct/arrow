@@ -9,7 +9,7 @@ class Ground {
   ~Ground ();
 
   void init(const char* objectfile);
-  void draw();
+  void draw(Shader* shader);
   void updateModel();
   Object& getModel()
   {

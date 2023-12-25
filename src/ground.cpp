@@ -14,8 +14,8 @@ void Ground::init(const char* objectfile) {
   }
 }
 
-void Ground::draw() {
-  model.draw();
+void Ground::draw(Shader* shader) {
+  model.draw(shader);
 }
 
 void Ground::updateModel() {

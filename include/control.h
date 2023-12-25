@@ -97,6 +97,11 @@ public:
 	bool another_leftPress = false;
 	bool another_rightPress = false;
 
+
+	// 阴影贴图
+	GLuint depthMapFBO;
+	GLuint depthMap;
+
 #ifdef SAT_TEST
 	SatTest test;
 #endif

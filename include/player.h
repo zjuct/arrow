@@ -37,7 +37,7 @@ public:
         PLAYER_DEAD,
     };
 
-    void draw();
+    void draw(Shader* shader);
     void updateModel();
     void update(float dt);
 

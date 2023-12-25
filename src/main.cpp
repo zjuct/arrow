@@ -103,14 +103,15 @@ int main(int argc, char **argv)
                 control->arrowMgr->updateArrow(i, control->players[i].getWeaponPos(), control->players[i].front);
             }
             // control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
-            updateMutex.unlock();
-            updateMutex.lock();
+//            updateMutex.unlock();
+//            updateMutex.lock();
             control->arrowMgr->update(control->dt);
-            updateMutex.unlock();
-            updateMutex.lock();
+//            updateMutex.unlock();
+//            updateMutex.lock();
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
+//        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         if(ui->gstate == GLOBAL_INIT) {
             std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }

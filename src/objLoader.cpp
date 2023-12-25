@@ -625,6 +625,7 @@ void Mesh::draw(Shader* shader) {
         material_t m = scene->getMaterials()[material];
         m.configShader(shader);
     }
+    shader->use();
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, indices.size());
     glBindVertexArray(0);

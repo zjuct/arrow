@@ -80,6 +80,21 @@ void Control::init()
     test.init();
 #endif
     grid.init(ground.getModel().getChildren(), 1.0f);
+
+    glGenFramebuffers(1, &depthMapFBO);
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // 绑定depthMap到depthMapFBO
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
     gladinit = true;
 }
@@ -291,6 +306,7 @@ auto oldtime = std::chrono::system_clock::now();
 auto newtime = std::chrono::system_clock::now();
 
 int init = 0;
+
 int FrontendMain()
 {
 
@@ -307,52 +323,87 @@ int FrontendMain()
         std::chrono::duration<double> elapsed_seconds = newtime - oldtime;
         oldtime = newtime;
         float dt = elapsed_seconds.count();
-        //std::cout<<"fps:"<<1.0f/dt<<std::endl;
 
+        // 锁定，将当前状态保存到局部
         updateMutex.lock();
-        // std::cout << "BackendMain" << std::endl;
         ui->updateModel();
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glm::mat4 lightProjection, lightView;
+        glm::mat4 lightSpaceMatrix;
+        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, control->dirLight.near_plane, control->dirLight.far_plane);
+        lightView = glm::lookAt(-10.0f * control->dirLight.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        lightSpaceMatrix = lightProjection * lightView;
 
-        // 设置view和projection矩阵
-        default_shader->use();
+        int wwidth = control->wwidth;
+        int wheight = control->wheight;
+
         glm::mat4 projection = glm::perspective(glm::radians(control->camera.Zoom), (float)control->wwidth / (float)control->wheight, 0.1f, 100.0f);
-        default_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
         glm::mat4 view = control->camera.GetViewMatrix();
-        default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-        default_shader->setvec3fv("viewPos", glm::value_ptr(control->camera.Position));
-        // default_shader->setBool("dirLight.enable", true);
-        // default_shader->setBool("pointLight.enable", true);
-        control->dirLight.configShader(default_shader);
-        // control->pointLight.configShader(default_shader);
+        glm::vec3 viewPos = control->camera.Position;
 
-        diffuse_shader->use();
-        diffuse_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-        diffuse_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+        updateMutex.unlock();
+
+        // 用局部状态配置着色器参数
+        shadowmap_shader->use();
+        shadowmap_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 
         segment_shader->use();
         segment_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
         segment_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
 
+        glm::mat4 sky_view = glm::mat4(glm::mat3(view));
         skybox_shader->use();
-        view = glm::mat4(glm::mat3(view));
-        skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(sky_view));
 
-        // std::cout<<"draw"<<std::endl;
-        updateMutex.unlock();
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+#if SHADOW_ENABLE
+        // 渲染阴影贴图
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, control->depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
+        ui->draw(shadowmap_shader);
+        glCullFace(GL_BACK);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+
+        // 用深度贴图渲染阴影
+        glViewport(0, 0, wwidth, wheight);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glDepthMask(GL_FALSE);
-        control->skybox_obj.draw();
+        control->skybox_obj.draw(skybox_shader);
         glDepthMask(GL_TRUE);
 
-        ui->draw();
-
-#ifdef SAT_TEST
-        control->test.draw(diffuse_shader);
+#if SHADOW_ENABLE
+        shadow_shader->use();
+        shadow_shader->setBool("dirLight.enable", false);
+        shadow_shader->setBool("pointLight.enable", false);
+        shadow_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        shadow_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+        shadow_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
+        shadow_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        shadow_shader->setInt("shadowMap", 3);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, control->depthMap);
+        shadow_shader->setBool("PCF_enable", false);
+#if PCF_ENABLE
+        shadow_shader->setBool("PCF_enable", true);
 #endif
+        control->dirLight.configShader(shadow_shader);      // TODO: 互斥
+        ui->draw(shadow_shader);
+#else
+        default_shader->use();
+        default_shader->setBool("dirLight.enable", false);
+        default_shader->setBool("pointLight.enable", false);
+        default_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+        default_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
+        control->dirLight.configShader(default_shader);
+        ui->draw(default_shader);
+#endif
+
         glfwSwapBuffers(control->window);
     }
     return 0;

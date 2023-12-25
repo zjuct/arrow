@@ -17,7 +17,7 @@ Arrow::Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike)
     this->arrow_ground_spike = arrow_ground_spike;
 }
 
-void Arrow::draw()
+void Arrow::draw(Shader* shader)
 {
     if (state == ARROW_DISAPPEAR | state == ARROW_NONE)
         return;
@@ -28,13 +28,13 @@ void Arrow::draw()
     switch (type)
     {
     case ARROW_NORMAL:
-        arrow_normal.draw();
+        arrow_normal.draw(shader);
         break;
     case ARROW_LASER:
-        arrow_laser.draw();
+        arrow_laser.draw(shader);
         break;
     case ARROW_GROUND_SPIKE:
-        arrow_ground_spike.draw();
+        arrow_ground_spike.draw(shader);
         break;
     }
 }
@@ -367,11 +367,11 @@ void ArrowManager::init(const char *objfile)
     }
 }
 
-void ArrowManager::draw()
+void ArrowManager::draw(Shader* shader)
 {
     for (auto &[_, arrow] : arrows)
     {
-        arrow.draw();
+        arrow.draw(shader);
     }
 }
 
