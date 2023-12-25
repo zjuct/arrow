@@ -307,7 +307,6 @@ auto newtime = std::chrono::system_clock::now();
 
 int init = 0;
 
-void renderQuad();
 int FrontendMain()
 {
 
@@ -327,6 +326,7 @@ int FrontendMain()
 
         // 锁定，将当前状态保存到局部
         updateMutex.lock();
+        ui->updateModel();
 
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
@@ -356,13 +356,17 @@ int FrontendMain()
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
         skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(sky_view));
 
-        // 渲染阴影贴图
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-//        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-//        glBindFramebuffer(GL_FRAMEBUFFER, control->depthMapFBO);
-//        glClear(GL_DEPTH_BUFFER_BIT);
-//        ui->draw(shadowmap_shader);
-//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if SHADOW_ENABLE
+        // 渲染阴影贴图
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, control->depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
+        ui->draw(shadowmap_shader);
+        glCullFace(GL_BACK);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 
         // 用深度贴图渲染阴影
         glViewport(0, 0, wwidth, wheight);
@@ -372,18 +376,24 @@ int FrontendMain()
         control->skybox_obj.draw(skybox_shader);
         glDepthMask(GL_TRUE);
 
-//        shadow_shader->use();
-//        shadow_shader->setBool("dirLight.enable", false);
-//        shadow_shader->setBool("pointLight.enable", false);
-//        shadow_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-//        shadow_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-//        shadow_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
-//        shadow_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-//        shadow_shader->setInt("shadowMap", 3);
-//        glActiveTexture(GL_TEXTURE3);
-//        glBindTexture(GL_TEXTURE_2D, control->depthMap);
-//        control->dirLight.configShader(shadow_shader);      // TODO: 互斥
-
+#if SHADOW_ENABLE
+        shadow_shader->use();
+        shadow_shader->setBool("dirLight.enable", false);
+        shadow_shader->setBool("pointLight.enable", false);
+        shadow_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        shadow_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+        shadow_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
+        shadow_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        shadow_shader->setInt("shadowMap", 3);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, control->depthMap);
+        shadow_shader->setBool("PCF_enable", false);
+#if PCF_ENABLE
+        shadow_shader->setBool("PCF_enable", true);
+#endif
+        control->dirLight.configShader(shadow_shader);      // TODO: 互斥
+        ui->draw(shadow_shader);
+#else
         default_shader->use();
         default_shader->setBool("dirLight.enable", false);
         default_shader->setBool("pointLight.enable", false);
@@ -391,80 +401,10 @@ int FrontendMain()
         default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
         default_shader->setvec3fv("viewPos", glm::value_ptr(viewPos));
         control->dirLight.configShader(default_shader);
-
         ui->draw(default_shader);
+#endif
 
         glfwSwapBuffers(control->window);
     }
     return 0;
-}
-
-void Control::configShader() {
-    updateMutex.lock();
-    ui->updateModel();
-
-    // 设置view和projection矩阵
-    default_shader->use();
-    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)wwidth / (float)wheight, 0.1f, 100.0f);
-    default_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-    glm::mat4 view = camera.GetViewMatrix();
-//    default_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-//    default_shader->setvec3fv("viewPos", glm::value_ptr(camera.Position));
-//    default_shader->setBool("dirLight.enable", false);
-//    default_shader->setBool("pointLight.enable", false);
-    shadow_shader->setBool("dirLight.enable", false);
-    shadow_shader->setBool("pointLight.enable", false);
-//    dirLight.configShader(default_shader);
-    // pointLight.configShader(default_shader);
-
-//    diffuse_shader->use();
-//    diffuse_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-//    diffuse_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-
-    shadow_shader->use();
-    shadow_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-    shadow_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-//    dirLight.configShader(shadow_shader);
-
-//    dirLight.configShaderShadowMap(shadowmap_shader);       // TODO: 改成shadowMapShader
-
-    segment_shader->use();
-    segment_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-    segment_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-
-    skybox_shader->use();
-    view = glm::mat4(glm::mat3(view));
-    skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
-    skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
-
-    updateMutex.unlock();
-}
-
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
-void renderQuad()
-{
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
 }

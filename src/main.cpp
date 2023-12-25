@@ -111,12 +111,12 @@ int main(int argc, char **argv)
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
-        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-//        if(ui->gstate == GLOBAL_INIT || ui->gstate_last == GLOBAL_INIT) {
-//            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-//        }
+//        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+        if(ui->gstate == GLOBAL_INIT) {
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+        }
 
-//        std::cout << "fps: " << 1.0f / control->dt << std::endl;
+        std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
     frontend.join();
 
