@@ -59,7 +59,7 @@ public:
         this->scale = scale;
     }
 
-    void draw();
+    void draw(Shader* shader);
     void update(float dt);
     void updateModel();
     void hit();
@@ -80,7 +80,7 @@ public:
 
     void update(float dt);
     void init(const char *objfile);
-    void draw();
+    void draw(Shader* shader);
     void updateModel();
     void generateCandy(glm::vec3 pos, CandyType type);
     void generateCandy();

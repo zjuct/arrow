@@ -12,18 +12,27 @@
 class Light {
 public:
     virtual void configShader(Shader* shader) = 0;
-    virtual void draw() = 0;
+//    virtual void draw() = 0;
     virtual void update(float dt) = 0;
 };
 
 class DirLight: public Light {
 public:
-    DirLight(glm::vec3 dir = glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3 a = glm::vec3(0.5), glm::vec3 d = glm::vec3(0.5), glm::vec3 s = glm::vec3(0.5))
+    DirLight(glm::vec3 dir = glm::vec3(0.0f, -1.0f, -1.0f), glm::vec3 a = glm::vec3(0.05), glm::vec3 d = glm::vec3(0.5), glm::vec3 s = glm::vec3(0.5))
         : direction(dir), ambient(a), diffuse(d), specular(s) {
 
     }
 
+    void configShaderShadowMap(Shader* shader) {
+        shader->use();
+        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 lightView = glm::lookAt(-10.0f * direction, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+        shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+    }
+
     void configShader(Shader* shader) {
+//        configShaderShadowMap(shader);
         shader->use();
         shader->setBool("dirLight.enable", true);
         shader->setvec3fv("dirLight.direction", glm::value_ptr(direction));
@@ -32,13 +41,14 @@ public:
         shader->setvec3fv("dirLight.specular", glm::value_ptr(specular));
     }
 
-    void draw() {}
     void update(float dt) {}
-private:
+
     glm::vec3 direction;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+    float near_plane = 1.0f;
+    float far_plane = 25.0f;
 };
 
 class PointLight: public Light {
@@ -63,11 +73,11 @@ public:
         shader->setvec3fv("pointLight.specular", glm::value_ptr(specular));
     }
 
-    void draw() {
-        if(box) {
-            box->draw();
-        }
-    }
+//    void draw() {
+//        if(box) {
+//            box->draw();
+//        }
+//    }
 
     void update(float dt) {
         float omega = 0.1f;
@@ -128,12 +138,11 @@ private:
 
 class PBRPointLight: public Object {
 public:
-    PBRPointLight(int _id, const glm::vec3& p, const glm::vec3& i, Shader* boxshader, bool _show)
+    PBRPointLight(int _id, const glm::vec3& p, const glm::vec3& i, bool _show)
         : position(p), intensity(i), id(_id) {
         shape = new Box(glm::vec3(1.0f, 1.0f, 1.0f));
         type = OBJECT_LIGHT;
         show = _show;
-        shader = boxshader;
 
         glm::mat4 model(1.0f);
         model = glm::translate(model, position);
@@ -153,9 +162,6 @@ public:
         shader->setvec3fv("pointLight[" + std::to_string(id) + "].intensity", glm::value_ptr(intensity));
     }
     
-    void draw() {
-        Object::draw();
-    }
     void update(float dt) {
 
     }

@@ -28,7 +28,7 @@ enum ObjectType {
 class Object {
 public:
     Object(ObjectType _type, Shape* _shape, Shader* _shader, glm::mat4 _model = glm::mat4(1.0f), Object* _parent = nullptr, bool _show = true)
-        : type(_type), shape(_shape), shader(_shader), lmodel(_model), parent(_parent), show(_show), obb(nullptr) {
+        : type(_type), shape(_shape), lmodel(_model), parent(_parent), show(_show), obb(nullptr) {
         lmodel_noscale = lmodel;
         if(parent)
             parent->addChild(this);
@@ -46,7 +46,6 @@ public:
     Object(const Object& o) {
         type = o.type;
         shape = o.shape;
-        shader = o.shader;
         lmodel = o.lmodel;
         lmodel_noscale = o.lmodel_noscale;
         parent = o.parent;
@@ -67,7 +66,6 @@ public:
         if(this == &o) return *this;
         type = o.type;
         shape = o.shape;
-        shader = o.shader;
         lmodel = o.lmodel;
         lmodel_noscale = o.lmodel_noscale;
         parent = o.parent;
@@ -96,10 +94,6 @@ public:
 
     ObjectType getType() {
         return type;
-    }
-
-    void setColor(const glm::vec3& c) {
-        color = c;
     }
 
     void addChild(Object* o) {
@@ -135,7 +129,7 @@ public:
         updateModel();
     }
 
-    virtual void draw() {
+    virtual void draw(Shader* shader) {
         if(show) {
             shader->use();
             shader->setmat4fv("model", GL_FALSE, glm::value_ptr(gmodel));
@@ -148,7 +142,7 @@ public:
                 shape->draw(shader);
         }
         for(Object* c: children) {
-            c->draw();
+            c->draw(shader);
         }
     }
 
@@ -200,7 +194,7 @@ public:
 
     Object()
         : type(OBJECT_NONE), shape(nullptr), lmodel_noscale(glm::mat4(1.0f)),
-        lmodel(glm::mat4(1.0f)), parent(nullptr), shader(nullptr), obb(nullptr) {
+        lmodel(glm::mat4(1.0f)), parent(nullptr), obb(nullptr) {
         updateModel();
     }
 
@@ -258,8 +252,6 @@ protected:
     Object* parent;
     std::vector<Object*> children;
 
-    Shader* shader;
-    glm::vec3 color;        // used for single color Object
     bool show;
 
     Obb* obb;

@@ -7,6 +7,9 @@ Shader* skybox_shader = nullptr;
 Shader* player_shader = nullptr;
 Shader* segment_shader = nullptr;
 Shader* flat_shader = nullptr;
+Shader* shadowmap_shader = nullptr;
+Shader* shadow_shader = nullptr;
+Shader* debug_shader = nullptr;
 
 void Shader::initShader() {
     default_shader = new Shader("resource/shader/default/vs.glsl", "resource/shader/default/fs.glsl");
@@ -15,6 +18,9 @@ void Shader::initShader() {
     skybox_shader = new Shader("resource/shader/skybox/vs.glsl", "resource/shader/skybox/fs.glsl");
     segment_shader = new Shader("resource/shader/segment/vs.glsl", "resource/shader/segment/fs.glsl");
     flat_shader = new Shader("resource/shader/flat/vs.glsl", "resource/shader/flat/fs.glsl");
+    shadowmap_shader = new Shader("resource/shader/shadowmap/vs.glsl", "resource/shader/shadowmap/fs.glsl");
+    shadow_shader = new Shader("resource/shader/shadow/vs.glsl", "resource/shader/shadow/fs.glsl");
+    debug_shader = new Shader("resource/shader/debug_quad/vs.glsl", "resource/shader/debug_quad/fs.glsl");
 
     player_shader = default_shader;
 }

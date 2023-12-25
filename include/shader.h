@@ -37,5 +37,8 @@ extern Shader* skybox_shader;
 extern Shader* player_shader;
 extern Shader* segment_shader;
 extern Shader* flat_shader;
+extern Shader* shadowmap_shader;
+extern Shader* shadow_shader;
+extern Shader* debug_shader;
 
 #endif

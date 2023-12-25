@@ -93,10 +93,9 @@ class UI {
 
   void init();
   void update();
-  void draw();
+  void draw(Shader* shader);
   void updateModel();
 
-  Shader *shader;
   Aim aim;
   Button bt;
   Background bg;

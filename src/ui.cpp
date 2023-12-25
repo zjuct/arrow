@@ -381,7 +381,6 @@ void UI::init()
 {
     gstate = GLOBAL_INIT;
     glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    shader = flat_shader;
     aim.init();
     bt = Button(glm::vec3(0.2f, 0.0f, 0.0f), 0.6f, 0.5f, true, "resource/assets/button/btn.png");
     bt.init();
@@ -419,27 +418,28 @@ void UI::updateModel()
         break;
     }
 }
-void UI::draw()
+
+void UI::draw(Shader* shader)
 {
 
     shader->use();
     switch (gstate)
     {
     case GLOBAL_GAME:
-        control->ground.draw();
+        control->ground.draw(shader);
         for (auto &player : control->players)
-            player.draw();
-        control->arrowMgr->draw();
-        control->candyMgr->draw();
+            player.draw(shader);
+        control->arrowMgr->draw(shader);
+        control->candyMgr->draw(shader);
 //        for(Obb* obb: control->grid.obbs) {
 //            obb->drawLine(segment_shader);
 //        }
-        aim.draw(shader);
+        aim.draw(flat_shader);
         break;
 
     case GLOBAL_INIT:
-        bg.draw(shader);
-        bt.draw(shader);
+        bg.draw(flat_shader);
+        bt.draw(flat_shader);
         break;
     }
 }

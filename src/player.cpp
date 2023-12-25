@@ -143,7 +143,7 @@ void Player::updatePlayerVectors()
     this->up = glm::normalize(glm::cross(right, front));
 }
 
-void Player::draw()
+void Player::draw(Shader* shader)
 {
     //    head.getObb()->drawFlag = true;
     //    body.getObb()->drawFlag = true;
@@ -151,12 +151,12 @@ void Player::draw()
     //    lleg.getObb()->drawFlag = true;
     //    rarm.getObb()->drawFlag = true;
     //    rleg.getObb()->drawFlag = true;
-    head.draw();
-    body.draw();
-    larm.draw();
-    rarm.draw();
-    lleg.draw();
-    rleg.draw();
+    head.draw(shader);
+    body.draw(shader);
+    larm.draw(shader);
+    rarm.draw(shader);
+    lleg.draw(shader);
+    rleg.draw(shader);
 }
 
 bool Player::checkBlocked(enum intersectType type)

@@ -43,6 +43,7 @@ public:
 	void handleKeyInput(int key, int action);
 	void handleScroll(double xoffset, double yoffset);
 	void pollKeyPress();
+	void configShader();
 	glm::vec3 getAim();
 
 	// 相机
@@ -96,6 +97,11 @@ public:
 	bool another_backPress = false;
 	bool another_leftPress = false;
 	bool another_rightPress = false;
+
+
+	// 阴影贴图
+	GLuint depthMapFBO;
+	GLuint depthMap;
 
 #ifdef SAT_TEST
 	SatTest test;

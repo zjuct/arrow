@@ -18,12 +18,12 @@ static CandyManager *candyMgr = CandyManager::getInstance();
 //     std::cout << "-------------" << std::endl;
 // }
 
-void Candy::draw()
+void Candy::draw(Shader* shader)
 {
     if (type == CANDY_NONE)
         return;
     // printMat4(candy->getGModelNoscale());
-    candy.draw();
+    candy.draw(shader);
 }
 
 void Candy::updateModel()
@@ -82,11 +82,11 @@ void CandyManager::init(const char *objfile)
     }
 }
 
-void CandyManager::draw()
+void CandyManager::draw(Shader* shader)
 {
     for (auto &candy : candies)
     {
-        candy.draw();
+        candy.draw(shader);
     }
 }
 
