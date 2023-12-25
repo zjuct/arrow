@@ -32,6 +32,8 @@ enum CandyType
     CANDY_DISAPPEAR,
 };
 
+class FuncSyncPackage;
+
 class Candy
 {
 public:
@@ -76,7 +78,8 @@ public:
     Object model;
     std::list<Candy> candies;
 
-    float generateTime = 10.5f;
+    const float generateTimeMax = 10.5f;
+    float generateTime = generateTimeMax;
 
     void update(float dt);
     void init(const char *objfile);
@@ -84,6 +87,7 @@ public:
     void updateModel();
     void generateCandy(glm::vec3 pos, CandyType type);
     void generateCandy();
+    void generateCandy(FuncSyncPackage &package);
 
     void eat(Player &player);
 };

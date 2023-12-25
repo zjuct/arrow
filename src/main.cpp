@@ -26,7 +26,6 @@ extern std::mutex updateMutex;
 extern bool backendinitfin;
 extern bool gladinit;
 
-
 void init()
 {
     // 初始化glfw，使用OpenGL 3.3
@@ -59,16 +58,16 @@ int main(int argc, char **argv)
         current_player = atoi(argv[1]);
     }
     std::string ip = "127.0.0.1";
-    if(argc>2)
+    if (argc > 2)
     {
         ip = argv[2];
     }
     clientInit(ip);
     init();
 
-
     std::thread frontend(FrontendMain);
-    while(!gladinit);
+    while (!gladinit)
+        ;
     std::thread client(clientThread);
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
@@ -76,7 +75,7 @@ int main(int argc, char **argv)
         updateMutex.lock();
         glfwPollEvents();
         // std::cout << "BackendMain" << std::endl;
-        
+
         float currenttime = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000000000.0f;
         // float currenttime = glfwGetTime();
         //        std::cout<<currenttime<<std::endl;
@@ -111,11 +110,12 @@ int main(int argc, char **argv)
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
-//        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-        if(ui->gstate == GLOBAL_INIT) {
+        if (ui->gstate == GLOBAL_INIT)
+        {
             std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }
 
+        // std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
     frontend.join();

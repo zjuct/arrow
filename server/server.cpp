@@ -9,6 +9,7 @@
 #include <vector>
 #include <windows.h>
 #include <winsock2.h>
+#include <server.hpp>
 
 SOCKET sock;
 using namespace std;
@@ -27,7 +28,7 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
     return FALSE;
 }
 
-// static Control *control = Control::getInstance();
+static Control *control = Control::getInstance();
 
 vector<client> clients;
 mutex clientsMtx;
@@ -37,13 +38,30 @@ map<int, Arrow> arrowMap;
 
 void sendThread()
 {
+    long long beginTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
     while (true)
     {
+        
+
         if (exit_flag)
         {
             break;
         }
+
+        float currenttime = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000000000.0f;
+        static int first = 0;
+        if (first == 0)
+        {
+            control->oldTime = currenttime;
+            first = 1;
+        }
+        control->dt = currenttime - control->oldTime;
+        control->oldTime = currenttime;
+        CandyManager *candyMgr = control->candyMgr;
         clientsMtx.lock();
+        candyMgr->update(control->dt);
+
         for (auto &player : players)
         {
             SyncPackage *package = new PlayerSyncPackage(&player.second);
@@ -75,16 +93,16 @@ void recvThread(int client_id, SOCKET client_sock)
         {
             break;
         }
-        SyncPackage* package;
+        SyncPackage *package;
         char buf[16];
         memset(buf, 0, sizeof(buf));
         int ret = recv(client_sock, buf, sizeof(buf), 0);
         SyncType type = *(SyncType *)(buf);
-        if(type == Sync_Player)
+        if (type == Sync_Player)
             package = new PlayerSyncPackage();
-        if(type == Sync_Arrow)
+        if (type == Sync_Arrow)
             package = new ArrowSyncPackage();
-        if(type == Sync_Func)
+        if (type == Sync_Func)
             package = new FuncSyncPackage();
         package->type = *(SyncType *)(buf);
         package->timestamp = *(long long *)(buf + 4);
@@ -116,14 +134,14 @@ void recvThread(int client_id, SOCKET client_sock)
         {
             PlayerSyncPackage *player_package = (PlayerSyncPackage *)package;
             int id = player_package->getId();
-            std::cout<<"sync player "<<id<<std::endl;
+            // std::cout << "sync player " << id << std::endl;
             player_package->update(&players[id]);
         }
         if (package->type == Sync_Arrow)
         {
             ArrowSyncPackage *arrow_package = (ArrowSyncPackage *)package;
             int id = arrow_package->getId();
-            std::cout<<"sync arrow "<<id<<std::endl;
+            // std::cout << "sync arrow " << id << std::endl;
             arrow_package->update(&arrowMap[id]);
         }
         if (package->type == Sync_Func)
@@ -131,6 +149,7 @@ void recvThread(int client_id, SOCKET client_sock)
             FuncSyncPackage *func_package = (FuncSyncPackage *)package;
             std::cout << "sync func" << std::endl;
             std::cout << func_package->getFuncType() << std::endl;
+            clientsMtx.lock();
             for (int i = 0; i < clients.size(); i++)
             {
                 if (clients[i].id != client_id)
@@ -139,6 +158,7 @@ void recvThread(int client_id, SOCKET client_sock)
                     break;
                 }
             }
+            clientsMtx.unlock();
         }
     }
 }

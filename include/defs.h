@@ -17,7 +17,7 @@
 #define WIND_RESISTANCE (0.1f)
 #define GRAVITY (9.8f)
 
-#define PLAYER_ID (current_player<0?0:current_player)
+#define PLAYER_ID (int)(current_player<0?0:current_player)
 #define ANOTHER_PLAYER_ID (current_player ^ 1)
 #define AIM_DISTANCE (10.0f)
 #define ELASTICITY (0.5f)

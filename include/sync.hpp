@@ -23,6 +23,7 @@ enum FuncType
     FUNC_ARROW_FIRE,
     FUNC_ARROW_UPDATE,
     FUNC_PLAYER_REBIRTH,
+    FUNC_CANDY_GENERATE,
 };
 
 class SyncPackage
@@ -56,6 +57,12 @@ public:
             std::cout << "Error: " << WSAGetLastError() << std::endl;
         }
     }
+
+    // void broadcast(std::vector<client> socks)
+    // {
+    //     for(auto sock : socks)
+    //         send(sock);
+    // }
 
     void recv(SOCKET sock)
     {

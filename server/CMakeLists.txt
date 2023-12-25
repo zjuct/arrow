@@ -16,3 +16,5 @@ target_link_libraries(server
     PUBLIC ${A} 
     ws2_32
 )
+
+target_compile_definitions(server PRIVATE SERVER)

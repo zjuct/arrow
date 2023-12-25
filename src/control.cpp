@@ -62,8 +62,11 @@ void Control::init()
     player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
     players.push_back(player1);
     Player player2;
-    player2.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+    player2.init("resource/assets/player2/player.obj", glm::vec3(-2.0f, 0.0f, 0.0f));
     players.push_back(player2);
+    Player player3;
+    player3.init("resource/assets/player2/player.obj", glm::vec3(-3.0f, 0.0f, 0.0f));
+    players.push_back(player3);
     camera.follow(&players[PLAYER_ID]);
 
     ground.init("resource/assets/scene/scene.obj");
@@ -71,6 +74,8 @@ void Control::init()
     // 箭
     arrowMgr->init("resource/assets/weapon/knife.obj");
     arrowMgr->bindArrow(PLAYER_ID, ARROW_NORMAL);
+    arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].isReflect = true;
+    arrowMgr->load(PLAYER_ID);
     // arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
 
     // 道具

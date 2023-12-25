@@ -2,6 +2,8 @@
 #include "control.h"
 #include "defs.h"
 #include <ray.h>
+#include <sync.hpp>
+#include <vector>
 
 static Control *control = Control::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
@@ -98,6 +100,9 @@ void CandyManager::updateModel()
     }
 }
 
+#ifdef SERVER
+extern std::vector<client> clients;
+#endif
 
 void CandyManager::update(float dt)
 {
@@ -117,17 +122,27 @@ void CandyManager::update(float dt)
             it++;
         }
     }
-    // std::cout<<"size:"<<candies.size()<<std::endl;
+#ifdef SERVER  
+    std::cout<<"size:"<<candies.size()<<std::endl;
     generateTime -= dt;
     if (generateTime <= 0.0f)
     {
         generateCandy();
-        generateTime = 1.0f;
+        generateTime = generateTimeMax;
     }
+#endif
 }
 
 void CandyManager::generateCandy(glm::vec3 pos, CandyType type)
 {
+    candies.emplace_back(model, pos, type, 0.0f, 1.0f);
+}
+
+void CandyManager::generateCandy(FuncSyncPackage &funcSyncPackage)
+{
+    glm::vec3 pos;
+    CandyType type;
+    funcSyncPackage.get(&pos, &type);
     candies.emplace_back(model, pos, type, 0.0f, 1.0f);
 }
 
@@ -142,6 +157,12 @@ void CandyManager::generateCandy()
     glm::vec3 pos = glm::vec3(x, y, z);
     CandyType type = (CandyType)(CANDY_NORMAL);
     generateCandy(pos, type);
+#ifdef SERVER
+    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_GENERATE, &pos, &type);
+    for(int i = 0; i < clients.size(); i++) {
+        funcSyncPackage.send(clients[i].sock);
+    }
+#endif
 }
 
 void CandyManager::eat(Player &player)

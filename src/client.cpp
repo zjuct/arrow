@@ -91,6 +91,10 @@ void recvThread()
                 // control->players[id].rebirth();
                 // break;
             }
+            case FUNC_CANDY_GENERATE:
+            {
+                control->candyMgr->generateCandy(*func_package);
+            }
             }
         }
         default:
@@ -102,7 +106,7 @@ void recvThread()
 
 void clientInit(std::string ip)
 {
-    if(current_player == -1)
+    if (current_player == -1)
         return;
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);

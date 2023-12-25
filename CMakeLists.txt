@@ -48,6 +48,7 @@ target_link_libraries(arrow
 # 设置编译选项 -Wno-volatile
 target_compile_options(arrow PRIVATE -Wno-volatile)
 
+
 set_target_properties(arrow PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
