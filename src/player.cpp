@@ -425,21 +425,22 @@ void Player::getCandy(CandyType type)
 void Player::getHit(const Arrow &arrow)
 {
     std::cout << "id: " << id << " hp: " << hp << std::endl;
+    if(id == arrow.attackerId || id != PLAYER_ID)
+        return;
     hp -= arrow.speed * arrow.damage;
     if (hp <= 0)
     {
         hp = 0;
         state = PLAYER_DEAD;
     }
-    std::cout << "id: " << id << " hp: " << hp << std::endl;
 }
 
 PlayerSyncPackage::PlayerSyncPackage(Player *player)
 {
-    // position, front, right, up, yaw, pitch, hp, level, exp, id
+    // position, front, right, up, yaw, pitch, hp, level, exp, id, state
     type = Sync_Player;
     timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    size = sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4;
+    size = sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4 + sizeof(player->state);
     data = new char[size];
     memset(data, 0, size);
     memcpy(data, &player->position, sizeof(glm::vec3));
@@ -452,6 +453,7 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), &player->level, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, &player->exp, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, &player->id, sizeof(int));
+    memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, &player->state, sizeof(player->state));
     // std::cout<<"pack Id: "<<*(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3)<<std::endl;
 }
 
@@ -472,6 +474,7 @@ void PlayerSyncPackage::update(Player *player)
     memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
     memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));
     memcpy(&player->id, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, sizeof(int));
+    memcpy(&player->state, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, sizeof(player->state));
 }
 
 int PlayerSyncPackage::getId()
