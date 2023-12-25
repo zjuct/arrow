@@ -86,10 +86,10 @@ void recvThread()
                 break;
             case FUNC_PLAYER_REBIRTH:
             {
-                int id = -1;
-                func_package->get(&id);
-                control->players[id].rebirth();
-                break;
+                // int id = -1;
+                // func_package->get(&id);
+                // control->players[id].rebirth();
+                // break;
             }
             }
         }
@@ -102,6 +102,8 @@ void recvThread()
 
 void clientInit(std::string ip)
 {
+    if(current_player == -1)
+        return;
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
     sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -112,7 +114,7 @@ void clientInit(std::string ip)
     addr.sin_addr.s_addr = inet_addr(ip.c_str());
     int port = SERVER_PORT;
     addr.sin_port = htons(port);
-    for(;;)
+    for (;;)
     {
         int ret = connect(sock, (sockaddr *)&addr, sizeof(addr));
         if (ret == SOCKET_ERROR)
@@ -124,7 +126,6 @@ void clientInit(std::string ip)
             break;
         }
     }
-    
 
     std::cout << "Connected to server" << std::endl;
 }
@@ -133,7 +134,13 @@ int clientThread()
 {
     while (!init)
         std::cout << "init" << std::endl;
-    std::thread recv(recvThread);
+    std::thread recv;
+    if (current_player != -1)
+        recv = std::thread(recvThread);
+    else
+    {
+        return 0;
+    }
     while (!glfwWindowShouldClose(control->window))
     {
         SyncPackage *package = new PlayerSyncPackage(&control->players[current_player]);
