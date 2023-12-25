@@ -9,7 +9,7 @@
 #include <sync.hpp>
 #include <winsock2.h>
 
-int current_player = 1;
+int current_player = -1;
 
 static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
@@ -271,8 +271,8 @@ void Control::handleKeyInput(int key, int action)
                 if (cnt_1 >= 5)
                 {
                     players[PLAYER_ID].rebirth();
-                    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_PLAYER_REBIRTH, &PLAYER_ID);
-                    funcSyncPackage.send(sock);
+                    // FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_PLAYER_REBIRTH, &PLAYER_ID);
+                    // funcSyncPackage.send(sock);
                     cnt_1 = 0;
                 }
             }

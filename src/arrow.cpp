@@ -495,7 +495,7 @@ bool ArrowManager::fire(int playerId)
     if (arrowMap.find(playerId) == arrowMap.end())
         return 0;
     Arrow &arrow = arrows[arrowMap[playerId]];
-    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_ARROW_FIRE, &playerId, &arrow.pos, &arrow.dir);
+    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_ARROW_FIRE, &playerId, &arrow.pos, &arrow.dir, &arrow.pressTime);
     if (playerId == PLAYER_ID)
         funcSyncPackage.send(sock);
     std::cout<<"pos: "<<arrow.pos.x<<" "<<arrow.pos.y<<" "<<arrow.pos.z<<std::endl;
@@ -515,10 +515,13 @@ void ArrowManager::fire(FuncSyncPackage &funcSyncPackage)
 {
     int playerId;
     glm::vec3 pos, dir;
-    funcSyncPackage.get(&playerId, &pos, &dir);
+    float pressTime;
+    funcSyncPackage.get(&playerId, &pos, &dir, &pressTime);
     std::cout<<"pos: "<<pos.x<<" "<<pos.y<<" "<<pos.z<<std::endl;
     std::cout<<"dir: "<<dir.x<<" "<<dir.y<<" "<<dir.z<<std::endl;
+    std::cout<<"pressTime: "<<pressTime<<std::endl;
     updateArrow(playerId, pos, dir);
+    arrows[arrowMap[playerId]].pressTime = pressTime;
     fire(playerId);
 }
 
