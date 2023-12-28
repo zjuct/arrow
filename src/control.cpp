@@ -60,13 +60,16 @@ void Control::init()
 
     Player player1;
     player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
-    players.push_back(player1);
+    // players.push_back(player1);
+    players[0] = player1;
     Player player2;
     player2.init("resource/assets/player2/player.obj", glm::vec3(-2.0f, 0.0f, 0.0f));
-    players.push_back(player2);
-    Player player3;
-    player3.init("resource/assets/player2/player.obj", glm::vec3(-3.0f, 0.0f, 0.0f));
-    players.push_back(player3);
+    // players.push_back(player2);
+    players[1] = player2;
+    // Player player3;
+    // player3.init("resource/assets/player2/player.obj", glm::vec3(-3.0f, 0.0f, 0.0f));
+    // players.push_back(player3);
+    // players[PLAYER_ID].init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
     camera.follow(&players[PLAYER_ID]);
 
     ground.init("resource/assets/scene/scene.obj");

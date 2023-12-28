@@ -21,6 +21,7 @@
 #include <grid.h>
 #include <ctime>
 #include <vector>
+#include <map>
 
 #ifdef SAT_TEST
 	#include <sattest.h>
@@ -53,7 +54,7 @@ public:
 	Object skybox_obj;
 
 	// 玩家(跟Player中保持同步)
-	std::vector<Player> players;
+	std::map<int, Player> players;
 
 	// 场景
 	Ground ground;

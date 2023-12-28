@@ -17,7 +17,7 @@ Arrow::Arrow(Object arrow_normal, Object arrow_laser, Object arrow_ground_spike)
     this->arrow_ground_spike = arrow_ground_spike;
 }
 
-void Arrow::draw(Shader* shader)
+void Arrow::draw(Shader *shader)
 {
     if (state == ARROW_DISAPPEAR | state == ARROW_NONE)
         return;
@@ -180,7 +180,7 @@ void Arrow::update(float dt)
             }
         }
         updateModel_obb();
-        for (auto &player : control->players)
+        for (auto &[_, player] : control->players)
         {
             if (player.id == attackerId)
                 continue;
@@ -367,7 +367,7 @@ void ArrowManager::init(const char *objfile)
     }
 }
 
-void ArrowManager::draw(Shader* shader)
+void ArrowManager::draw(Shader *shader)
 {
     for (auto &[_, arrow] : arrows)
     {
@@ -498,8 +498,8 @@ bool ArrowManager::fire(int playerId)
     FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_ARROW_FIRE, &playerId, &arrow.pos, &arrow.dir, &arrow.pressTime);
     if (playerId == PLAYER_ID)
         funcSyncPackage.send(sock);
-    std::cout<<"pos: "<<arrow.pos.x<<" "<<arrow.pos.y<<" "<<arrow.pos.z<<std::endl;
-    std::cout<<"dir: "<<arrow.dir.x<<" "<<arrow.dir.y<<" "<<arrow.dir.z<<std::endl;
+    std::cout << "pos: " << arrow.pos.x << " " << arrow.pos.y << " " << arrow.pos.z << std::endl;
+    std::cout << "dir: " << arrow.dir.x << " " << arrow.dir.y << " " << arrow.dir.z << std::endl;
     bool t = arrows[arrowMap[playerId]].fire();
     // std::cout << "fire time: " << pressTime << std::endl;
     // std::cout << "playerId: " << playerId << std::endl;
@@ -517,9 +517,9 @@ void ArrowManager::fire(FuncSyncPackage &funcSyncPackage)
     glm::vec3 pos, dir;
     float pressTime;
     funcSyncPackage.get(&playerId, &pos, &dir, &pressTime);
-    std::cout<<"pos: "<<pos.x<<" "<<pos.y<<" "<<pos.z<<std::endl;
-    std::cout<<"dir: "<<dir.x<<" "<<dir.y<<" "<<dir.z<<std::endl;
-    std::cout<<"pressTime: "<<pressTime<<std::endl;
+    std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+    std::cout << "dir: " << dir.x << " " << dir.y << " " << dir.z << std::endl;
+    std::cout << "pressTime: " << pressTime << std::endl;
     updateArrow(playerId, pos, dir);
     arrows[arrowMap[playerId]].pressTime = pressTime;
     fire(playerId);
@@ -568,8 +568,6 @@ void ArrowManager::deleteArrow(int playerId)
         arrowMap.erase(playerId);
     }
 }
-
-
 
 ArrowSyncPackage::ArrowSyncPackage(Arrow *arrow)
 {

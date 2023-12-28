@@ -72,9 +72,6 @@ int main(int argc, char **argv)
     // 渲染循环
     while (!glfwWindowShouldClose(control->window))
     {
-        updateMutex.lock();
-        glfwPollEvents();
-        // std::cout << "BackendMain" << std::endl;
 
         float currenttime = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() - beginTime) / 1000000000.0f;
         // float currenttime = glfwGetTime();
@@ -87,7 +84,8 @@ int main(int argc, char **argv)
         }
         control->dt = currenttime - control->oldTime;
         control->oldTime = currenttime;
-
+        updateMutex.lock();
+        glfwPollEvents();
         ui->update();
         if (ui->gstate == GLOBAL_GAME)
         {
@@ -102,21 +100,23 @@ int main(int argc, char **argv)
                 control->arrowMgr->updateArrow(i, control->players[i].getWeaponPos(), control->players[i].front);
             }
             // control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
-//            updateMutex.unlock();
-//            updateMutex.lock();
+            updateMutex.unlock();
+            std::this_thread::yield();
+            updateMutex.lock();
             control->arrowMgr->update(control->dt);
-//            updateMutex.unlock();
-//            updateMutex.lock();
+            updateMutex.unlock();
+            std::this_thread::yield();
+            updateMutex.lock();
             control->candyMgr->update(control->dt);
         }
         updateMutex.unlock();
-        if (ui->gstate == GLOBAL_INIT)
-        {
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-        }
-
-        // std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-        std::cout << "fps: " << 1.0f / control->dt << std::endl;
+        // if (ui->gstate == GLOBAL_INIT)
+        // {
+        //     std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+        // }
+        std::this_thread::sleep_for(std::chrono::microseconds(1000));
+        std::this_thread::yield();
+        // std::cout << "fps: " << 1.0f / control->dt << std::endl;
     }
     frontend.join();
 

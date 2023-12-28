@@ -279,8 +279,8 @@ void Button::handleMouseMove(double xposIn, double yposIn)
     if (xpos > position.x && xpos < position.x + width &&
         ypos < position.y && ypos > position.y - height)
     {
-      state = BUTTON_ON;
-    //   std::cout << "set button on" << std::endl;
+        state = BUTTON_ON;
+        //   std::cout << "set button on" << std::endl;
     }
     else
         state = BUTTON_OFF;
@@ -409,7 +409,7 @@ void UI::updateModel()
     switch (gstate)
     {
     case GLOBAL_GAME:
-        for (auto &player : control->players)
+        for (auto &[_, player] : control->players)
             player.updateModel();
         control->arrowMgr->updateModel();
         control->candyMgr->updateModel();
@@ -420,7 +420,7 @@ void UI::updateModel()
     }
 }
 
-void UI::draw(Shader* shader)
+void UI::draw(Shader *shader)
 {
 
     shader->use();
@@ -428,13 +428,13 @@ void UI::draw(Shader* shader)
     {
     case GLOBAL_GAME:
         control->ground.draw(shader);
-        for (auto &player : control->players)
+        for (auto &[_, player] : control->players)
             player.draw(shader);
         control->arrowMgr->draw(shader);
         control->candyMgr->draw(shader);
-//        for(Obb* obb: control->grid.obbs) {
-//            obb->drawLine(segment_shader);
-//        }
+        //        for(Obb* obb: control->grid.obbs) {
+        //            obb->drawLine(segment_shader);
+        //        }
         aim.draw(flat_shader);
         break;
 
