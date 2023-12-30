@@ -21,8 +21,8 @@ class Arrow;
 class Player
 {
 public:
-    Player();
-    Player(const char *objfile, glm::vec3 position, int id);
+    Player(int id = -1);
+    // Player(const char *objfile, glm::vec3 position, int id);
     ~Player();
 
     void init(const char *objfile, glm::vec3 position, int id);
@@ -117,6 +117,7 @@ public:
     float hp = 100.0f;
     int exp = 0;
     int level = 1;
+    int inited = 0;
 
 private:
     bool checkBlocked(enum intersectType type);

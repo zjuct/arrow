@@ -32,7 +32,7 @@ bool gladinit = false;
 void Control::init()
 {
     srand((unsigned)time(NULL));
-    
+
     glfwMakeContextCurrent(window);
 
     // 初始化GLAD
@@ -49,7 +49,6 @@ void Control::init()
 
     // 初始化视口
     glViewport(0, 0, control->wwidth, control->wheight);
-
 
     Shader::initShader();
 
@@ -71,7 +70,7 @@ void Control::init()
     // players.push_back(player3);
     players[PLAYER_ID].init(PLAYER_OBJECT_PATH, glm::vec3(-1.0f, 0.0f, 0.0f), PLAYER_ID);
     camera.follow(PLAYER_ID, &players);
-    std::cout<<"[DEBUG] Player "<<PLAYER_ID<<" initialized."<<std::endl;
+    std::cout << "[DEBUG] Player " << PLAYER_ID << " initialized." << std::endl;
 
     ground.init("resource/assets/scene/scene.obj");
 
@@ -96,7 +95,7 @@ void Control::init()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // 绑定depthMap到depthMapFBO
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -104,7 +103,7 @@ void Control::init()
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
+
     gladinit = true;
 }
 
@@ -309,6 +308,18 @@ void Control::handleScroll(double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
+void Control::initNewPlayer()
+{
+    for (auto &player : players)
+    {
+        if (player.second.inited == 0)
+        {
+            player.second.init(PLAYER_OBJECT_PATH, player.second.position, player.second.id);
+            std::cout << "[DEBUG] Player " << player.second.id << " initialized." << std::endl;
+        }
+    }
+}
+
 std::mutex updateMutex;
 
 auto oldtime = std::chrono::system_clock::now();
@@ -335,6 +346,7 @@ int FrontendMain()
 
         // 锁定，将当前状态保存到局部
         updateMutex.lock();
+        control->initNewPlayer();
         ui->updateModel();
 
         glm::mat4 lightProjection, lightView;
@@ -400,7 +412,7 @@ int FrontendMain()
 #if PCF_ENABLE
         shadow_shader->setBool("PCF_enable", true);
 #endif
-        control->dirLight.configShader(shadow_shader);      // TODO: 互斥
+        control->dirLight.configShader(shadow_shader); // TODO: 互斥
         ui->draw(shadow_shader);
 #else
         default_shader->use();

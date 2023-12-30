@@ -38,6 +38,7 @@ public:
 	// 单例模式
 	static Control* getInstance();
 	void init();
+	void initNewPlayer();
 
 	void handleMousePress(int button, int action);
 	void handleMouseMove(double xposIn, double yposIn);

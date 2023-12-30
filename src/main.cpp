@@ -93,11 +93,17 @@ int main(int argc, char **argv)
             // control->players[ANOTHER_PLAYER_ID].update(control->dt);
             control->camera.updateCamera();
             control->arrowMgr->updateArrow(PLAYER_ID, control->players[PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[PLAYER_ID].getWeaponPos()));
-            for (int i = 0; i < control->players.size(); i++)
+            // for (int i = 0; i < control->players.size(); i++)
+            // {
+            //     if (i == PLAYER_ID)
+            //         continue;
+            //     control->arrowMgr->updateArrow(i, control->players[i].getWeaponPos(), control->players[i].front);
+            // }
+            for (auto &[id, player] : control->players)
             {
-                if (i == PLAYER_ID)
+                if (id == PLAYER_ID)
                     continue;
-                control->arrowMgr->updateArrow(i, control->players[i].getWeaponPos(), control->players[i].front);
+                control->arrowMgr->updateArrow(id, player.getWeaponPos(), player.front);
             }
             // control->arrowMgr->updateArrow(ANOTHER_PLAYER_ID, control->players[ANOTHER_PLAYER_ID].getWeaponPos(), glm::normalize(control->camera.Position + control->camera.Front * AIM_DISTANCE - control->players[ANOTHER_PLAYER_ID].getWeaponPos()));
             updateMutex.unlock();

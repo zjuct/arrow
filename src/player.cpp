@@ -16,13 +16,9 @@ static CandyManager *candyMgr = CandyManager::getInstance();
 
 extern SOCKET sock;
 
-Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
+Player::Player(int id) : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
 {
-}
-
-Player::Player(const char *objfile, glm::vec3 position, int id) : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
-{
-    init(objfile, position, id);
+    this->id = id;
 }
 
 Player::~Player()
@@ -46,6 +42,7 @@ void Player::init(const char *objfile, glm::vec3 position, int id)
     lleg = Object(OBJECT_MESH, &meshes[4], player_shader);
     rarm = Object(OBJECT_MESH, &meshes[1], player_shader);
     rleg = Object(OBJECT_MESH, &meshes[2], player_shader);
+    inited = 1;
 }
 void Player::rebirth()
 {

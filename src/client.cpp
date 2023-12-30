@@ -44,8 +44,8 @@ void recvThread()
                 break;
             if(!control->players.count(player_package->getId()))
             {
-                control->players[player_package->getId()] = Player();
-                control->players[player_package->getId()].init(PLAYER_OBJECT_PATH, glm::vec3(0.0f, 0.0f, 0.0f), player_package->getId());
+                control->players[player_package->getId()] = Player(player_package->getId());
+                // control->players[player_package->getId()].init(PLAYER_OBJECT_PATH, glm::vec3(0.0f, 0.0f, 0.0f), player_package->getId());
             }
             player_package->update(&control->players[player_package->getId()]);
             // std::cout << "id: " << player_package->getId() << std::endl;
