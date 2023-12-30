@@ -4,6 +4,7 @@
 #include <ray.h>
 #include <sync.hpp>
 #include <vector>
+#include <winsock2.h>
 
 static Control *control = Control::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
@@ -104,6 +105,8 @@ void CandyManager::updateModel()
 extern std::vector<client> clients;
 #endif
 
+extern SOCKET sock;
+
 void CandyManager::update(float dt)
 {
     for (auto &candy : candies)
@@ -173,10 +176,31 @@ void CandyManager::eat(Player &player)
         {
             if (it->candy.intersectWith(player.getBody()) || it->candy.intersectWith(player.getHead()))
             {
-                it->liveTime = 0.0f;
-                player.getCandy(it->type);
-                it->type = CANDY_DISAPPEARING;
+                // it->liveTime = 0.0f;
+                // player.getCandy(it->type);
+                // it->type = CANDY_DISAPPEARING;
+                FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_TOUCH, &player.id, &it->id);
+                funcSyncPackage.send(sock);
             }
         }
     }
 }
+
+int CandyManager::touch(FuncSyncPackage &funcSyncPackage)
+{
+    int player_id;
+    int candy_id;
+    funcSyncPackage.get(&player_id, &candy_id);
+    for(auto it = candies.begin(); it != candies.end(); it++) {
+        if(it->id == candy_id) {
+            it->liveTime = 0.0f;
+            control->players[player_id].getCandy(it->type);
+            it->type = CANDY_DISAPPEARING;
+            break;
+        }
+    }
+    
+    return 0;
+}
+
+int Candy::idCnt = 0;

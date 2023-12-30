@@ -24,6 +24,7 @@ enum FuncType
     FUNC_ARROW_UPDATE,
     FUNC_PLAYER_REBIRTH,
     FUNC_CANDY_GENERATE,
+    FUNC_CANDY_TOUCH,
 };
 
 class SyncPackage

@@ -10,6 +10,7 @@
 #include <vector>
 #include <windows.h>
 #include <winsock2.h>
+#include <candy.hpp>
 
 SOCKET sock;
 using namespace std;
@@ -29,6 +30,7 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 }
 
 static Control *control = Control::getInstance();
+static CandyManager *candyMgr = CandyManager::getInstance();
 
 vector<client> clients;
 mutex clientsMtx;
@@ -162,16 +164,23 @@ void recvThread(int client_id, SOCKET client_sock)
             FuncSyncPackage *func_package = (FuncSyncPackage *)package;
             std::cout << "sync func" << std::endl;
             std::cout << func_package->getFuncType() << std::endl;
-            clientsMtx.lock();
-            for (int i = 0; i < clients.size(); i++)
+            if (func_package->getFuncType() == FUNC_CANDY_TOUCH)
             {
-                if (clients[i].id != client_id)
-                {
-                    func_package->send(clients[i].sock);
-                    break;
-                }
+                int ret = candyMgr->touch(*func_package);
             }
-            clientsMtx.unlock();
+            else
+            {
+                clientsMtx.lock();
+                for (int i = 0; i < clients.size(); i++)
+                {
+                    if (clients[i].id != client_id)
+                    {
+                        func_package->send(clients[i].sock);
+                        break;
+                    }
+                }
+                clientsMtx.unlock();
+            }
         }
     }
 }

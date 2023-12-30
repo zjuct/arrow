@@ -104,7 +104,7 @@ void Player::jump()
     //	std::cout << "jump" << std::endl;
     if (jumpTime <= 0)
         return;
-    if(state == PLAYER_DEAD)
+    if (state == PLAYER_DEAD)
         return;
     --jumpTime;
     jumpSpeed = 1.0f * jumpHeight;
@@ -146,7 +146,7 @@ void Player::updatePlayerVectors()
     this->up = glm::normalize(glm::cross(right, front));
 }
 
-void Player::draw(Shader* shader)
+void Player::draw(Shader *shader)
 {
     //    head.getObb()->drawFlag = true;
     //    body.getObb()->drawFlag = true;
@@ -240,7 +240,6 @@ void Player::updatey(float dt)
 void Player::update(float dt)
 {
     processKeyboard();
-    candyMgr->eat(*this);
     switch (this->state)
     {
     case PLAYER_STILL:
@@ -306,6 +305,7 @@ void Player::update(float dt)
         position.y = FLOOR_Y;
         jumpTime = maxJumpTime;
     }
+    candyMgr->eat(*this);
     // if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
     // {
     // 	jumpSpeed = 0.0f;
@@ -405,7 +405,7 @@ void Player::updateModel_obb()
 
 void Player::fire()
 {
-    if(state == PLAYER_DEAD)
+    if (state == PLAYER_DEAD)
         return;
     if (arrowMgr->fire(PLAYER_ID))
         fireTime = 1.0f;
@@ -427,7 +427,7 @@ void Player::getCandy(CandyType type)
 void Player::getHit(const Arrow &arrow)
 {
     std::cout << "id: " << id << " hp: " << hp << std::endl;
-    if(id == arrow.attackerId || id != PLAYER_ID)
+    if (id == arrow.attackerId || id != PLAYER_ID)
         return;
     hp -= arrow.speed * arrow.damage;
     if (hp <= 0)
@@ -466,17 +466,20 @@ void PlayerSyncPackage::update(Player *player)
     // std::cout<<"update Id: "<<packageId<<std::endl;
     // if (id != packageId)
     //     return;
-    memcpy(&player->position, data, sizeof(glm::vec3));
-    memcpy(&player->front, data + sizeof(glm::vec3), sizeof(glm::vec3));
-    memcpy(&player->right, data + sizeof(glm::vec3) * 2, sizeof(glm::vec3));
-    memcpy(&player->up, data + sizeof(glm::vec3) * 3, sizeof(glm::vec3));
-    memcpy(&player->yaw, data + sizeof(glm::vec3) * 4, sizeof(float));
-    memcpy(&player->pitch, data + sizeof(glm::vec3) * 4 + sizeof(float), sizeof(float));
+    if (packageId != PLAYER_ID)
+    {
+        memcpy(&player->position, data, sizeof(glm::vec3));
+        memcpy(&player->front, data + sizeof(glm::vec3), sizeof(glm::vec3));
+        memcpy(&player->right, data + sizeof(glm::vec3) * 2, sizeof(glm::vec3));
+        memcpy(&player->up, data + sizeof(glm::vec3) * 3, sizeof(glm::vec3));
+        memcpy(&player->yaw, data + sizeof(glm::vec3) * 4, sizeof(float));
+        memcpy(&player->pitch, data + sizeof(glm::vec3) * 4 + sizeof(float), sizeof(float));
+        memcpy(&player->state, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, sizeof(player->state));
+    }
     memcpy(&player->hp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2, sizeof(int));
     memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
     memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));
     memcpy(&player->id, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, sizeof(int));
-    memcpy(&player->state, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, sizeof(player->state));
 }
 
 int PlayerSyncPackage::getId()

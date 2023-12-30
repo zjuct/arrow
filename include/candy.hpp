@@ -43,6 +43,8 @@ public:
     glm::vec3 pos;
     float rotateDir;
     float scale = 1.0f;
+    int id;
+    static int idCnt;
 
     CandyType type = CANDY_NONE;
     Candy()
@@ -51,6 +53,7 @@ public:
         rotateDir = 0.0f;
         scale = 1.0f;
         type = CANDY_NONE;
+        id = idCnt++;
     }
     Candy(Object &candy, glm::vec3 pos, CandyType type, float rotateDir = 0.0f, float scale = 1.0f)
     : candy(candy)
@@ -59,6 +62,7 @@ public:
         this->type = type;
         this->rotateDir = 1.0f * (rand() % 360);
         this->scale = scale;
+        id = idCnt++;
     }
 
     void draw(Shader* shader);
@@ -90,6 +94,7 @@ public:
     void generateCandy(FuncSyncPackage &package);
 
     void eat(Player &player);
+    int touch(FuncSyncPackage &package);
 };
 
 #endif

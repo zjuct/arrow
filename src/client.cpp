@@ -40,8 +40,8 @@ void recvThread()
         case Sync_Player:
         {
             PlayerSyncPackage *player_package = new PlayerSyncPackage(package);
-            if (player_package->getId() == current_player)
-                break;
+            // if (player_package->getId() == current_player)
+            //     break;
             if(!control->players.count(player_package->getId()))
             {
                 control->players[player_package->getId()] = Player(player_package->getId());
