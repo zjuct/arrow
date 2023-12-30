@@ -22,9 +22,10 @@ class Player
 {
 public:
     Player();
+    Player(const char *objfile, glm::vec3 position, int id);
     ~Player();
 
-    void init(const char *objfile, glm::vec3 position);
+    void init(const char *objfile, glm::vec3 position, int id);
 
     void processKeyboard();
     void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
@@ -37,7 +38,7 @@ public:
         PLAYER_DEAD,
     };
 
-    void draw(Shader* shader);
+    void draw(Shader *shader);
     void updateModel();
     void update(float dt);
 

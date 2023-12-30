@@ -40,7 +40,7 @@ public:
             delete[] data;
     }
 
-    void send(SOCKET sock)
+    int send(SOCKET sock)
     {
         char sendbuf[16];
         memcpy(sendbuf, (char *)&type, sizeof(SyncType));
@@ -56,6 +56,7 @@ public:
         {
             std::cout << "Error: " << WSAGetLastError() << std::endl;
         }
+        return ret;
     }
 
     // void broadcast(std::vector<client> socks)

@@ -9,7 +9,7 @@
 #include <sync.hpp>
 #include <winsock2.h>
 
-int current_player = -1;
+int current_player = DEFAULT_PLAYER_ID;
 
 static Control *control = Control::getInstance();
 static UI *ui = UI::getInstance();
@@ -58,19 +58,20 @@ void Control::init()
     skybox_obj = Object(OBJECT_BOX, &skybox, skybox_shader, skybox_model);
     skybox_obj.material.skybox_texname = "resource/assets/skybox_zjg";
 
-    Player player1;
-    player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
+    // Player player1;
+    // player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
     // players.push_back(player1);
-    players[0] = player1;
-    Player player2;
-    player2.init("resource/assets/player2/player.obj", glm::vec3(-2.0f, 0.0f, 0.0f));
+    // players[0] = player1;
+    // Player player2;
+    // player2.init("resource/assets/player2/player.obj", glm::vec3(-2.0f, 0.0f, 0.0f));
     // players.push_back(player2);
-    players[1] = player2;
+    // players[1] = player2;
     // Player player3;
     // player3.init("resource/assets/player2/player.obj", glm::vec3(-3.0f, 0.0f, 0.0f));
     // players.push_back(player3);
-    // players[PLAYER_ID].init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
-    camera.follow(&players[PLAYER_ID]);
+    players[PLAYER_ID].init(PLAYER_OBJECT_PATH, glm::vec3(-1.0f, 0.0f, 0.0f), PLAYER_ID);
+    camera.follow(PLAYER_ID, &players);
+    std::cout<<"[DEBUG] Player "<<PLAYER_ID<<" initialized."<<std::endl;
 
     ground.init("resource/assets/scene/scene.obj");
 
@@ -283,7 +284,7 @@ void Control::handleKeyInput(int key, int action)
         if (key == GLFW_KEY_M)
         {
             current_player = (current_player ^ 1);
-            camera.follow(&players[PLAYER_ID]);
+            camera.follow(current_player, &players);
         }
         static int cnt_1 = 0;
         if (key == GLFW_KEY_1)

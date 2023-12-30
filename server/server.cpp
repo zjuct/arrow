@@ -4,12 +4,12 @@
 #include <map>
 #include <mutex>
 #include <player.h>
+#include <server.hpp>
 #include <sync.hpp>
 #include <thread>
 #include <vector>
 #include <windows.h>
 #include <winsock2.h>
-#include <server.hpp>
 
 SOCKET sock;
 using namespace std;
@@ -42,7 +42,6 @@ void sendThread()
 
     while (true)
     {
-        
 
         if (exit_flag)
         {
@@ -67,7 +66,14 @@ void sendThread()
             SyncPackage *package = new PlayerSyncPackage(&player.second);
             for (int j = 0; j < clients.size(); j++)
             {
-                package->send(clients[j].sock);
+                int ret = package->send(clients[j].sock);
+                if (ret == SOCKET_ERROR)
+                {
+                    std::cout << "Error: " << WSAGetLastError() << std::endl;
+                    clients.erase(clients.begin() + j);
+                    j--;
+                    continue;
+                }
                 // std::cout << "send to " << j << std::endl;
             }
         }
@@ -76,7 +82,14 @@ void sendThread()
             SyncPackage *package = new ArrowSyncPackage(&arrow.second);
             for (int j = 0; j < clients.size(); j++)
             {
-                package->send(clients[j].sock);
+                int ret = package->send(clients[j].sock);
+                if (ret == SOCKET_ERROR)
+                {
+                    std::cout << "Error: " << WSAGetLastError() << std::endl;
+                    clients.erase(clients.begin() + j);
+                    j--;
+                    continue;
+                }
                 // std::cout << "send to " << j << std::endl;
             }
         }

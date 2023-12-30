@@ -5,8 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "player.h"
 #include "defs.h"
-
 #include <vector>
+#include <map>
 
 // Default camera values
 const float YAW = -90.0f;
@@ -28,7 +28,9 @@ public:
     // camera options
     float Zoom;
 
-    Player *player;
+    // Player *player;
+    int playerIndex;
+    std::map<int, Player> *players;
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f))
@@ -54,17 +56,23 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
-    void follow(Player *player)
+    void follow(int playerIndex, std::map<int, Player> *players)
     {
-        this->player = player;
+        this->playerIndex = playerIndex;
+        this->players = players;
+    }
+
+    Player& getPlayer()
+    {
+        return (*players)[playerIndex];
     }
 
     void updateCamera()
     {
         glm::vec3 offset = CAMERA_TO_PLAYER_OFFSET;
-        glm::vec3 position = player->position;
-        glm::vec3 front = player->front;
-        glm::vec3 right = player->right;
+        glm::vec3 position = getPlayer().position;
+        glm::vec3 front = getPlayer().front;
+        glm::vec3 right = getPlayer().right;
         glm::vec3 offsetRight = CAMERA_TO_PLAYER_OFFSET_RIGHT * right;
         // this->Position = // - ((2.5f - front.y) * front);
         this->Front = front;

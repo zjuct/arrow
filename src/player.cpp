@@ -20,14 +20,20 @@ Player::Player() : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), ya
 {
 }
 
+Player::Player(const char *objfile, glm::vec3 position, int id) : position(glm::vec3(0.0f)), speed(2.5f), sensitivity(0.1f), yaw(-90.0f), pitch(0.0f), lastyaw(-90.0f)
+{
+    init(objfile, position, id);
+}
+
 Player::~Player()
 {
 }
 
-void Player::init(const char *objfile, glm::vec3 position)
+void Player::init(const char *objfile, glm::vec3 position, int id)
 {
     static int cnt = 0;
-    id = cnt++;
+    // id = cnt++;
+    this->id = id;
     this->position = position;
     jumpSpeed = 0.0f;
     updatePlayerVectors();
