@@ -64,12 +64,18 @@ bool TextureMgr::load_2D(const std::string& file) {
 
 bool TextureMgr::load_CubeMap(const std::string& path) {
     std::vector<std::string> faces = {
-        "/right.jpg",
-        "/left.jpg",
-        "/top.jpg",
-        "/bottom.jpg",
-        "/front.jpg",
-        "/back.jpg",
+//        "/right.jpg",
+//        "/left.jpg",
+//        "/top.jpg",
+//        "/bottom.jpg",
+//        "/front.jpg",
+//        "/back.jpg",
+        "/posx.jpg",
+        "/negx.jpg",
+        "/posy.jpg",
+        "/negy.jpg",
+        "/posz.jpg",
+        "/negz.jpg",
     };
     unsigned int texture;
     glGenTextures(1, &texture);

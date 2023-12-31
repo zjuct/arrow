@@ -1,6 +1,7 @@
 #include <objLoader.hpp>
 #include <texturemgr.hpp>
 #include <material.h>
+#include <defs.h>
 
 #include <iostream>
 #include <map>
@@ -53,7 +54,7 @@ TODO: 增加对Mesh内包含不同形状face的支持
 */
 bool commitMesh(const std::string& name, const std::vector<index_t>& indices,
     unsigned int vertex_per_face, tuple_type type, int material,
-    std::vector<Mesh>& meshes, attrib_t* attrib, bool triangulate = true) {
+    std::vector<Mesh>& meshes, attrib_t* attrib, Scene* scene, bool triangulate = true) {
     if(indices.empty())
         return true;
 
@@ -142,9 +143,11 @@ bool commitMesh(const std::string& name, const std::vector<index_t>& indices,
         }
         
         vertex_per_face = 3;
-        meshes.push_back(Mesh(name, tri_indices, vertex_per_face, type, material, attrib));
+        meshes.push_back(Mesh(name, tri_indices, vertex_per_face, type, material, attrib, scene));
+        meshes.back().setupMesh();
     } else {
-        meshes.push_back(Mesh(name, indices, vertex_per_face, type, material, attrib));
+        meshes.push_back(Mesh(name, indices, vertex_per_face, type, material, attrib, scene));
+        meshes.back().setupMesh();
     }
     return true;
 }
@@ -339,8 +342,31 @@ bool loadmtl(const std::string& file, const std::string& basedir, std::vector<ma
     return true;
 }
 
-Scene* Scene::LoadObj(std::string file) {
+Scene* Scene::LoadObj(std::string file, bool PRT, std::string SHL, std::string SHLT) {
     Scene* s = new Scene();
+    s->PRT = false;
+
+#if PRT_ENABLE
+    if(PRT) {
+        s->PRT = PRT;
+        std::ifstream ifs(SHL);
+        if(!ifs.is_open()) {
+            std::cerr << "[ERROR] Can not open file " << SHL << std::endl;
+        }
+        while(!ifs.eof()) {
+            float r, g, b;
+            ifs >> r >> g >> b;
+            s->SHL[0].push_back(r);
+            s->SHL[1].push_back(g);
+            s->SHL[2].push_back(b);
+        }
+        
+        s->SHLT = std::ifstream(SHLT);
+        if(!s->SHLT) {
+            std::cerr << "[ERROR] Can not open file " << SHLT << std::endl;
+        }
+    }
+#endif
 
     attrib_t& attrib = s->attrib;
     std::vector<Mesh>& meshes = s->meshes;
@@ -497,7 +523,7 @@ Scene* Scene::LoadObj(std::string file) {
             }
 
             if(new_material != material) {
-                if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib)) {
+                if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib, s)) {
                     std::cerr << "[ERROR] " << file << ":" << lineno << " Failed to commit mesh" << std::endl;
                 }
                 indices.clear();
@@ -531,7 +557,7 @@ Scene* Scene::LoadObj(std::string file) {
         // object name
         if(op == "o" || op == "g") {
             // commit faces to meshes
-            if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib)) {
+            if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib, s)) {
                 std::cerr << "[ERROR] " << file << ":" << lineno << " Failed to commit mesh" << std::endl;
             }
             indices.clear();
@@ -545,16 +571,21 @@ Scene* Scene::LoadObj(std::string file) {
     }
     
     // commit last mesh
-    if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib)) {
+    if(!commitMesh(name, indices, vertices_per_face, type, material, meshes, &attrib, s)) {
         std::cerr << "[ERROR] " << file << ":" << lineno << " Failed to commit mesh" << std::endl;
     }
 //    Scene* s = new Scene(attrib, meshes, materials);
     for(int i = 0; i < s->meshes.size(); i++) {
         s->meshes[i].setScene(s);
     }
+
+
     return s;
 }
 
+#define SHOrder 2
+
+int cnt = 0;
 void Mesh::setupMesh() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -562,55 +593,125 @@ void Mesh::setupMesh() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    std::vector<float> buf;
-    for(int i = 0; i < indices.size(); i++) {
-        // 注意.obj的下标是1开始
-        buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3]);
-        buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3 + 1]);
-        buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3 + 2]);
-        
-        if(indices[i].nid > 0) {
+//    std::vector<float> buf;
+
+    if(scene->PRTenable()) {
+        int SHCoeffCount = 9;
+        for(int i = 0; i < indices.size(); i++) {
+            buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3]);
+            buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3 + 1]);
+            buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3 + 2]);
             buf.push_back(attrib->normals[(indices[i].nid - 1) * 3]);
             buf.push_back(attrib->normals[(indices[i].nid - 1) * 3 + 1]);
             buf.push_back(attrib->normals[(indices[i].nid - 1) * 3 + 2]);
-        }
-
-        if(indices[i].tcid > 0) {
             buf.push_back(attrib->texcoords[(indices[i].tcid - 1) * 2]);
             buf.push_back(attrib->texcoords[(indices[i].tcid - 1) * 2 + 1]);
+            
+            for(int k = 0; k < 3; k++) {
+                for(int j = 0; j < SHCoeffCount; j++) {
+                    float shcoeff;
+                    scene->SHLTstream() >> shcoeff;
+                    buf.push_back(shcoeff);
+                }
+            }
+//            std::cout << ++cnt << std::endl;
+
         }
-    }
+        glBufferData(GL_ARRAY_BUFFER, buf.size() * sizeof(float), &buf[0], GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);   
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);   
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);  
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(8 * sizeof(float)));
+        glEnableVertexAttribArray(3);   
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(11 * sizeof(float)));
+        glEnableVertexAttribArray(4);   
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(14 * sizeof(float)));
+        glEnableVertexAttribArray(5);   
+//        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)0);
+//        glEnableVertexAttribArray(0);   
+//        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(3 * sizeof(float)));
+//        glEnableVertexAttribArray(1);   
+//        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(6 * sizeof(float)));
+//        glEnableVertexAttribArray(2);  
+//        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(8 * sizeof(float)));
+//        glEnableVertexAttribArray(3);   
+//        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(11 * sizeof(float)));
+//        glEnableVertexAttribArray(4);   
+//        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(14 * sizeof(float)));
+//        glEnableVertexAttribArray(5);   
+//
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(17 * sizeof(float)));
+        glEnableVertexAttribArray(6);   
+        glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(20 * sizeof(float)));
+        glEnableVertexAttribArray(7);   
+        glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(23 * sizeof(float)));
+        glEnableVertexAttribArray(8);   
 
-    glBufferData(GL_ARRAY_BUFFER, buf.size() * sizeof(float), &buf[0], GL_STATIC_DRAW);
+        glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(26 * sizeof(float)));
+        glEnableVertexAttribArray(9);   
+        glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(29 * sizeof(float)));
+        glEnableVertexAttribArray(10);   
+        glVertexAttribPointer(11, 3, GL_FLOAT, GL_FALSE, (8 + 27) * sizeof(float), (void*)(32 * sizeof(float)));
+        glEnableVertexAttribArray(11);   
+//        glVertexAttribPointer(3, SHCoeffCount, GL_FLOAT, GL_FALSE, (8 + 3 * SHCoeffCount) * sizeof(float), (void*)(8 * sizeof(float)));
+//        glEnableVertexAttribArray(3);   
+//        glVertexAttribPointer(4, SHCoeffCount, GL_FLOAT, GL_FALSE, (8 + 3 * SHCoeffCount) * sizeof(float), (void*)((8 + SHCoeffCount) * sizeof(float)));
+//        glEnableVertexAttribArray(4);   
+//        glVertexAttribPointer(5, SHCoeffCount, GL_FLOAT, GL_FALSE, (8 + 3 * SHCoeffCount) * sizeof(float), (void*)((8 + 2 * SHCoeffCount) * sizeof(float)));
+//        glEnableVertexAttribArray(5);   
+    } else {
+        for(int i = 0; i < indices.size(); i++) {
+            // 注意.obj的下标是1开始
+            buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3]);
+            buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3 + 1]);
+            buf.push_back(attrib->vertices[(indices[i].vid - 1) * 3 + 2]);
+            
+            if(indices[i].nid > 0) {
+                buf.push_back(attrib->normals[(indices[i].nid - 1) * 3]);
+                buf.push_back(attrib->normals[(indices[i].nid - 1) * 3 + 1]);
+                buf.push_back(attrib->normals[(indices[i].nid - 1) * 3 + 2]);
+            }
 
-    // TODO: 设置has_normal, has_tex uniform变量
-    switch(type) {
-        case TUPLE_V:
-            glEnableVertexAttribArray(0);   
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-            break;
-        case TUPLE_V_VN:
-            glEnableVertexAttribArray(0);   
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);   
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-            break;
-        case TUPLE_V_VT_VN:
-            glEnableVertexAttribArray(0);   
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);   
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(2);   
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-            break;
-        case TUPLE_V_VT:
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);   
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(2);   
-            break;
-        default:
-            break;
+            if(indices[i].tcid > 0) {
+                buf.push_back(attrib->texcoords[(indices[i].tcid - 1) * 2]);
+                buf.push_back(attrib->texcoords[(indices[i].tcid - 1) * 2 + 1]);
+            }
+        }
+
+        glBufferData(GL_ARRAY_BUFFER, buf.size() * sizeof(float), &buf[0], GL_STATIC_DRAW);
+
+        // TODO: 设置has_normal, has_tex uniform变量
+        switch(type) {
+            case TUPLE_V:
+                glEnableVertexAttribArray(0);   
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+                break;
+            case TUPLE_V_VN:
+                glEnableVertexAttribArray(0);   
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(1);   
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+                break;
+            case TUPLE_V_VT_VN:
+                glEnableVertexAttribArray(0);   
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(1);   
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(2);   
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+                break;
+            case TUPLE_V_VT:
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);   
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);   
+                break;
+            default:
+                break;
+        }
     }
     glBindVertexArray(0);
 }

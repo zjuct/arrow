@@ -16,7 +16,6 @@ class Ground {
     return model;
   }
 
-  private:
   Scene *obj;
   Object model;
 };

@@ -5,7 +5,7 @@ Ground::Ground() {}
 Ground::~Ground() {}
 
 void Ground::init(const char* objectfile) {
-  obj = Scene::LoadObj(objectfile);
+  obj = Scene::LoadObj(objectfile, true, "resource/assets/CornellBox/lighting.txt", "resource/assets/CornellBox/lighttransport.txt");
   model = Object(OBJECT_NONE, nullptr, nullptr, glm::mat4(1.0),
                   nullptr, false);
   for (auto& mesh : obj->getMesh()) {

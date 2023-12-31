@@ -10,6 +10,7 @@ Shader* flat_shader = nullptr;
 Shader* shadowmap_shader = nullptr;
 Shader* shadow_shader = nullptr;
 Shader* debug_shader = nullptr;
+Shader* prt_shader = nullptr;
 
 void Shader::initShader() {
     default_shader = new Shader("resource/shader/default/vs.glsl", "resource/shader/default/fs.glsl");
@@ -21,6 +22,7 @@ void Shader::initShader() {
     shadowmap_shader = new Shader("resource/shader/shadowmap/vs.glsl", "resource/shader/shadowmap/fs.glsl");
     shadow_shader = new Shader("resource/shader/shadow/vs.glsl", "resource/shader/shadow/fs.glsl");
     debug_shader = new Shader("resource/shader/debug_quad/vs.glsl", "resource/shader/debug_quad/fs.glsl");
+    prt_shader = new Shader("resource/shader/prt/vs.glsl", "resource/shader/prt/fs.glsl");
 
     player_shader = default_shader;
 }
@@ -143,6 +145,10 @@ void Shader::setFloat(const std::string &name, float value) const {
 
 void Shader::setmat4fv(const std::string &name, int transpose, GLfloat* value) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, transpose, value);
+}
+
+void Shader::setmat3fv(const std::string &name, int transpose, GLfloat* value) const {
+    glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, transpose, value);
 }
 
 void Shader::setvec3fv(const std::string &name, GLfloat* value) const {

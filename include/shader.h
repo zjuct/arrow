@@ -25,6 +25,7 @@ public:
     void setInt(const std::string &name, int value) const;   
     void setFloat(const std::string &name, float value) const;
     void setmat4fv(const std::string &name, int transpose, GLfloat* value) const;
+    void setmat3fv(const std::string &name, int transpose, GLfloat* value) const;
     void setvec4fv(const std::string &name, GLfloat* value) const;
     void setvec3fv(const std::string &name, GLfloat* value) const;
     void setvec3(const std::string& name, GLfloat x, GLfloat y, GLfloat z) const;
@@ -40,5 +41,6 @@ extern Shader* flat_shader;
 extern Shader* shadowmap_shader;
 extern Shader* shadow_shader;
 extern Shader* debug_shader;
+extern Shader* prt_shader;
 
 #endif

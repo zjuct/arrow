@@ -56,7 +56,7 @@ void Control::init()
     skybox = Box(glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 skybox_model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f));
     skybox_obj = Object(OBJECT_BOX, &skybox, skybox_shader, skybox_model);
-    skybox_obj.material.skybox_texname = "resource/assets/skybox_zjg";
+    skybox_obj.material.skybox_texname = "resource/assets/CornellBox";
 
     Player player1;
     player1.init("resource/assets/player2/player.obj", glm::vec3(-1.0f, 0.0f, 0.0f));
@@ -351,10 +351,20 @@ int FrontendMain()
         segment_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
         segment_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
 
+#if PRT_ENABLE
+        prt_shader->use();
+        prt_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
+        prt_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(view));
+        prt_shader->setmat3fv("PrecomputeL[0]", GL_FALSE, control->ground.obj->getSHL()[0].data());
+        prt_shader->setmat3fv("PrecomputeL[1]", GL_FALSE, control->ground.obj->getSHL()[1].data());
+        prt_shader->setmat3fv("PrecomputeL[2]", GL_FALSE, control->ground.obj->getSHL()[2].data());
+#endif
+
         glm::mat4 sky_view = glm::mat4(glm::mat3(view));
         skybox_shader->use();
         skybox_shader->setmat4fv("projection", GL_FALSE, glm::value_ptr(projection));
         skybox_shader->setmat4fv("view", GL_FALSE, glm::value_ptr(sky_view));
+
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 #if SHADOW_ENABLE
