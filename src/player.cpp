@@ -430,6 +430,8 @@ void Player::getHit(const Arrow &arrow)
     if (id == arrow.attackerId || id != PLAYER_ID)
         return;
     hp -= arrow.speed * arrow.damage;
+    // if (!checkBlocked(INTERSECT_SOMETHING))
+    //     position += arrow.speed * arrow.damage * arrow.dir * 0.01f;
     if (hp <= 0)
     {
         hp = 0;
@@ -462,7 +464,7 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
 void PlayerSyncPackage::update(Player *player)
 {
     // int id = player->id;
-    int packageId = *(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3);
+    int packageId = getId();
     // std::cout<<"update Id: "<<packageId<<std::endl;
     // if (id != packageId)
     //     return;
@@ -476,6 +478,7 @@ void PlayerSyncPackage::update(Player *player)
         memcpy(&player->pitch, data + sizeof(glm::vec3) * 4 + sizeof(float), sizeof(float));
         memcpy(&player->state, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, sizeof(player->state));
     }
+
     memcpy(&player->hp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2, sizeof(int));
     memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
     memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));

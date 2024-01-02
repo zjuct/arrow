@@ -126,7 +126,7 @@ void CandyManager::update(float dt)
         }
     }
 #ifdef SERVER  
-    std::cout<<"size:"<<candies.size()<<std::endl;
+    // std::cout<<"size:"<<candies.size()<<std::endl;
     generateTime -= dt;
     if (generateTime <= 0.0f)
     {
@@ -145,8 +145,10 @@ void CandyManager::generateCandy(FuncSyncPackage &funcSyncPackage)
 {
     glm::vec3 pos;
     CandyType type;
-    funcSyncPackage.get(&pos, &type);
+    int id;
+    funcSyncPackage.get(&pos, &type, &id);
     candies.emplace_back(model, pos, type, 0.0f, 1.0f);
+    candies.back().id = id;
 }
 
 void CandyManager::generateCandy()
@@ -161,7 +163,7 @@ void CandyManager::generateCandy()
     CandyType type = (CandyType)(CANDY_NORMAL);
     generateCandy(pos, type);
 #ifdef SERVER
-    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_GENERATE, &pos, &type);
+    FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_GENERATE, &pos, &type, &candies.back().id);
     for(int i = 0; i < clients.size(); i++) {
         funcSyncPackage.send(clients[i].sock);
     }
@@ -186,7 +188,7 @@ void CandyManager::eat(Player &player)
     }
 }
 
-int CandyManager::touch(FuncSyncPackage &funcSyncPackage)
+FuncSyncPackage CandyManager::touch(FuncSyncPackage &funcSyncPackage)
 {
     int player_id;
     int candy_id;
@@ -196,11 +198,26 @@ int CandyManager::touch(FuncSyncPackage &funcSyncPackage)
             it->liveTime = 0.0f;
             control->players[player_id].getCandy(it->type);
             it->type = CANDY_DISAPPEARING;
+            FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_EATEN, &it->id);
+            return funcSyncPackage;
             break;
         }
     }
-    
-    return 0;
+    return FuncSyncPackage();
+}
+
+void CandyManager::eaten(FuncSyncPackage &funcSyncPackage)
+{
+    int candy_id;
+    funcSyncPackage.get(&candy_id);
+    // std::cout<<"candy_id:"<<candy_id<<std::endl;
+    for(auto it = candies.begin(); it != candies.end(); it++) {
+        if(it->id == candy_id) {
+            it->liveTime = 0.0f;
+            it->type = CANDY_DISAPPEARING;
+            break;
+        }
+    }
 }
 
 int Candy::idCnt = 0;

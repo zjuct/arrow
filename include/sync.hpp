@@ -8,6 +8,7 @@
 
 enum SyncType
 {
+    Sync_None,
     Sync_Player,
     Sync_Candy,
     Sync_Arrow,
@@ -18,6 +19,7 @@ enum SyncType
 
 enum FuncType
 {
+    FUNC_NONE,
     FUNC_ARROW_BIND,
     FUNC_ARROW_LOAD,
     FUNC_ARROW_FIRE,
@@ -25,6 +27,7 @@ enum FuncType
     FUNC_PLAYER_REBIRTH,
     FUNC_CANDY_GENERATE,
     FUNC_CANDY_TOUCH,
+    FUNC_CANDY_EATEN,
 };
 
 class SyncPackage
@@ -37,8 +40,27 @@ public:
 
     virtual ~SyncPackage()
     {
-        if (data)
+        if (data && size)
             delete[] data;
+    }
+
+    SyncPackage() : type(Sync_None), timestamp(0), size(0), data(nullptr) {}
+    SyncPackage(SyncPackage &package)
+    {
+        type = package.type;
+        timestamp = package.timestamp;
+        size = package.size;
+        data = new char[size];
+        memcpy(data, package.data, size);
+    }
+    SyncPackage(SyncPackage &&package)
+    {
+        type = package.type;
+        timestamp = package.timestamp;
+        size = package.size;
+        data = package.data;
+        package.data = nullptr;
+        package.size = 0;
     }
 
     int send(SOCKET sock)

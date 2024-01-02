@@ -166,7 +166,16 @@ void recvThread(int client_id, SOCKET client_sock)
             std::cout << func_package->getFuncType() << std::endl;
             if (func_package->getFuncType() == FUNC_CANDY_TOUCH)
             {
-                int ret = candyMgr->touch(*func_package);
+                FuncSyncPackage ret = move(candyMgr->touch(*func_package));
+                if(ret.type != Sync_None)
+                {
+                    clientsMtx.lock();
+                    for (int i = 0; i < clients.size(); i++)
+                    {
+                        ret.send(clients[i].sock);
+                    }
+                    clientsMtx.unlock();
+                }
             }
             else
             {
@@ -187,6 +196,7 @@ void recvThread(int client_id, SOCKET client_sock)
 
 int main()
 {
+    current_player = -1;
     WSADATA wsaData;
     int ret = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (ret == SOCKET_ERROR)

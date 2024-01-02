@@ -82,7 +82,7 @@ public:
     Object model;
     std::list<Candy> candies;
 
-    const float generateTimeMax = 10.5f;
+    const float generateTimeMax = 1.0f;
     float generateTime = generateTimeMax;
 
     void update(float dt);
@@ -94,7 +94,8 @@ public:
     void generateCandy(FuncSyncPackage &package);
 
     void eat(Player &player);
-    int touch(FuncSyncPackage &package);
+    void eaten(FuncSyncPackage &package);
+    FuncSyncPackage touch(FuncSyncPackage &package);
 };
 
 #endif

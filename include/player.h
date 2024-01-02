@@ -159,7 +159,7 @@ private:
     int maxLevel = 20;
     int expToLevelUp[20] = {0, 110, 120, 130, 140, 150, 160, 170, 180, 190,
                             200, 210, 220, 230, 240, 250, 260, 270, 280, 290};
-    int candyExp = 10;
+    int candyExp = 20;
 };
 
 #endif

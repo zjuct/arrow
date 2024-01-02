@@ -42,7 +42,7 @@ void recvThread()
             PlayerSyncPackage *player_package = new PlayerSyncPackage(package);
             // if (player_package->getId() == current_player)
             //     break;
-            if(!control->players.count(player_package->getId()))
+            if (!control->players.count(player_package->getId()))
             {
                 control->players[player_package->getId()] = Player(player_package->getId());
                 // control->players[player_package->getId()].init(PLAYER_OBJECT_PATH, glm::vec3(0.0f, 0.0f, 0.0f), player_package->getId());
@@ -99,6 +99,12 @@ void recvThread()
             case FUNC_CANDY_GENERATE:
             {
                 control->candyMgr->generateCandy(*func_package);
+                break;
+            }
+            case FUNC_CANDY_EATEN:
+            {
+                control->candyMgr->eaten(*func_package);
+                break;
             }
             }
         }
