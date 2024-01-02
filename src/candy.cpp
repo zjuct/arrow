@@ -196,9 +196,8 @@ FuncSyncPackage CandyManager::touch(FuncSyncPackage &funcSyncPackage)
     for(auto it = candies.begin(); it != candies.end(); it++) {
         if(it->id == candy_id) {
             it->liveTime = 0.0f;
-            control->players[player_id].getCandy(it->type);
             it->type = CANDY_DISAPPEARING;
-            FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_EATEN, &it->id);
+            FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_EATEN, &player_id, &candy_id);
             return funcSyncPackage;
             break;
         }
@@ -208,11 +207,13 @@ FuncSyncPackage CandyManager::touch(FuncSyncPackage &funcSyncPackage)
 
 void CandyManager::eaten(FuncSyncPackage &funcSyncPackage)
 {
+    int player_id;
     int candy_id;
-    funcSyncPackage.get(&candy_id);
+    funcSyncPackage.get(&player_id, &candy_id);
     // std::cout<<"candy_id:"<<candy_id<<std::endl;
     for(auto it = candies.begin(); it != candies.end(); it++) {
         if(it->id == candy_id) {
+            control->players[player_id].getCandy(it->type);
             it->liveTime = 0.0f;
             it->type = CANDY_DISAPPEARING;
             break;

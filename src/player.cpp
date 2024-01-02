@@ -430,6 +430,20 @@ void Player::getHit(const Arrow &arrow)
     if (id == arrow.attackerId || id != PLAYER_ID)
         return;
     hp -= arrow.speed * arrow.damage;
+    float l = 0.0f, r = 0.01f;
+    for (int checkTime = 3; checkTime--;)
+    {
+        float m = (l + r) / 2.0f;
+        glm::vec3 pos = position + arrow.speed * arrow.damage * arrow.dir * m;
+        std::swap(pos, position);
+        updateModel_obb();
+        if (checkBlocked(INTERSECT_SOMETHING))
+            r = m;
+        else
+            l = m;
+        std::swap(pos, position);
+    }
+    position += arrow.speed * arrow.damage * arrow.dir * l;
     // if (!checkBlocked(INTERSECT_SOMETHING))
     //     position += arrow.speed * arrow.damage * arrow.dir * 0.01f;
     if (hp <= 0)
@@ -477,12 +491,12 @@ void PlayerSyncPackage::update(Player *player)
         memcpy(&player->yaw, data + sizeof(glm::vec3) * 4, sizeof(float));
         memcpy(&player->pitch, data + sizeof(glm::vec3) * 4 + sizeof(float), sizeof(float));
         memcpy(&player->state, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, sizeof(player->state));
-    }
 
-    memcpy(&player->hp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2, sizeof(int));
-    memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
-    memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));
-    memcpy(&player->id, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, sizeof(int));
+        memcpy(&player->hp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2, sizeof(int));
+        memcpy(&player->level, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int), sizeof(int));
+        memcpy(&player->exp, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, sizeof(int));
+        memcpy(&player->id, data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, sizeof(int));
+    }
 }
 
 int PlayerSyncPackage::getId()
