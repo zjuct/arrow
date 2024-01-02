@@ -62,3 +62,6 @@ if(WIN32)
 	set_target_properties(server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
+add_subdirectory(prtbackend)
+set_target_properties(prtbackend PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+

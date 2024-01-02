@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 
 struct attrib_t {
     std::vector<float> vertices;        // v
@@ -30,12 +31,13 @@ class Mesh: public Shape {
 public:
     Mesh(const std::string& _name, const std::vector<index_t>& _indices,
         unsigned int _vertices_per_face, tuple_type _type,
-        int _material, attrib_t* attrib)
+        int _material, attrib_t* attrib, Scene* scene)
         : name(_name), indices(_indices), vertices_per_face(_vertices_per_face),
-          type(_type), material(_material), attrib(attrib) {
+          type(_type), material(_material), attrib(attrib), scene(scene) {
         nrfaces = indices.size() / vertices_per_face;
-        setupMesh();
+//        setupMesh();
     }
+    void setupMesh();
 
     void draw(Shader* shader);
     void setScene(Scene* scene) {
@@ -48,7 +50,6 @@ public:
 
     Obb* getObb();
 private:
-    void setupMesh();
 
     std::string name;
     std::vector<index_t> indices;       // index into Scene::attrib
@@ -59,13 +60,16 @@ private:
     attrib_t* attrib;
     tuple_type type;
     Scene* scene;
+
+
+    std::vector<float> buf;
 };
 
 
 /* LoadObj的返回值 */
 class Scene {
 public:
-    static Scene* LoadObj(std::string file);
+    static Scene* LoadObj(std::string file, bool PRT = false, std::string SHL = "", std::string SHLT = "");
     std::vector<Mesh>& getMesh() {
         return meshes;
     }
@@ -74,6 +78,18 @@ public:
     }
     std::vector<material_t>& getMaterials() {
         return materials;
+    }
+
+    bool PRTenable() {
+        return PRT;
+    }
+
+    std::ifstream& SHLTstream() {
+        return SHLT;
+    }
+
+    std::array<std::vector<float>, 3> getSHL() {
+        return SHL;
     }
 
 private:
@@ -88,6 +104,10 @@ private:
     attrib_t attrib;
     std::vector<Mesh> meshes;
     std::vector<material_t> materials;
+
+    bool PRT;
+    std::array<std::vector<float>, 3> SHL;
+    std::ifstream SHLT;
 };
 
 

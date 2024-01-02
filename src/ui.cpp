@@ -427,6 +427,9 @@ void UI::draw(Shader *shader)
     switch (gstate)
     {
     case GLOBAL_GAME:
+#if PRT_ENABLE
+        control->ground.draw(prt_shader);
+#else
         control->ground.draw(shader);
         for (auto &[_, player] : control->players)
             player.draw(shader);

@@ -43,8 +43,10 @@ extern int current_player;
 
 #define SERVER_PORT (2333)
 
-#define SHADOW_ENABLE 1
-#define PCF_ENABLE 1
+#define SHADOW_ENABLE 0
+#define PCF_ENABLE 0
+
+#define PRT_ENABLE 1
 
 #define PLAYER_OBJECT_PATH "resource/assets/player2/player.obj"
 
