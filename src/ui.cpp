@@ -431,6 +431,7 @@ void UI::draw(Shader *shader)
         control->ground.draw(prt_shader);
 #else
         control->ground.draw(shader);
+#endif
         for (auto &[_, player] : control->players)
             player.draw(shader);
         control->arrowMgr->draw(shader);
