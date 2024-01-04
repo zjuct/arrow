@@ -1,9 +1,17 @@
 #include "ui.hpp"
 #include "control.h"
 #include "ui.hpp"
+#include <ft2build.h>
+#include <sstream>
+#include <string>
+#include FT_FREETYPE_H
 
+extern Shader* text_shader;
 static UI *ui = UI::getInstance();
 static Control *control = Control::getInstance();
+
+unsigned int F_VAO, F_VBO;    // 渲染字体专用
+std::map<GLchar, Character> Characters;
 
 /* ============================= class Aim ================================ */
 
@@ -315,6 +323,130 @@ void Button::draw(Shader *shader)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *)0);
 }
 
+/* ================================ class Text =========================================*/
+void Text::init() {}
+void Text::draw(Shader* shader)
+{
+    GLfloat x = posx;
+    GLfloat y = posy;
+
+    // Activate corresponding render state	
+    shader->use();
+    shader->setvec3fv("textColor", glm::value_ptr(color));
+    glm::mat4 m = glm::mat4(1.0f);
+    shader->setmat4fv("model", GL_FALSE, glm::value_ptr(m));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(F_VAO);
+
+    // Iterate through all characters
+    std::string::const_iterator c;
+    for (c = content.begin(); c != content.end(); c++) 
+    {
+
+        Character ch = Characters[*c];
+
+        GLfloat xpos = x + ch.Bearing.x * scale;
+        GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+        GLfloat w = ch.Size.x * scale;
+        GLfloat h = ch.Size.y * scale;
+        // Update VBO for each character
+        GLfloat vertices[6][4] = {
+            { xpos,     ypos + h,   0.0, 0.0 },            
+            { xpos,     ypos,       0.0, 1.0 },
+            { xpos + w, ypos,       1.0, 1.0 },
+
+            { xpos,     ypos + h,   0.0, 0.0 },
+            { xpos + w, ypos,       1.0, 1.0 },
+            { xpos + w, ypos + h,   1.0, 0.0 }           
+        };
+        // Render glyph texture over quad
+        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+        // Update content of VBO memory
+        glBindBuffer(GL_ARRAY_BUFFER, F_VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // Be sure to use glBufferSubData and not glBufferData
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // Render quad
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+        x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+    }
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+void Text::setText(std::string _text)
+{
+    this->content = _text;
+}
+/* ================================ class Rectangle =====================================*/
+
+void Rectangle::init() {
+    float v[20];
+    v[0] = position.x, v[1] = position.y, v[2] = 0.0f, v[3] = 0.0f, v[4] = 0.0f;
+    v[5] = position.x + width, v[6] = position.y, v[7] = 0.0f, v[8] = 1.0f, v[9] = 0.0f;
+    v[10] = position.x + width, v[11] = position.y - height, v[12] = 0.0f, v[13] = 1.0f, v[14] = 1.0f;
+    v[15] = position.x, v[16] = position.y - height, v[17] = 0.0f, v[18] = 0.0f, v[19] = 1.0f;
+
+    if (has_texture)
+        TextureMgr::getInstance()->load(texname, TEX_2D);
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+void Rectangle::draw(Shader *shader) {
+    glm::mat4 m = glm::mat4(1.0f);
+    float v[20];
+    v[0] = position.x, v[1] = position.y, v[2] = 0.0f, v[3] = 0.0f, v[4] = 0.0f;
+    v[5] = position.x + width, v[6] = position.y, v[7] = 0.0f, v[8] = 1.0f, v[9] = 0.0f;
+    v[10] = position.x + width, v[11] = position.y - height, v[12] = 0.0f, v[13] = 1.0f, v[14] = 1.0f;
+    v[15] = position.x, v[16] = position.y - height, v[17] = 0.0f, v[18] = 0.0f, v[19] = 1.0f;
+    
+    shader->use();
+    shader->setBool("has_texture", has_texture);
+    if (has_texture)
+    {
+        int tex = TextureMgr::getInstance()->gettex(texname, TEX_2D);
+        if (tex < 0)
+        {
+            std::cerr << "[ERROR] No texture." << std::endl;
+        }
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex); // 将纹理数据绑定到纹理单元
+    }
+
+    shader->setvec3fv("color", glm::value_ptr(color));
+    shader->setmat4fv("model", GL_FALSE, glm::value_ptr(m));
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v), v);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (wireFrame)
+    {
+        glPolygonMode(GL_FRONT, GL_LINE);
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
+    }
+    else
+    {
+        glPolygonMode(GL_FRONT, GL_FILL);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+    glPolygonMode(GL_FRONT, GL_FILL);
+}
+
 /* ================================ class UI =================================== */
 
 UI::UI() : gstate(GLOBAL_INIT)
@@ -329,8 +461,6 @@ UI *UI::getInstance() // 在本文件中声明/找到静态单例，然后返回
 
 void UI::handleMousePress(int button, int action)
 {
-    for (auto btn : btns)
-        btn.handleMousePress(button, action);
 
     bt.handleMousePress(button, action);
 
@@ -372,6 +502,27 @@ void UI::handleMouseMove(double xposIn, double yposIn)
 }
 void UI::handleKeyInput(int key, int action)
 {
+    if (levelUp)
+    {
+        if (action == GLFW_PRESS)
+        {
+            if (key == GLFW_KEY_1)
+            {
+                std::cout << "choose 1: do something" << std::endl;
+                levelUp = false;
+            }
+            else if(key == GLFW_KEY_2)
+            {
+                std::cout << "choose 2: do something" << std::endl;
+                levelUp = false;
+            }
+            else if(key == GLFW_KEY_3)
+            {
+                std::cout << "choose 3: do something" << std::endl;
+                levelUp = false;
+            }
+        }
+    }
 }
 void UI::handleScroll(double xoffset, double yoffset)
 {
@@ -379,13 +530,124 @@ void UI::handleScroll(double xoffset, double yoffset)
 
 void UI::init()
 {
+    // FreeType
+    FT_Library ft;
+    // All functions return a value different than 0 whenever an error occurred
+    if (FT_Init_FreeType(&ft))
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+
+    // Load font as face
+    FT_Face face;
+    if (FT_New_Face(ft, "resource/assets/fonts/Antonio-Bold.ttf", 0, &face))
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+
+    // Set size to load glyphs as
+    FT_Set_Pixel_Sizes(face, 0, 48);
+
+    // Disable byte-alignment restriction
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
+
+    // Load first 128 characters of ASCII set
+    for (GLubyte c = 0; c < 128; c++)
+    {
+        // Load character glyph 
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+        {
+            std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+            continue;
+        }
+        // Generate texture
+        GLuint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RED,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            face->glyph->bitmap.buffer
+        );
+        // Set texture options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // Now store character for later use
+        Character character = {
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x
+        };
+        Characters.insert(std::pair<GLchar, Character>(c, character));
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+    // Destroy FreeType once we're finished
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
+
+    // Configure VAO/VBO for texture quads
+    glGenVertexArrays(1, &F_VAO);
+    glGenBuffers(1, &F_VBO);
+    glBindVertexArray(F_VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, F_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    levelUp = false;
     gstate = GLOBAL_INIT;
     glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
     aim.init();
+    option[0] = Text("Option 1: ....", -0.5f, 0.2f, 0.002, glm::vec3(0.95f));
+    option[1] = Text("Option 2: ....", -0.5f, 0.0f, 0.002, glm::vec3(0.95f));
+    option[2] = Text("Option 3: ....", -0.5f, -0.2f, 0.002, glm::vec3(0.95f));
+    blood_1 = Rectangle(glm::vec3(0.4, -0.5, 0), 0.5f, 0.15f, true, glm::vec3(1.0f));
+    blood   = Rectangle(glm::vec3(0.41, -0.51, 0), 0.48f, 0.13f, false, glm::vec3(1.0f));
+    experience_1 = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, true, glm::vec3(1.0f));
+    experience   = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, false, glm::vec3(1.0f, 0.8f, 0.0f));
+    std::stringstream ss;
+    std::string _level;
+    ss << control->players[current_player].level;
+    ss >> _level;
+    level = Text("Level: " + _level, 0.4f, -0.49f, 0.002, glm::vec3(1.0f));
+
     bt = Button(glm::vec3(0.2f, 0.0f, 0.0f), 0.6f, 0.5f, true, "resource/assets/button/btn.png");
     bt.init();
     bg.init();
+    blood_1.init();
+    blood.init();
+    experience_1.init();
+    experience.init();
     control->ground.updateModel();
+}
+
+void UI::updateBlood()
+{
+    blood.setWidth(0.48f * control->players[current_player].hp /  control->players[current_player].maxHp);
+}
+
+void UI::updateExperience()
+{
+    printf("oldWidth: %f\nexp: %d\nlimit: %d\n", experience.getWidth(), control->players[current_player].exp, control->players[current_player].expToLevelUp[control->players[current_player].level]);
+    experience.setWidth(0.5f * (float)(control->players[current_player].exp) / control->players[current_player].expToLevelUp[control->players[current_player].level]);
+    printf("newWidth: %f\n\n", experience.getWidth());
+}
+
+void UI::updateLevel()
+{
+    std::string newLevel;
+    std::stringstream ss;
+    ss << control->players[current_player].level;
+    ss >> newLevel;
+    level.setText("Level: " + newLevel);
 }
 
 void UI::update()
@@ -393,6 +655,9 @@ void UI::update()
     gstate_last = gstate;
     if (gstate == GLOBAL_GAME)
     {
+        updateBlood();
+        updateExperience();
+        updateLevel();
     }
     else if (gstate == GLOBAL_INIT)
     {
@@ -436,15 +701,73 @@ void UI::draw(Shader *shader)
             player.draw(shader);
         control->arrowMgr->draw(shader);
         control->candyMgr->draw(shader);
-        //        for(Obb* obb: control->grid.obbs) {
-        //            obb->drawLine(segment_shader);
-        //        }
         aim.draw(flat_shader);
+        blood_1.draw(flat_shader);
+        blood.draw(flat_shader);
+        experience_1.draw(flat_shader);
+        experience.draw(flat_shader);
+        level.draw(text_shader);
+
+        if (levelUp)
+        {
+            for (int i = 0; i < 3; ++i)
+                option[i].draw(text_shader);
+        }
         break;
 
     case GLOBAL_INIT:
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
         bg.draw(flat_shader);
         bt.draw(flat_shader);
         break;
     }
 }
+
+// void RenderText(Shader *shader, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color)
+// {
+//     // Activate corresponding render state	
+//     shader->use();
+//     shader->setvec3fv("textColor", glm::value_ptr(color));
+//     glm::mat4 m = glm::mat4(1.0f);
+//     shader->setmat4fv("model", GL_FALSE, glm::value_ptr(m));
+
+//     glActiveTexture(GL_TEXTURE0);
+//     glBindVertexArray(F_VAO);
+
+//     // Iterate through all characters
+//     std::string::const_iterator c;
+//     for (c = text.begin(); c != text.end(); c++) 
+//     {
+//         Character ch = Characters[*c];
+
+//         GLfloat xpos = x + ch.Bearing.x * scale;
+//         GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+//         GLfloat w = ch.Size.x * scale;
+//         GLfloat h = ch.Size.y * scale;
+//         // Update VBO for each character
+//         GLfloat vertices[6][4] = {
+//             { xpos,     ypos + h,   0.0, 0.0 },            
+//             { xpos,     ypos,       0.0, 1.0 },
+//             { xpos + w, ypos,       1.0, 1.0 },
+
+//             { xpos,     ypos + h,   0.0, 0.0 },
+//             { xpos + w, ypos,       1.0, 1.0 },
+//             { xpos + w, ypos + h,   1.0, 0.0 }           
+//         };
+//         // Render glyph texture over quad
+//         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+//         // Update content of VBO memory
+//         glBindBuffer(GL_ARRAY_BUFFER, F_VBO);
+//         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // Be sure to use glBufferSubData and not glBufferData
+//         glBindBuffer(GL_ARRAY_BUFFER, 0);
+//         // Render quad
+//         glDrawArrays(GL_TRIANGLES, 0, 6);
+//         // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+//         x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+//     }
+//     glBindVertexArray(0);
+//     glBindTexture(GL_TEXTURE_2D, 0);
+// }

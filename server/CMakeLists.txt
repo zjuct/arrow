@@ -14,6 +14,7 @@ target_include_directories(server PRIVATE ../3rdparty)
 message(AUTHOR_WARNING "A: ${A}")
 target_link_libraries(server 
     PUBLIC ${A} 
+    PUBLIC ${B}
     ws2_32
 )
 

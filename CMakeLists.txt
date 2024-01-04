@@ -36,10 +36,12 @@ target_include_directories(arrow PRIVATE ./3rdparty)
 target_include_directories(arrow PRIVATE ./test)
 
 find_library(A glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-# message(AUTHOR_WARNING "glfw3 path: ${A}")
+find_library(B freetype PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+message(AUTHOR_WARNING "${B}")
 
 target_link_libraries(arrow 
     PUBLIC ${A}
+		PUBLIC ${B}
 		${UNIX_LIBS}
 		ws2_32
 )

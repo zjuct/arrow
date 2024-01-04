@@ -115,8 +115,12 @@ public:
     float pitch;
 
     float hp = 100.0f;
+    float maxHp = 100.0f;
     int exp = 0;
     int level = 1;
+    int maxLevel = 20;
+    int expToLevelUp[20] = {0, 110, 120, 130, 140, 150, 160, 170, 180, 190,
+                            200, 210, 220, 230, 240, 250, 260, 270, 280, 290};
     int inited = 0;
 
 private:
@@ -153,12 +157,9 @@ private:
     float frontSpeed = 0.0f;
     float rightSpeed = 0.0f;
 
-    float maxHp = 100.0f;
     float hpRecover = 0.1f;
     float hpRecoverTime = 0.0f;
-    int maxLevel = 20;
-    int expToLevelUp[20] = {0, 110, 120, 130, 140, 150, 160, 170, 180, 190,
-                            200, 210, 220, 230, 240, 250, 260, 270, 280, 290};
+    
     int candyExp = 20;
 };
 

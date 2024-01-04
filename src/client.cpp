@@ -147,8 +147,8 @@ void clientInit(std::string ip)
 
 int clientThread()
 {
-    while (!init)
-        std::cout << "init" << std::endl;
+    // while (!init)
+    //     std::cout << "init" << std::endl;
     std::thread recv;
     if (current_player != -1)
         recv = std::thread(recvThread);

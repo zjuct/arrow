@@ -128,7 +128,10 @@ void keyCB(GLFWwindow *window, int key, int scancode, int action, int mods)
         glfwSetWindowShouldClose(window, true);
     }
     if (ui->gstate == GLOBAL_GAME)
+    {
         control->handleKeyInput(key, action);
+        ui->handleKeyInput(key, action);
+    }
 }
 
 void scrollCB(GLFWwindow *window, double xoffset, double yoffset)

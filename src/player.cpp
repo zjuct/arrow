@@ -1,5 +1,6 @@
 #include "player.h"
 #include "shader.h"
+#include "ui.hpp"
 #include <control.h>
 #include <defs.h>
 #include <glm/glm.hpp>
@@ -13,6 +14,7 @@
 static Control *control = Control::getInstance();
 static ArrowManager *arrowMgr = ArrowManager::getInstance();
 static CandyManager *candyMgr = CandyManager::getInstance();
+static UI *ui = UI::getInstance();
 
 extern SOCKET sock;
 
@@ -420,6 +422,7 @@ void Player::getCandy(CandyType type)
         level++;
         maxHp += 5;
         hp = maxHp;
+        ui->setLevelUp(true);
         std::cout << "level up: " << level << std::endl;
     }
 }
