@@ -738,7 +738,11 @@ void UI::draw(Shader *shader)
     {
     case GLOBAL_GAME:
 #if PRT_ENABLE
-        control->ground.draw(prt_shader);
+        if(shader == shadowmap_shader) {
+            control->ground.draw(shader);
+        } else {
+            control->ground.draw(prt_shader);
+        }
 #else
         control->ground.draw(shader);
 #endif
