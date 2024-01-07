@@ -310,8 +310,8 @@ int Obb::intersectWith(Obb &other)
     if (t > ra + rb)
         return false;
 
-    other.drawFlag = 200;
-    this->drawFlag = 200;
+    // other.drawFlag = 200;
+    // this->drawFlag = 200;
     // return true;
 
     // std::cout<<"extend: "<<this->extends.x<<" "<<this->extends.y<<" "<<this->extends.z<<std::endl;
