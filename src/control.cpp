@@ -82,7 +82,7 @@ void Control::init()
     // arrowMgr->bindArrow(ANOTHER_PLAYER_ID, ARROW_NORMAL);
 
     // 道具
-    candyMgr->init("resource/assets/weapon/knife.obj");
+    candyMgr->init("resource/assets/candy/candy.obj");
 
 #ifdef SAT_TEST
     test.init();
