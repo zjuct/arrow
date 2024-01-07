@@ -6,11 +6,11 @@
 #include <string>
 #include FT_FREETYPE_H
 
-extern Shader* text_shader;
+extern Shader *text_shader;
 static UI *ui = UI::getInstance();
 static Control *control = Control::getInstance();
 
-unsigned int F_VAO, F_VBO;    // 渲染字体专用
+unsigned int F_VAO, F_VBO; // 渲染字体专用
 std::map<GLchar, Character> Characters;
 
 /* ============================= class Aim ================================ */
@@ -325,12 +325,12 @@ void Button::draw(Shader *shader)
 
 /* ================================ class Text =========================================*/
 void Text::init() {}
-void Text::draw(Shader* shader)
+void Text::draw(Shader *shader)
 {
     GLfloat x = posx;
     GLfloat y = posy;
 
-    // Activate corresponding render state	
+    // Activate corresponding render state
     shader->use();
     shader->setvec3fv("textColor", glm::value_ptr(color));
     glm::mat4 m = glm::mat4(1.0f);
@@ -341,7 +341,7 @@ void Text::draw(Shader* shader)
 
     // Iterate through all characters
     std::string::const_iterator c;
-    for (c = content.begin(); c != content.end(); c++) 
+    for (c = content.begin(); c != content.end(); c++)
     {
 
         Character ch = Characters[*c];
@@ -353,14 +353,13 @@ void Text::draw(Shader* shader)
         GLfloat h = ch.Size.y * scale;
         // Update VBO for each character
         GLfloat vertices[6][4] = {
-            { xpos,     ypos + h,   0.0, 0.0 },            
-            { xpos,     ypos,       0.0, 1.0 },
-            { xpos + w, ypos,       1.0, 1.0 },
+            {xpos, ypos + h, 0.0, 0.0},
+            {xpos, ypos, 0.0, 1.0},
+            {xpos + w, ypos, 1.0, 1.0},
 
-            { xpos,     ypos + h,   0.0, 0.0 },
-            { xpos + w, ypos,       1.0, 1.0 },
-            { xpos + w, ypos + h,   1.0, 0.0 }           
-        };
+            {xpos, ypos + h, 0.0, 0.0},
+            {xpos + w, ypos, 1.0, 1.0},
+            {xpos + w, ypos + h, 1.0, 0.0}};
         // Render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
         // Update content of VBO memory
@@ -381,7 +380,8 @@ void Text::setText(std::string _text)
 }
 /* ================================ class Rectangle =====================================*/
 
-void Rectangle::init() {
+void Rectangle::init()
+{
     float v[20];
     v[0] = position.x, v[1] = position.y, v[2] = 0.0f, v[3] = 0.0f, v[4] = 0.0f;
     v[5] = position.x + width, v[6] = position.y, v[7] = 0.0f, v[8] = 1.0f, v[9] = 0.0f;
@@ -407,14 +407,15 @@ void Rectangle::init() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
-void Rectangle::draw(Shader *shader) {
+void Rectangle::draw(Shader *shader)
+{
     glm::mat4 m = glm::mat4(1.0f);
     float v[20];
     v[0] = position.x, v[1] = position.y, v[2] = 0.0f, v[3] = 0.0f, v[4] = 0.0f;
     v[5] = position.x + width, v[6] = position.y, v[7] = 0.0f, v[8] = 1.0f, v[9] = 0.0f;
     v[10] = position.x + width, v[11] = position.y - height, v[12] = 0.0f, v[13] = 1.0f, v[14] = 1.0f;
     v[15] = position.x, v[16] = position.y - height, v[17] = 0.0f, v[18] = 0.0f, v[19] = 1.0f;
-    
+
     shader->use();
     shader->setBool("has_texture", has_texture);
     if (has_texture)
@@ -502,24 +503,29 @@ void UI::handleMouseMove(double xposIn, double yposIn)
 }
 void UI::handleKeyInput(int key, int action)
 {
-    if (levelUp)
+    if (levelUpBuff.size())
     {
         if (action == GLFW_PRESS)
         {
+            Buff b1, b2, b3;
+            std::tie(b1, b2, b3) = levelUpBuff.front();
             if (key == GLFW_KEY_1)
             {
                 std::cout << "choose 1: do something" << std::endl;
-                levelUp = false;
+                levelUpBuff.pop_front();
+                control->players[current_player].getBuff(b1);
             }
-            else if(key == GLFW_KEY_2)
+            else if (key == GLFW_KEY_2)
             {
                 std::cout << "choose 2: do something" << std::endl;
-                levelUp = false;
+                levelUpBuff.pop_front();
+                control->players[current_player].getBuff(b2);
             }
-            else if(key == GLFW_KEY_3)
+            else if (key == GLFW_KEY_3)
             {
                 std::cout << "choose 3: do something" << std::endl;
-                levelUp = false;
+                levelUpBuff.pop_front();
+                control->players[current_player].getBuff(b3);
             }
         }
     }
@@ -545,12 +551,12 @@ void UI::init()
     FT_Set_Pixel_Sizes(face, 0, 48);
 
     // Disable byte-alignment restriction
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     // Load first 128 characters of ASCII set
     for (GLubyte c = 0; c < 128; c++)
     {
-        // Load character glyph 
+        // Load character glyph
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
             std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
@@ -569,8 +575,7 @@ void UI::init()
             0,
             GL_RED,
             GL_UNSIGNED_BYTE,
-            face->glyph->bitmap.buffer
-        );
+            face->glyph->bitmap.buffer);
         // Set texture options
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -581,8 +586,7 @@ void UI::init()
             texture,
             glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
             glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-            face->glyph->advance.x
-        };
+            face->glyph->advance.x};
         Characters.insert(std::pair<GLchar, Character>(c, character));
     }
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -601,18 +605,18 @@ void UI::init()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    levelUp = false;
+    // levelUp = false;
     gstate = GLOBAL_INIT;
     glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     aim.init();
-    option[0] = Text("Option 1: ....", -0.5f, 0.2f, 0.002, glm::vec3(0.95f));
-    option[1] = Text("Option 2: ....", -0.5f, 0.0f, 0.002, glm::vec3(0.95f));
-    option[2] = Text("Option 3: ....", -0.5f, -0.2f, 0.002, glm::vec3(0.95f));
+    option[0] = Text("Option 1: ....", -0.6f, 0.2f, 0.002, glm::vec3(0.95f));
+    option[1] = Text("Option 2: ....", -0.6f, 0.0f, 0.002, glm::vec3(0.95f));
+    option[2] = Text("Option 3: ....", -0.6f, -0.2f, 0.002, glm::vec3(0.95f));
     blood_1 = Rectangle(glm::vec3(0.4, -0.5, 0), 0.5f, 0.15f, true, glm::vec3(1.0f));
-    blood   = Rectangle(glm::vec3(0.41, -0.51, 0), 0.48f, 0.13f, false, glm::vec3(1.0f));
+    blood = Rectangle(glm::vec3(0.41, -0.51, 0), 0.48f, 0.13f, false, glm::vec3(1.0f));
     experience_1 = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, true, glm::vec3(1.0f));
-    experience   = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, false, glm::vec3(1.0f, 0.8f, 0.0f));
+    experience = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, false, glm::vec3(1.0f, 0.8f, 0.0f));
     std::stringstream ss;
     std::string _level;
     ss << control->players[current_player].level;
@@ -627,11 +631,46 @@ void UI::init()
     experience_1.init();
     experience.init();
     control->ground.updateModel();
+// enum Buff
+// {
+//     BUFF_SPEED_UP,
+//     BUFF_JUMP_HEIGHT_UP,
+//     BUFF_JUMP_TIME_UP,
+//     BUFF_ARROW_SPEED_UP,
+//     BUFF_ARROW_LOAD_TIME_DOWN,
+//     BUFF_ARROW_STRENGTH_TIME_DOWN,
+//     BUFF_ARROW_DAMAGE_UP,
+//     BUFF_ARROW_REFLECT,
+//     BUFF_ARROW_LASER,
+//     BUFF_ARROW_NOT_REFLECT,
+//     BUFF_ARROW_NORMAL,
+//     BUFF_LIVE_TIME_UP,
+//     BUFF_HP_RECOVER,
+//     BUFF_MAXHP_UP,
+//     BUFF_NUM,
+
+// };
+    BuffName.resize(BUFF_NUM);
+    BuffName[BUFF_SPEED_UP] = "Player Speed Up";
+    BuffName[BUFF_JUMP_HEIGHT_UP] = "Player Jump Height Up";
+    BuffName[BUFF_JUMP_TIME_UP] = "Player Jump Time Up";
+    BuffName[BUFF_ARROW_SPEED_UP] = "Arrow Speed Up";
+    BuffName[BUFF_ARROW_LOAD_TIME_DOWN] = "Arrow Reloading Time Down";
+    BuffName[BUFF_ARROW_STRENGTH_TIME_DOWN] = "Player Charging Time Down";
+    BuffName[BUFF_ARROW_DAMAGE_UP] = "Arrow Damage Up";
+    BuffName[BUFF_ARROW_REFLECT] = "Arrow Reflect";
+    BuffName[BUFF_ARROW_LASER] = "Arrow Laser(No Gravity)";
+    BuffName[BUFF_ARROW_NOT_REFLECT] = "Arrow Not Reflect";
+    BuffName[BUFF_ARROW_NORMAL] = "Arrow Normal(With Gravity)";
+    BuffName[BUFF_LIVE_TIME_UP] = "Arrow Live Time Up (for laser arrow)";
+    BuffName[BUFF_HP_RECOVER] = "HP Recover";
+    BuffName[BUFF_MAXHP_UP] = "Max HP Up";
+
 }
 
 void UI::updateBlood()
 {
-    blood.setWidth(0.48f * control->players[current_player].hp /  control->players[current_player].maxHp);
+    blood.setWidth(0.48f * control->players[current_player].hp / control->players[current_player].maxHp);
 }
 
 void UI::updateExperience()
@@ -648,6 +687,7 @@ void UI::updateLevel()
     ss << control->players[current_player].level;
     ss >> newLevel;
     level.setText("Level: " + newLevel);
+    // option[0].setText("123213" + newLevel);
 }
 
 void UI::update()
@@ -667,6 +707,11 @@ void UI::update()
             glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
+}
+
+void UI::setLevelUp(Buff b1, Buff b2, Buff b3)
+{
+    levelUpBuff.push_back(std::make_tuple(b1, b2, b3));
 }
 
 void UI::updateModel()
@@ -708,8 +753,11 @@ void UI::draw(Shader *shader)
         experience.draw(flat_shader);
         level.draw(text_shader);
 
-        if (levelUp)
+        if (levelUpBuff.size())
         {
+            option[0].setText("Buff 1: " + BuffName[std::get<0>(levelUpBuff.front())]);
+            option[1].setText("Buff 2: " + BuffName[std::get<1>(levelUpBuff.front())]);
+            option[2].setText("Buff 3: " + BuffName[std::get<2>(levelUpBuff.front())]);
             for (int i = 0; i < 3; ++i)
                 option[i].draw(text_shader);
         }
@@ -718,7 +766,7 @@ void UI::draw(Shader *shader)
     case GLOBAL_INIT:
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
+
         bg.draw(flat_shader);
         bt.draw(flat_shader);
         break;
@@ -727,7 +775,7 @@ void UI::draw(Shader *shader)
 
 // void RenderText(Shader *shader, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color)
 // {
-//     // Activate corresponding render state	
+//     // Activate corresponding render state
 //     shader->use();
 //     shader->setvec3fv("textColor", glm::value_ptr(color));
 //     glm::mat4 m = glm::mat4(1.0f);
@@ -738,7 +786,7 @@ void UI::draw(Shader *shader)
 
 //     // Iterate through all characters
 //     std::string::const_iterator c;
-//     for (c = text.begin(); c != text.end(); c++) 
+//     for (c = text.begin(); c != text.end(); c++)
 //     {
 //         Character ch = Characters[*c];
 
@@ -749,13 +797,13 @@ void UI::draw(Shader *shader)
 //         GLfloat h = ch.Size.y * scale;
 //         // Update VBO for each character
 //         GLfloat vertices[6][4] = {
-//             { xpos,     ypos + h,   0.0, 0.0 },            
+//             { xpos,     ypos + h,   0.0, 0.0 },
 //             { xpos,     ypos,       0.0, 1.0 },
 //             { xpos + w, ypos,       1.0, 1.0 },
 
 //             { xpos,     ypos + h,   0.0, 0.0 },
 //             { xpos + w, ypos,       1.0, 1.0 },
-//             { xpos + w, ypos + h,   1.0, 0.0 }           
+//             { xpos + w, ypos + h,   1.0, 0.0 }
 //         };
 //         // Render glyph texture over quad
 //         glBindTexture(GL_TEXTURE_2D, ch.TextureID);

@@ -422,8 +422,96 @@ void Player::getCandy(CandyType type)
         level++;
         maxHp += 5;
         hp = maxHp;
-        ui->setLevelUp(true);
+        Buff buff1 = (Buff)(rand() % BUFF_NUM);
+        Buff buff2 = (Buff)(rand() % BUFF_NUM);
+        while (buff2 == buff1)
+            buff2 = (Buff)(rand() % BUFF_NUM);
+        Buff buff3 = (Buff)(rand() % BUFF_NUM);
+        while (buff3 == buff1 || buff3 == buff2)
+            buff3 = (Buff)(rand() % BUFF_NUM);
+        ui->setLevelUp(buff1, buff2, buff3);
         std::cout << "level up: " << level << std::endl;
+    }
+}
+
+// enum Buff
+// {
+//     BUFF_SPEED_UP,
+//     BUFF_JUMP_HEIGHT_UP,
+//     BUFF_JUMP_TIME_UP,
+//     BUFF_ARROW_SPEED_UP,
+//     BUFF_ARROW_LOAD_TIME_DOWN,
+//     BUFF_ARROW_STRENGTH_TIME_DOWN,
+//     BUFF_ARROW_DAMAGE_UP,
+//     BUFF_ARROW_REFLECT,
+//     BUFF_ARROW_LASER,
+//     BUFF_ARROW_NOT_REFLECT,
+//     BUFF_ARROW_NORMAL,
+//     BUFF_LIVE_TIME_UP,
+//     BUFF_HP_RECOVER,
+//     BUFF_MAXHP_UP,
+//     BUFF_NUM,
+
+// };
+
+void Player::getBuff(Buff buff)
+{
+    switch (buff)
+    {
+    case BUFF_SPEED_UP:
+        speed += 0.25f;
+        break;
+    case BUFF_JUMP_HEIGHT_UP:
+        jumpHeight += 0.3f;
+        break;
+    case BUFF_JUMP_TIME_UP:
+        maxJumpTime += 1;
+        break;
+    case BUFF_ARROW_SPEED_UP:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].speed += 0.1f;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_LOAD_TIME_DOWN:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].loadTime -= 0.1f;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_STRENGTH_TIME_DOWN:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].strengthTime -= 0.2f;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_DAMAGE_UP:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].damage += 0.1f;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_REFLECT:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].isReflect = true;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_LASER:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].type = ARROW_LASER;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_NOT_REFLECT:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].isReflect = false;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_ARROW_NORMAL:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].type = ARROW_NORMAL;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_LIVE_TIME_UP:
+        arrowMgr->arrows[arrowMgr->arrowSetting[PLAYER_ID]].liveTime += 3.0f;
+        arrowMgr->load(PLAYER_ID);
+        break;
+    case BUFF_HP_RECOVER:
+        hp += 100;
+        if (hp > maxHp)
+            hp = maxHp;
+        break;
+    case BUFF_MAXHP_UP:
+        maxHp += 10;
+        hp += 10;
+        break;
     }
 }
 

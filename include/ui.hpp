@@ -5,9 +5,11 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <deque>
 #include "defs.h"
 #include "shader.h"
 #include "texturemgr.hpp"
+#include <player.h>
 
 #define SEGMENTS (100)
 
@@ -141,6 +143,8 @@ class Rectangle {
 enum GlobalState {
   GLOBAL_INIT, GLOBAL_GAME
 };
+
+
 class UI {
 
   public:
@@ -159,10 +163,7 @@ class UI {
   void updateExperience();
   void updateLevel();
 
-  void setLevelUp(bool levelUp)
-  {
-    this->levelUp = levelUp;
-  }
+  void setLevelUp(Buff b1, Buff b2, Buff b3);
 
   Aim aim;
   Button bt;
@@ -174,7 +175,9 @@ class UI {
   Rectangle experience;
   Text level;
 
-  bool levelUp;
+  // bool levelUp;
+  std::deque<std::tuple<Buff,Buff,Buff>> levelUpBuff;
+  std::vector<std::string> BuffName;
   bool leftPress;
   bool rightPress;
 

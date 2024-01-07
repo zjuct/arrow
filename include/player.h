@@ -16,6 +16,26 @@ enum Movement
     STILL,
 };
 
+enum Buff
+{
+    BUFF_SPEED_UP,
+    BUFF_JUMP_HEIGHT_UP,
+    BUFF_JUMP_TIME_UP,
+    BUFF_ARROW_SPEED_UP,
+    BUFF_ARROW_LOAD_TIME_DOWN,
+    BUFF_ARROW_STRENGTH_TIME_DOWN,
+    BUFF_ARROW_DAMAGE_UP,
+    BUFF_ARROW_REFLECT,
+    BUFF_ARROW_LASER,
+    BUFF_ARROW_NOT_REFLECT,
+    BUFF_ARROW_NORMAL,
+    BUFF_LIVE_TIME_UP,
+    BUFF_HP_RECOVER,
+    BUFF_MAXHP_UP,
+    BUFF_NUM,
+
+};
+
 class Arrow;
 
 class Player
@@ -97,6 +117,7 @@ public:
         return head;
     }
     void getCandy(CandyType type);
+    void getBuff(Buff buff);
     int id;
     int getHp()
     {
@@ -159,7 +180,7 @@ private:
 
     float hpRecover = 0.1f;
     float hpRecoverTime = 0.0f;
-    
+
     int candyExp = 20;
 };
 
