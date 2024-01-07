@@ -158,7 +158,7 @@ int clientThread()
     }
     while (!glfwWindowShouldClose(control->window))
     {
-        SyncPackage *package = new PlayerSyncPackage(&control->players[current_player]);
+        SyncPackage *package = new PlayerSyncPackage(&control->players[PLAYER_ID]);
         package->send(sock);
         package = new ArrowSyncPackage(&control->arrowMgr->arrows[control->arrowMgr->arrowMap[current_player]]);
         package->send(sock);

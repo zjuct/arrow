@@ -320,7 +320,12 @@ void Player::update(float dt)
         jumpSpeed = 0.0f;
         position.y = FLOOR_Y;
         jumpTime = maxJumpTime;
-        hp -= 0.1f;
+        hp -= 0.5f;
+        if (hp <= 0)
+        {
+            hp = 0;
+            state = PLAYER_DEAD;
+        }
     }
     candyMgr->eat(*this);
     // if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
@@ -562,6 +567,8 @@ void Player::getHit(const Arrow &arrow)
 PlayerSyncPackage::PlayerSyncPackage(Player *player)
 {
     // position, front, right, up, yaw, pitch, hp, level, exp, id, state
+    if (player->id == -1)
+        return;
     type = Sync_Player;
     timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     size = sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4 + sizeof(player->state);
@@ -578,7 +585,6 @@ PlayerSyncPackage::PlayerSyncPackage(Player *player)
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 2, &player->exp, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3, &player->id, sizeof(int));
     memcpy(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 4, &player->state, sizeof(player->state));
-    // std::cout<<"pack Id: "<<*(int *)(data + sizeof(glm::vec3) * 4 + sizeof(float) * 2 + sizeof(int) * 3)<<std::endl;
 }
 
 void PlayerSyncPackage::update(Player *player)
