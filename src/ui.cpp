@@ -675,9 +675,9 @@ void UI::updateBlood()
 
 void UI::updateExperience()
 {
-    printf("oldWidth: %f\nexp: %d\nlimit: %d\n", experience.getWidth(), control->players[current_player].exp, control->players[current_player].expToLevelUp[control->players[current_player].level]);
+    // printf("oldWidth: %f\nexp: %d\nlimit: %d\n", experience.getWidth(), control->players[current_player].exp, control->players[current_player].expToLevelUp[control->players[current_player].level]);
     experience.setWidth(0.5f * (float)(control->players[current_player].exp) / control->players[current_player].expToLevelUp[control->players[current_player].level]);
-    printf("newWidth: %f\n\n", experience.getWidth());
+    // printf("newWidth: %f\n\n", experience.getWidth());
 }
 
 void UI::updateLevel()
