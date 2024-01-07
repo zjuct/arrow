@@ -1,4 +1,4 @@
-# Blender 4.0.1 MTL File: 'sence.blend'
+# Blender 4.0.1 MTL File: 'None'
 # www.blender.org
 
 newmtl colormap
@@ -41,16 +41,6 @@ d 1.000000
 illum 1
 map_Kd colormap.png
 
-newmtl colormap.004
-Ns 0.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 1
-map_Kd colormap.png
-
 newmtl colormap.005
 Ns 441.763062
 Ka 1.000000 1.000000 1.000000
@@ -61,27 +51,7 @@ d 1.000000
 illum 1
 map_Kd colormap.png
 
-newmtl colormap.006
-Ns 0.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 1
-map_Kd colormap.png
-
 newmtl colormap.007
-Ns 0.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 1
-map_Kd colormap.png
-
-newmtl colormap.008
 Ns 0.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.000000 0.000000 0.000000
@@ -120,16 +90,6 @@ Ni 1.450000
 d 1.000000
 illum 1
 map_Kd colormap.png
-
-newmtl colormap.013
-Ns 227.854813
-Ka 1.000000 1.000000 1.000000
-Kd 0.936992 0.936992 0.936992
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 1
 
 newmtl colormap.014
 Ns 0.000000
