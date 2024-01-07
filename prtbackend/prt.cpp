@@ -180,7 +180,8 @@ std::vector<std::array<std::vector<float>, 3>> PrecomputeLightTransportBounce(co
                             float refSH = bary[0] * SHLT_before[3 * tri_idx][i][j]
                                         + bary[1] * SHLT_before[3 * tri_idx + 1][i][j]
                                         + bary[2] * SHLT_before[3 * tri_idx + 2][i][j];
-                            SHLT[idx][i][j] += refSH * V;
+                            float weight = 4.0 * M_PI / (sample_side * sample_side);
+                            SHLT[idx][i][j] += weight * refSH * V;
                         }
                     }
                 }
@@ -199,9 +200,9 @@ std::vector<std::array<std::vector<float>, 3>> PrecomputeLightTransportBounce(co
 }
 
 const char* precompute_L = "resource/assets/CornellBox/lighting.txt";
-const char* precomupte_LT = "resource/assets/CornellBox/lighttransport.txt";
+const char* precomupte_LT = "resource/assets/CornellBox/lighttransport-bounce1.txt";
 
-constexpr int m_bounce = 0;
+constexpr int m_bounce = 1;
 
 void PRTPrecompute(const char* sceneobj, const char* skybox) {
     Scene scene(sceneobj);
