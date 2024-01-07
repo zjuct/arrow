@@ -170,7 +170,8 @@ bool Player::checkBlocked(enum intersectType type)
     {
         if (body.getObb()->intersectWith(*(obj->getObb())) == type ||
             rleg.getObb()->intersectWith(*(obj->getObb())) == type ||
-            lleg.getObb()->intersectWith(*(obj->getObb())) == type) // 小人踢墙，镜头抖动
+            lleg.getObb()->intersectWith(*(obj->getObb())) == type ||
+            head.getObb()->intersectWith(*(obj->getObb())) == type) // 小人踢墙，镜头抖动
         // if (body.getObb()->intersectWith(*(obj->getObb())) == type)
         {
             if (type == INTERSECT_UNDER)
@@ -221,19 +222,32 @@ void Player::updatey(float dt)
 {
     float radix = 1.0f;
     float oldy = position.y;
+    float newy = position.y + jumpSpeed * dt * radix;
+    float midy;
+
+    position.y = newy;
+    updateModel_obb();
+    if (!checkBlocked(INTERSECT_UNDER) && !checkBlocked(INTERSECT_ON))
+    {
+        return;
+    }
     for (int ct = 0; ct < CHECK_TIME; ++ct)
     {
-        position.y = oldy + jumpSpeed * dt * radix;
+        midy = oldy + (newy - oldy) / 2;
+        position.y = midy;
         updateModel_obb();
-
         if ((jumpSpeed > 0) ? checkBlocked(INTERSECT_ON) : checkBlocked(INTERSECT_UNDER))
         {
-            if (ct > 0)
-                printf("jump backtrace time %d\n", ct);
-            radix *= 0.5;
+            newy = midy;
+        }
+        else if ((jumpSpeed > 0) ? checkBlocked(INTERSECT_UNDER) : checkBlocked(INTERSECT_ON))
+        {
+            newy = midy;
         }
         else
         {
+            position.y = newy;
+            updateModel_obb();
             break;
         }
     }
