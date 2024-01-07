@@ -18,6 +18,7 @@ layout (location = 11) in vec3 aPrecomputeLTB3;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
+out vec4 FragPosLightSpace;
 
 out vec3 PrecomputeLTR1;
 out vec3 PrecomputeLTR2;
@@ -32,6 +33,8 @@ out vec3 PrecomputeLTB3;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+uniform mat4 lightSpaceMatrix;
 
 
 float dotmat3(vec3 L1, vec3 L2, vec3 L3, mat3 LT) {
@@ -52,6 +55,7 @@ void main()
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoords = aTexCoords;
+    FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
 
     gl_Position = projection * view * vec4(FragPos, 1.0);
 

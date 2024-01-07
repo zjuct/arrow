@@ -354,7 +354,7 @@ int FrontendMain()
 
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
-        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, control->dirLight.near_plane, control->dirLight.far_plane);
+        lightProjection = glm::ortho(-30.0f, 30.0f, -30.0f, 30.0f, control->dirLight.near_plane, control->dirLight.far_plane);
         lightView = glm::lookAt(-10.0f * control->dirLight.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
 
@@ -382,6 +382,8 @@ int FrontendMain()
         prt_shader->setmat3fv("PrecomputeL[0]", GL_FALSE, control->ground.obj->getSHL()[0].data());
         prt_shader->setmat3fv("PrecomputeL[1]", GL_FALSE, control->ground.obj->getSHL()[1].data());
         prt_shader->setmat3fv("PrecomputeL[2]", GL_FALSE, control->ground.obj->getSHL()[2].data());
+        prt_shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        prt_shader->setBool("dirLight.enable", false);
 #endif
 
         glm::mat4 sky_view = glm::mat4(glm::mat3(view));
@@ -411,6 +413,12 @@ int FrontendMain()
         glDepthMask(GL_TRUE);
 
 #if SHADOW_ENABLE
+        prt_shader->use();
+        prt_shader->setInt("shadowMap", 3);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, control->depthMap);
+        prt_shader->setBool("PCF_enable", true);
+
         shadow_shader->use();
         shadow_shader->setBool("dirLight.enable", false);
         shadow_shader->setBool("pointLight.enable", false);
@@ -425,6 +433,7 @@ int FrontendMain()
 #if PCF_ENABLE
         shadow_shader->setBool("PCF_enable", true);
 #endif
+        control->dirLight.configShader(prt_shader);
         control->dirLight.configShader(shadow_shader); // TODO: 互斥
         ui->draw(shadow_shader);
 #else

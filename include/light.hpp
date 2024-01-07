@@ -23,13 +23,13 @@ public:
 
     }
 
-    void configShaderShadowMap(Shader* shader) {
-        shader->use();
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(-10.0f * direction, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-        shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-    }
+//    void configShaderShadowMap(Shader* shader) {
+//        shader->use();
+//        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+//        glm::mat4 lightView = glm::lookAt(-10.0f * direction, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+//        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+//        shader->setmat4fv("lightSpaceMatrix", GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+//    }
 
     void configShader(Shader* shader) {
 //        configShaderShadowMap(shader);
@@ -47,7 +47,7 @@ public:
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
-    float near_plane = 1.0f;
+    float near_plane = 0.5f;
     float far_plane = 25.0f;
 };
 

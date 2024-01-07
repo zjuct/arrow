@@ -11,7 +11,7 @@
 
 #include <glm/glm.hpp>
 
-#define ALBEDO_ENABLE 0
+#define ALBEDO_ENABLE 1
 
 static constexpr int SHOrder = 2;
 static constexpr int m_SampleCount = 100;
@@ -180,7 +180,7 @@ std::vector<std::array<std::vector<float>, 3>> PrecomputeLightTransportBounce(co
                             float refSH = bary[0] * SHLT_before[3 * tri_idx][i][j]
                                         + bary[1] * SHLT_before[3 * tri_idx + 1][i][j]
                                         + bary[2] * SHLT_before[3 * tri_idx + 2][i][j];
-                            float weight = 4.0 * M_PI / (sample_side * sample_side);
+                            float weight = 0.2 * 4.0 * M_PI / (sample_side * sample_side);
                             SHLT[idx][i][j] += weight * refSH * V;
                         }
                     }
