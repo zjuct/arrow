@@ -21,7 +21,7 @@ static CandyManager *candyMgr = CandyManager::getInstance();
 //     std::cout << "-------------" << std::endl;
 // }
 
-void Candy::draw(Shader* shader)
+void Candy::draw(Shader *shader)
 {
     if (type == CANDY_NONE)
         return;
@@ -85,7 +85,7 @@ void CandyManager::init(const char *objfile)
     }
 }
 
-void CandyManager::draw(Shader* shader)
+void CandyManager::draw(Shader *shader)
 {
     for (auto &candy : candies)
     {
@@ -125,7 +125,7 @@ void CandyManager::update(float dt)
             it++;
         }
     }
-#ifdef SERVER  
+#ifdef SERVER
     // std::cout<<"size:"<<candies.size()<<std::endl;
     generateTime -= dt;
     if (generateTime <= 0.0f)
@@ -164,7 +164,8 @@ void CandyManager::generateCandy()
     generateCandy(pos, type);
 #ifdef SERVER
     FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_GENERATE, &pos, &type, &candies.back().id);
-    for(int i = 0; i < clients.size(); i++) {
+    for (int i = 0; i < clients.size(); i++)
+    {
         funcSyncPackage.send(clients[i].sock);
     }
 #endif
@@ -193,8 +194,10 @@ FuncSyncPackage CandyManager::touch(FuncSyncPackage &funcSyncPackage)
     int player_id;
     int candy_id;
     funcSyncPackage.get(&player_id, &candy_id);
-    for(auto it = candies.begin(); it != candies.end(); it++) {
-        if(it->id == candy_id) {
+    for (auto it = candies.begin(); it != candies.end(); it++)
+    {
+        if (it->id == candy_id)
+        {
             it->liveTime = 0.0f;
             it->type = CANDY_DISAPPEARING;
             FuncSyncPackage funcSyncPackage = FuncSyncPackage(FUNC_CANDY_EATEN, &player_id, &candy_id);
@@ -211,8 +214,14 @@ void CandyManager::eaten(FuncSyncPackage &funcSyncPackage)
     int candy_id;
     funcSyncPackage.get(&player_id, &candy_id);
     // std::cout<<"candy_id:"<<candy_id<<std::endl;
-    for(auto it = candies.begin(); it != candies.end(); it++) {
-        if(it->id == candy_id) {
+    if (player_id != PLAYER_ID)
+    {
+        return;
+    }
+    for (auto it = candies.begin(); it != candies.end(); it++)
+    {
+        if (it->id == candy_id)
+        {
             control->players[player_id].getCandy(it->type);
             it->liveTime = 0.0f;
             it->type = CANDY_DISAPPEARING;
