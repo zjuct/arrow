@@ -320,6 +320,7 @@ void Player::update(float dt)
         jumpSpeed = 0.0f;
         position.y = FLOOR_Y;
         jumpTime = maxJumpTime;
+        hp -= 0.1f;
     }
     candyMgr->eat(*this);
     // if(lleg.intersectWith(control->ground.getModel()) == INTERSECT_ON || rleg.intersectWith(control->ground.getModel()) == INTERSECT_ON)
