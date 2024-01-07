@@ -513,19 +513,19 @@ void UI::handleKeyInput(int key, int action)
             {
                 std::cout << "choose 1: do something" << std::endl;
                 levelUpBuff.pop_front();
-                control->players[current_player].getBuff(b1);
+                control->players[PLAYER_ID].getBuff(b1);
             }
             else if (key == GLFW_KEY_2)
             {
                 std::cout << "choose 2: do something" << std::endl;
                 levelUpBuff.pop_front();
-                control->players[current_player].getBuff(b2);
+                control->players[PLAYER_ID].getBuff(b2);
             }
             else if (key == GLFW_KEY_3)
             {
                 std::cout << "choose 3: do something" << std::endl;
                 levelUpBuff.pop_front();
-                control->players[current_player].getBuff(b3);
+                control->players[PLAYER_ID].getBuff(b3);
             }
         }
     }
@@ -619,7 +619,7 @@ void UI::init()
     experience = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, false, glm::vec3(1.0f, 0.8f, 0.0f));
     std::stringstream ss;
     std::string _level;
-    ss << control->players[current_player].level;
+    ss << control->players[PLAYER_ID].level;
     ss >> _level;
     level = Text("Level: " + _level, 0.4f, -0.49f, 0.002, glm::vec3(1.0f));
 
@@ -670,13 +670,13 @@ void UI::init()
 
 void UI::updateBlood()
 {
-    blood.setWidth(0.48f * control->players[current_player].hp / control->players[current_player].maxHp);
+    blood.setWidth(0.48f * control->players[PLAYER_ID].hp / control->players[PLAYER_ID].maxHp);
 }
 
 void UI::updateExperience()
 {
-    // printf("oldWidth: %f\nexp: %d\nlimit: %d\n", experience.getWidth(), control->players[current_player].exp, control->players[current_player].expToLevelUp[control->players[current_player].level]);
-    experience.setWidth(0.5f * (float)(control->players[current_player].exp) / control->players[current_player].expToLevelUp[control->players[current_player].level]);
+    // printf("oldWidth: %f\nexp: %d\nlimit: %d\n", experience.getWidth(), control->players[PLAYER_ID].exp, control->players[PLAYER_ID].expToLevelUp[control->players[PLAYER_ID].level]);
+    experience.setWidth(0.5f * (float)(control->players[PLAYER_ID].exp) / control->players[PLAYER_ID].expToLevelUp[control->players[PLAYER_ID].level]);
     // printf("newWidth: %f\n\n", experience.getWidth());
 }
 
@@ -684,7 +684,7 @@ void UI::updateLevel()
 {
     std::string newLevel;
     std::stringstream ss;
-    ss << control->players[current_player].level;
+    ss << control->players[PLAYER_ID].level;
     ss >> newLevel;
     level.setText("Level: " + newLevel);
     // option[0].setText("123213" + newLevel);
