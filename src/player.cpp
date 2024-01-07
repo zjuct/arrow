@@ -318,7 +318,7 @@ void Player::update(float dt)
     if (position.y <= FLOOR_Y)
     {
         jumpSpeed = 0.0f;
-        position.y = FLOOR_Y;
+        position.y = FLOOR_Y - EPS;
         jumpTime = maxJumpTime;
         hp -= 0.5f;
         if (hp <= 0)
