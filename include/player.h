@@ -122,6 +122,7 @@ public:
     int expToLevelUp[20] = {0, 110, 120, 130, 140, 150, 160, 170, 180, 190,
                             200, 210, 220, 230, 240, 250, 260, 270, 280, 290};
     int inited = 0;
+    int point = 0;
 
 private:
     bool checkBlocked(enum intersectType type);
