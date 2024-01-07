@@ -610,9 +610,9 @@ void UI::init()
     glfwSetInputMode(control->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     aim.init();
-    option[0] = Text("Option 1: ....", -0.6f, 0.2f, 0.002, glm::vec3(0.95f));
-    option[1] = Text("Option 2: ....", -0.6f, 0.0f, 0.002, glm::vec3(0.95f));
-    option[2] = Text("Option 3: ....", -0.6f, -0.2f, 0.002, glm::vec3(0.95f));
+    option[0] = Text("Option 1: ....", -0.6f, 0.6f, 0.002, glm::vec3(0.95f));
+    option[1] = Text("Option 2: ....", -0.6f, 0.4f, 0.002, glm::vec3(0.95f));
+    option[2] = Text("Option 3: ....", -0.6f, 0.2f, 0.002, glm::vec3(0.95f));
     blood_1 = Rectangle(glm::vec3(0.4, -0.5, 0), 0.5f, 0.15f, true, glm::vec3(1.0f));
     blood = Rectangle(glm::vec3(0.41, -0.51, 0), 0.48f, 0.13f, false, glm::vec3(1.0f));
     experience_1 = Rectangle(glm::vec3(0.4, -0.66, 0), 0.5f, 0.02f, true, glm::vec3(1.0f));
@@ -662,7 +662,7 @@ void UI::init()
     BuffName[BUFF_ARROW_LASER] = "Arrow Laser(No Gravity)";
     BuffName[BUFF_ARROW_NOT_REFLECT] = "Arrow Not Reflect";
     BuffName[BUFF_ARROW_NORMAL] = "Arrow Normal(With Gravity)";
-    BuffName[BUFF_LIVE_TIME_UP] = "Arrow Live Time Up (for laser arrow)";
+    BuffName[BUFF_LIVE_TIME_UP] = "Arrow Live Time Up (for reflect arrow)";
     BuffName[BUFF_HP_RECOVER] = "HP Recover";
     BuffName[BUFF_MAXHP_UP] = "Max HP Up";
 
