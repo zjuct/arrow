@@ -35,7 +35,7 @@ void init()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 创建窗口，设置OpenGL context
-    control->window = glfwCreateWindow(control->wwidth, control->wheight, "Solar System", NULL, NULL);
+    control->window = glfwCreateWindow(control->wwidth, control->wheight, "Arrow", NULL, NULL);
     if (control->window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
